@@ -1,8 +1,13 @@
 <script setup>
 import AdminLayout from '../layouts/AdminLayout.vue'
+import { onMounted } from 'vue'
+
+onMounted(() => {
+  console.log(localStorage.getItem('token'))
+})
 </script>
 <template>
-  <AdminLayout >
+  <AdminLayout>
     <div class="row">
       <div class="col-lg-6">
         <div class="card">
@@ -36,7 +41,9 @@ import AdminLayout from '../layouts/AdminLayout.vue'
           </div>
           <div class="card-body">
             <h6 class="card-title">Special title treatment</h6>
-            <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+            <p class="card-text">
+              With supporting text below as a natural lead-in to additional content.
+            </p>
             <a href="#" class="btn btn-primary">Go somewhere</a>
           </div>
         </div>
@@ -46,12 +53,13 @@ import AdminLayout from '../layouts/AdminLayout.vue'
           </div>
           <div class="card-body">
             <h6 class="card-title">Special title treatment</h6>
-            <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+            <p class="card-text">
+              With supporting text below as a natural lead-in to additional content.
+            </p>
             <a href="#" class="btn btn-primary">Go somewhere</a>
           </div>
         </div>
       </div>
-
     </div>
   </AdminLayout>
 </template>

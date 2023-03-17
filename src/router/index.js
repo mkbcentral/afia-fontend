@@ -13,11 +13,22 @@ const router = createRouter({
       }
     },
     {
+      path: '/admin/hospital',
+      name: 'hospial',
+      component: () => import('../views/admin/hospital/HospitalView.vue'),
+      meta: {
+        requireAuth: true
+      }
+    },
+    {
       path: '/login',
       name: 'login',
       component: () => import('../views/auth/LoginView.vue'),
-
+      meta: {
+        requireAuth: false
+      }
     },
+    
   ]
 })
 
