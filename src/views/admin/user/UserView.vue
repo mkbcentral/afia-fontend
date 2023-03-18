@@ -1,14 +1,16 @@
 <script setup>
+
 import AdminLayout from '../../../layouts/AdminLayout.vue';
+
 import axios from 'axios';
 import { ref, reactive, onMounted } from 'vue'
 import { Form, Field } from 'vee-validate'
 import * as yup from 'yup'
 import { useToastr } from '../../../../src/widgets/toastr.js'
 
-import HospitalItemList from './widgets/HospitalItemList.vue';
+import ItemListUserWdgetVue from './widgets/ItemListUserWdget.vue';
 
-const listHospitals = ref([])
+const listUsers = ref([])
 
 const token = ref('')
 let errors = ref({})
@@ -28,17 +30,17 @@ const schema = yup.object({
 
 const add = async () => {
   isEditing.value = false;
-  $('#addHospitalModal').modal('show');
+  $('#adduserModal').modal('show');
   form.value.resetForm()
 }
 
-const getHospitals = async () => {
-  await axios.get('http://127.0.0.1:8000/api/v1/hospital', {
+const getUsers = async () => {
+  await axios.get('http://127.0.0.1:8000/api/v1/user', {
     headers: {
       'Authorization': `Bearer ${token.value}`
     }
   }).then((response) => {
-    listHospitals.value = response.data.data
+    listUsers.value = response.data.data
   });
 }
 
@@ -46,7 +48,7 @@ const getHospitals = async () => {
 const create = async (values) => {
   isLoanding.value = true
   await axios
-    .post('http://127.0.0.1:8000/api/v1/hospital', values, {
+    .post('http://127.0.0.1:8000/api/v1/user', values, {
       headers: {
         'Authorization': `Bearer ${token.value}`
       }
@@ -55,9 +57,9 @@ const create = async (values) => {
       if (response.data.success) {
         console.log(response.data)
         isLoanding.value = false
-        getHospitals()
+        getUsers()
         toastr.success(response.data.message, 'Validation')
-        $('#addHospitalModal').modal('hide');
+        $('#adduserModal').modal('hide');
         form.value.resetForm()
       } else {
         errorResp.value = response.data.message
@@ -77,7 +79,7 @@ const create = async (values) => {
 const update = async (values) => {
   isLoanding.value = true
   await axios
-    .put('http://127.0.0.1:8000/api/v1/hospital/' + formValues.value.id, values, {
+    .put('http://127.0.0.1:8000/api/v1/user/' + formValues.value.id, values, {
       headers: {
         'Authorization': `Bearer ${token.value}`
       }
@@ -85,9 +87,9 @@ const update = async (values) => {
     .then((response) => {
       if (response.data.success) {
         isLoanding.value = false
-        getHospitals()
+        getUsers()
         toastr.success(response.data.message, 'Validation')
-        $('#addHospitalModal').modal('hide');
+        $('#adduserModal').modal('hide');
         form.value.resetForm()
       } else {
         errorResp.value = response.data.message
@@ -105,15 +107,15 @@ const update = async (values) => {
 }
 
 
-const edit = (hospital) => {
+const edit = (user) => {
   isEditing.value = true;
-  $('#addHospitalModal').modal('show');
+  $('#adduserModal').modal('show');
   form.value.resetForm()
   formValues.value = {
-    id: hospital.id,
-    name: hospital.name,
-    email: hospital.email,
-    phone: hospital.phone
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    phone: user.phone
   }
 }
 
@@ -125,9 +127,10 @@ const handlerSubmit = (values) => {
   }
 }
 
-const changeStatus = async (hospital, status) => {
+const changeStatus = async (user, status) => {
+    console.log(user)
   console.log(status)
-  await axios.put('http://127.0.0.1:8000/api/v1/hospital/status/' + hospital.id, { status: status }, {
+  await axios.put('http://127.0.0.1:8000/api/v1/user/status/'+ user.id, { status: status }, {
     headers: {
       'Authorization': `Bearer ${token.value}`
     }
@@ -138,13 +141,13 @@ const changeStatus = async (hospital, status) => {
 
 onMounted(async () => {
   token.value = localStorage.getItem('token')
-  await getHospitals()
+  await getUsers()
 })
 
 </script>
 <template>
-  <AdminLayout>
-    <div class="card card-primary card-outline">
+    <AdminLayout>
+        <div class="card card-primary card-outline">
       <div class="card-header">
         <div class="d-flex justify-content-between">
           <div>
@@ -167,14 +170,14 @@ onMounted(async () => {
                   <th>EMAIL</th>
                   <th>PHONE</th>
                   <th>STATUS</th>
-                  <th>LOGO</th>
+                  <th>AVATAR</th>
                   <th class="text-center">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                <HospitalItemList v-for="(hospital, index) in listHospitals" :key="hospital.id" :hospital=hospital
+                <ItemListUserWdgetVue v-for="(user, index) in listUsers" :key="user.id" :user=user
                   :index=index
-                   @edit-hospital="edit" 
+                   @edit-user="edit" 
                   @change-status="changeStatus"/>
               </tbody>
             </table>
@@ -186,16 +189,16 @@ onMounted(async () => {
       </Suspense>
     </div>
     <!-- Modal -->
-    <div class="modal fade" id="addHospitalModal" tabindex="-1" aria-labelledby="addHospitalModalLabel"
+    <div class="modal fade" id="adduserModal" tabindex="-1" aria-labelledby="adduserModalLabel"
       aria-hidden="true">
       <div class="modal-dialog">
         <Form ref="form" @submit="handlerSubmit" :validation-schema="schema" v-slot="{ errors }"
           :initial-values="formValues">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 v-if="isEditing" class="modal-title" id="addHospitalModalLabel"><i class="fa fa-plus-circle"
-                  aria-hidden="true"></i> EDIT HOSPITAL</h5>
-              <h5 v-else class="modal-title" id="addHospitalModalLabel"><i class="fas fa-edit    "></i> CREATE HOPITAL
+              <h5 v-if="isEditing" class="modal-title" id="adduserModalLabel"><i class="fa fa-plus-circle"
+                  aria-hidden="true"></i> EDIT user</h5>
+              <h5 v-else class="modal-title" id="adduserModalLabel"><i class="fas fa-edit    "></i> CREATE HOPITAL
               </h5>
             </div>
             <div class="modal-body">
@@ -217,6 +220,20 @@ onMounted(async () => {
                   placeholder="Phone of clinic" />
                 <span class="invalid-feedback">{{ errors.phone }}</span>
               </div>
+              <div class="form-group">
+                <label for="">Role</label>
+                <select class="form-control" name="" id="">
+                  <option></option>
+                
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="">Role</label>
+                <select class="form-control" name="" id="">
+                  <option></option>
+                
+                </select>
+              </div>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -232,5 +249,5 @@ onMounted(async () => {
         </Form>
       </div>
     </div>
-  </AdminLayout>
+    </AdminLayout>
 </template>

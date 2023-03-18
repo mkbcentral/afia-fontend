@@ -21,6 +21,22 @@ const router = createRouter({
       }
     },
     {
+      path: '/admin/role',
+      name: 'role',
+      component: () => import('../views/admin/user/RoleView.vue'),
+      meta: {
+        requireAuth: true
+      }
+    },
+    {
+      path: '/admin/user',
+      name: 'user',
+      component: () => import('../views/admin/user/UserView.vue'),
+      meta: {
+        requireAuth: true
+      }
+    },
+    {
       path: '/login',
       name: 'login',
       component: () => import('../views/auth/LoginView.vue'),

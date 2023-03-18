@@ -29,8 +29,16 @@ import Navbar from '../layouts/partials/Navabar.vue'
                 <p>Dashboard</p>
               </RouterLink>
               <RouterLink to="/admin/hospital" class="nav-link" active-class="active">
-               <i class="fas fa-hospital    "></i>
+               <i class="fas fa-hospital"></i>
                 <p> Gestion hopital</p>
+              </RouterLink>
+              <RouterLink to="/admin/role" class="nav-link" active-class="active">
+               <i class="fa fa-list" aria-hidden="true"></i>
+                <p> Role</p>
+              </RouterLink>
+              <RouterLink to="/admin/user" class="nav-link" active-class="active">
+               <i class="fas fa-users-cog"></i>
+                <p> Users</p>
               </RouterLink>
             </li>
           </ul>
@@ -43,7 +51,7 @@ import Navbar from '../layouts/partials/Navabar.vue'
         <div class="container-fluid">
           <div class="row mb-2">
             <div class="col-sm-6">
-              <h1 class="m-0">Starter Page</h1>
+              <h1 class="m-0">Clinic management</h1>
             </div>
             <div class="col-sm-6">
               <ol class="breadcrumb float-sm-right">
