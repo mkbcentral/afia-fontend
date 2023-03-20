@@ -5,7 +5,6 @@ import { ref, reactive, onMounted } from 'vue'
 import { Form, Field } from 'vee-validate'
 import * as yup from 'yup'
 import { useToastr } from '../../../../src/widgets/toastr.js'
-
 import HospitalItemList from './widgets/HospitalItemList.vue';
 
 const listHospitals = ref([])
@@ -18,6 +17,8 @@ const isEditing = ref(true)
 const formValues = ref()
 const form = ref(null)
 const toastr = useToastr()
+const logo = ref(null)
+
 
 
 const schema = yup.object({
@@ -131,24 +132,24 @@ const showDeleteDialogue = async (hospital) => {
 }
 
 const deleteHospital = async () => {
-    isLoanding.value = true
-    await axios.delete('http://127.0.0.1:8000/api/v1/hospital/' + hospitalToEdit.value.id, {
-        headers: {
-            'Authorization': `Bearer ${token.value}`
-        }
-    }).then((response) => {
-        if (response.data.success) {
-            isLoanding.value = false
-            toastr.success(response.data.message, 'Validation')
-            $('#deleteHospitalModal').modal('hide');
-            getHospitals()
-        } else {
-            errorResp.value = response.data.message
-            toastr.error(response.data.message, 'Validation')
-            isLoanding.value = false
-            $('#deleteHospitalModal').modal('hide');
-        }
-    });
+  isLoanding.value = true
+  await axios.delete('http://127.0.0.1:8000/api/v1/hospital/' + hospitalToEdit.value.id, {
+    headers: {
+      'Authorization': `Bearer ${token.value}`
+    }
+  }).then((response) => {
+    if (response.data.success) {
+      isLoanding.value = false
+      toastr.success(response.data.message, 'Validation')
+      $('#deleteHospitalModal').modal('hide');
+      getHospitals()
+    } else {
+      errorResp.value = response.data.message
+      toastr.error(response.data.message, 'Validation')
+      isLoanding.value = false
+      $('#deleteHospitalModal').modal('hide');
+    }
+  });
 }
 
 const changeStatus = async (hospital, status) => {
@@ -162,6 +163,40 @@ const changeStatus = async (hospital, status) => {
   });
 }
 
+const changeLogo = async (hospital) => {
+  hospitalToEdit.value = hospital
+  $('#changeHospitalModal').modal('show');
+}
+const onchange = async (e) => {
+  logo.value = e.target.files[0];
+}
+
+const updateLogo = async (e) => {
+  console.log(logo.value)
+  const data = new FormData();
+  data.append('logo', logo.value);
+  
+  isLoanding.value = true
+  await axios.put('http://127.0.0.1:8000/api/v1/hospital/logo/' + hospitalToEdit.value.id
+    ,data, {
+    headers: {
+      'Authorization': `Bearer ${token.value}`,
+    }
+  }).then((response) => {
+    console.log(response.data)
+    if (response.data.success) {
+      isLoanding.value = false
+      toastr.success(response.data.message, 'Validation')
+      $('#deleteHospitalModal').modal('hide');
+      getHospitals()
+    } else {
+      errorResp.value = response.data.message
+      toastr.error(response.data.message, 'Validation')
+      isLoanding.value = false
+      $('#deleteHospitalModal').modal('hide');
+    }
+  });
+}
 onMounted(async () => {
   token.value = localStorage.getItem('token')
   await getHospitals()
@@ -198,8 +233,8 @@ onMounted(async () => {
               </thead>
               <tbody>
                 <HospitalItemList v-for="(hospital, index) in listHospitals" :key="hospital.id" :hospital=hospital
-                  :index=index @edit-hospital="edit" @change-status="changeStatus"
-                  @delete-hospital="showDeleteDialogue" />
+                  :index=index @edit-hospital="edit" @change-status="changeStatus" @delete-hospital="showDeleteDialogue"
+                  @change-logo="changeLogo" />
               </tbody>
             </table>
           </div>
@@ -282,5 +317,35 @@ onMounted(async () => {
         </div>
       </div>
     </div>
+    <!--Delete Modal -->
+    <div class="modal fade" id="changeHospitalModal" tabindex="-1" aria-labelledby="addRoleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title text-info" id="addRoleModalLabel">
+              CHANGE LOGO
+            </h5>
+          </div>
+          <form @submit.prevent="updateLogo" enctype="multipart/form-data">
+            <div class="modal-body">
+              <div class="mb-3">
+                <label for="formFile" class="form-label">Choisir le logo</label>
+                <input ref="logo" @change="onchange" class="form-control" type="file">
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Non</button>
+              <button type="submit" class="btn btn-danger btn-sm">
+                <div class="d-flex justify-content-center">
+                  <div v-if="isLoanding" class="spinner-border text-light spinner-sm" role="status"></div>
+                  <div class="pl-2">Oui</div>
+                </div>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
   </AdminLayout>
 </template>

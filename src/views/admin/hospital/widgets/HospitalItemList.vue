@@ -4,7 +4,7 @@ import { useToastr } from '../../../../widgets/toastr.js'
 
 const toastr = useToastr()
 
-const emit =defineEmits(['editHospital','changeStatus','deleteHospital'])
+const emit =defineEmits(['editHospital','changeStatus','deleteHospital','changeLogo'])
 
 defineProps({
     hospital: {},
@@ -32,6 +32,10 @@ const deleteHospital = (hospital) => {
   emit ('deleteHospital',hospital)
 }
 
+const changeLogo = (hospital) => {
+  emit ('changeLogo',hospital)
+}
+
 const editStatus = async (hospital, status) => {
     emit ('changeStatus',hospital,status)
 }
@@ -51,7 +55,7 @@ const editStatus = async (hospital, status) => {
             </div>
         </td>
         <td>
-            <img width="40" height="40" src="@/assets/logo.jpg" class="img-circle elevation-2" alt="User Image" />
+          <img @click="changeLogo(hospital)" width="40" height="40" src="@/assets/logo.jpg" class="img-circle elevation-2" alt="User Image" />
         </td>
         <td class="text-center">
             <button @click="edit(hospital)" class="btn btn-link"><i class="fas fa-edit    "></i></button>
