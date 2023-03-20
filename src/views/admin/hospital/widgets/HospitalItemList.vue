@@ -4,7 +4,7 @@ import { useToastr } from '../../../../widgets/toastr.js'
 
 const toastr = useToastr()
 
-const emit =defineEmits(['editHospital','changeStatus'])
+const emit =defineEmits(['editHospital','changeStatus','deleteHospital'])
 
 defineProps({
     hospital: {},
@@ -28,6 +28,10 @@ const edit = (hospital) => {
   emit ('editHospital',hospital)
 }
 
+const deleteHospital = (hospital) => {
+  emit ('deleteHospital',hospital)
+}
+
 const editStatus = async (hospital, status) => {
     emit ('changeStatus',hospital,status)
 }
@@ -38,7 +42,7 @@ const editStatus = async (hospital, status) => {
         <td v-text="hospital.name"></td>
         <td v-text="hospital.email"></td>
         <td v-text="hospital.phone"></td>
-        <td>
+        <td class="text-center">
             <div class="form-group">
                 <select class="form-control" @change="editStatus(hospital, $event.target.value)">
                     <option v-for="item in status" :value="item.name" :selected="item.name == hospital.status">{{ item.name }}
@@ -51,6 +55,7 @@ const editStatus = async (hospital, status) => {
         </td>
         <td class="text-center">
             <button @click="edit(hospital)" class="btn btn-link"><i class="fas fa-edit    "></i></button>
+            <button @click="deleteHospital(hospital)" class="btn btn-link"><i class="fa fa-trash text-danger"></i></button>
         </td>
     </tr>
 </template>

@@ -21,6 +21,8 @@ const login = async () => {
     .then((response) => {
       if (response.data.success) {
         localStorage.setItem('token', response.data.data.token)
+        localStorage.setItem('role', JSON.stringify(response.data.data.role))
+        localStorage.setItem('hospital', JSON.stringify(response.data.data.hospital))
         router.push('/')
         isLoanding.value = false
       } else {

@@ -9,6 +9,7 @@ import ItemListRoleWidget from './widgets/ItemListRoleWidget.vue';
 
 
 const listRoles = ref([])
+const roleToEdit = ref({})
 const token = ref('')
 let errors = ref({})
 let errorResp = ref('')
@@ -120,14 +121,40 @@ const handlerSubmit = (values) => {
 }
 
 const changeStatus = async (role, status) => {
-  console.log(status)
-  await axios.put('http://127.0.0.1:8000/api/v1/role/status/' + role.id, { status: status }, {
-    headers: {
-      'Authorization': `Bearer ${token.value}`
-    }
-  }).then((response) => {
-    toastr.success(response.data.message, 'Validation')
-  });
+    console.log(status)
+    await axios.put('http://127.0.0.1:8000/api/v1/role/status/' + role.id, { status: status }, {
+        headers: {
+            'Authorization': `Bearer ${token.value}`
+        }
+    }).then((response) => {
+        toastr.success(response.data.message, 'Validation')
+    });
+}
+
+const showDeleteDialogue = async (role) => {
+    $('#deleteRoleModal').modal('show');
+    roleToEdit.value = role;
+}
+
+const deleteRole = async () => {
+    isLoanding.value = true
+    await axios.delete('http://127.0.0.1:8000/api/v1/role/' + roleToEdit.value.id, {
+        headers: {
+            'Authorization': `Bearer ${token.value}`
+        }
+    }).then((response) => {
+        if (response.data.success) {
+            isLoanding.value = false
+            toastr.success(response.data.message, 'Validation')
+            $('#deleteRoleModal').modal('hide');
+            getRoles()
+        } else {
+            errorResp.value = response.data.message
+            toastr.error(response.data.message, 'Validation')
+            isLoanding.value = false
+            $('#deleteRoleModal').modal('hide');
+        }
+    });
 }
 
 onMounted(async () => {
@@ -163,7 +190,8 @@ onMounted(async () => {
                             </thead>
                             <tbody>
                                 <ItemListRoleWidget v-for="(role, index) in listRoles" :key="role.id" :role=role
-                                    :index=index @edit-role="edit" @change-status="changeStatus" />
+                                    :index=index @edit-role="edit" @change-status="changeStatus"
+                                    @delete-role="showDeleteDialogue" />
                             </tbody>
                         </table>
                     </div>
@@ -173,7 +201,7 @@ onMounted(async () => {
                 </template>
             </Suspense>
         </div>
-        <!-- Modal -->
+        <!--Add Modal -->
         <div class="modal fade" id="addRoleModal" tabindex="-1" aria-labelledby="addRoleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <Form ref="form" @submit="handlerSubmit" :validation-schema="schema" v-slot="{ errors }"
@@ -207,6 +235,33 @@ onMounted(async () => {
                         </div>
                     </div>
                 </Form>
+            </div>
+        </div>
+
+        <!--Delete Modal -->
+        <div class="modal fade" id="deleteRoleModal" tabindex="-1" aria-labelledby="addRoleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 v-if="isEditing" class="modal-title text-info" id="addRoleModalLabel">
+                            Voulez-vous vraiment supprimer ?
+                        </h5>
+                    </div>
+                    <div class="modal-body">
+                        <h1 class="text-center text-danger">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        </h1>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Non</button>
+                        <button type="button" @click="deleteRole" class="btn btn-danger btn-sm">
+                            <div class="d-flex justify-content-center">
+                                <div v-if="isLoanding" class="spinner-border text-light spinner-sm" role="status"></div>
+                                <div class="pl-2">Oui</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </AdminLayout>

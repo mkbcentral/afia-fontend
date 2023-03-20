@@ -4,7 +4,7 @@ import { useToastr } from '../../../../widgets/toastr.js'
 
 const toastr = useToastr()
 
-const emit = defineEmits(['editUser', 'changeStatus'])
+const emit = defineEmits(['editUser', 'changeStatus','deleteUser'])
 
 defineProps({
     user: {},
@@ -25,7 +25,11 @@ const status = ref([
 
 
 const edit = (user) => {
-    emit('edituser', user)
+    emit('editUser', user)
+}
+
+const deleteUser = (user) => {
+    emit('deleteUser', user)
 }
 
 const editStatus = async (user, status) => {
@@ -38,6 +42,7 @@ const editStatus = async (user, status) => {
         <td v-text="user.name"></td>
         <td v-text="user.email"></td>
         <td v-text="user.phone"></td>
+        <td v-text="user.role.name"></td>
         <td>
             <div class="form-group">
                 <select class="form-control" @change="editStatus(user, $event.target.value)">
@@ -47,11 +52,9 @@ const editStatus = async (user, status) => {
                 </select>
             </div>
         </td>
-        <td>
-            <img width="40" height="40" src="@/assets/logo.jpg" class="img-circle elevation-2" alt="User Image" />
-        </td>
         <td class="text-center">
             <button @click="edit(user)" class="btn btn-link"><i class="fas fa-edit    "></i></button>
+            <button @click="deleteUser(user)" class="btn btn-link"><i class="fa fa-trash text-danger"></i></button>
         </td>
     </tr>
 </template>

@@ -9,7 +9,7 @@ import { useToastr } from '../../../../src/widgets/toastr.js'
 import HospitalItemList from './widgets/HospitalItemList.vue';
 
 const listHospitals = ref([])
-
+const hospitalToEdit = ref({})
 const token = ref('')
 let errors = ref({})
 let errorResp = ref('')
@@ -125,6 +125,32 @@ const handlerSubmit = (values) => {
   }
 }
 
+const showDeleteDialogue = async (hospital) => {
+  hospitalToEdit.value = hospital
+  $('#deleteHospitalModal').modal('show');
+}
+
+const deleteHospital = async () => {
+    isLoanding.value = true
+    await axios.delete('http://127.0.0.1:8000/api/v1/hospital/' + hospitalToEdit.value.id, {
+        headers: {
+            'Authorization': `Bearer ${token.value}`
+        }
+    }).then((response) => {
+        if (response.data.success) {
+            isLoanding.value = false
+            toastr.success(response.data.message, 'Validation')
+            $('#deleteHospitalModal').modal('hide');
+            getHospitals()
+        } else {
+            errorResp.value = response.data.message
+            toastr.error(response.data.message, 'Validation')
+            isLoanding.value = false
+            $('#deleteHospitalModal').modal('hide');
+        }
+    });
+}
+
 const changeStatus = async (hospital, status) => {
   console.log(status)
   await axios.put('http://127.0.0.1:8000/api/v1/hospital/status/' + hospital.id, { status: status }, {
@@ -153,13 +179,12 @@ onMounted(async () => {
           <div>
             <button @click="add" type="button" class="btn btn-primary btn-sm">New</button>
           </div>
-          
         </div>
       </div>
       <Suspense>
         <template #default>
           <div class="card-body">
-            <table class="table">
+            <table class="table table-bordered table-sm">
               <thead>
                 <tr>
                   <th>#</th>
@@ -173,9 +198,8 @@ onMounted(async () => {
               </thead>
               <tbody>
                 <HospitalItemList v-for="(hospital, index) in listHospitals" :key="hospital.id" :hospital=hospital
-                  :index=index
-                   @edit-hospital="edit" 
-                  @change-status="changeStatus"/>
+                  :index=index @edit-hospital="edit" @change-status="changeStatus"
+                  @delete-hospital="showDeleteDialogue" />
               </tbody>
             </table>
           </div>
@@ -230,6 +254,32 @@ onMounted(async () => {
             </div>
           </div>
         </Form>
+      </div>
+    </div>
+    <!--Delete Modal -->
+    <div class="modal fade" id="deleteHospitalModal" tabindex="-1" aria-labelledby="addRoleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 v-if="isEditing" class="modal-title text-info" id="addRoleModalLabel">
+              Voulez-vous vraiment supprimer ?
+            </h5>
+          </div>
+          <div class="modal-body">
+            <h1 class="text-center text-danger">
+              <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+            </h1>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Non</button>
+            <button type="button" @click="deleteHospital" class="btn btn-danger btn-sm">
+              <div class="d-flex justify-content-center">
+                <div v-if="isLoanding" class="spinner-border text-light spinner-sm" role="status"></div>
+                <div class="pl-2">Oui</div>
+              </div>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </AdminLayout>
