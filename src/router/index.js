@@ -37,14 +37,57 @@ const router = createRouter({
       }
     },
     {
+      path: '/admin/branch',
+      name: 'branch',
+      component: () => import('../views/admin/hospital/BranchView.vue'),
+      meta: {
+        requireAuth: true
+      }
+    },
+    //COMMUNE ROUTE
+    {
+      path: '/admin/commune',
+      name: 'commune',
+      component: () => import('../views/admin/others/CommuneView.vue'),
+      meta: {
+        requireAuth: true
+      }
+    },
+    //TYPE PATIENT ROUTE
+    {
+      path: '/admin/type',
+      name: 'type',
+      component: () => import('../views/admin/others/TypePatientView.vue'),
+      meta: {
+        requireAuth: true
+      }
+    },
+    //SUBSCRIPTION ROUTE
+    {
+      path: '/admin/subscription',
+      name: 'subscription',
+      component: () => import('../views/admin/others/SubscriptionView.vue'),
+      meta: {
+        requireAuth: true
+      }
+    },
+    {
+      path: '/about',
+      name: 'about',
+      component: () => import('../views/AboutView.vue'),
+      meta: {
+        requireAuth: true
+      }
+    },
+    {
       path: '/login',
       name: 'login',
       component: () => import('../views/auth/LoginView.vue'),
       meta: {
         requireAuth: false
       }
-    },
-    
+    }
+
   ]
 })
 

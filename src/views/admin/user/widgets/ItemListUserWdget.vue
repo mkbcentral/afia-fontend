@@ -4,7 +4,7 @@ import { useToastr } from '../../../../widgets/toastr.js'
 
 const toastr = useToastr()
 
-const emit = defineEmits(['editUser', 'changeStatus','deleteUser'])
+const emit = defineEmits(['editUser', 'changeStatus', 'deleteUser'])
 
 defineProps({
     user: {},
@@ -14,7 +14,7 @@ defineProps({
 const status = ref([
     {
         value: 1,
-        name: 'ACTIVE'
+        name: 'ENABLE'
     },
     {
         value: 2,
@@ -43,18 +43,17 @@ const editStatus = async (user, status) => {
         <td v-text="user.email"></td>
         <td v-text="user.phone"></td>
         <td v-text="user.role.name"></td>
+        <td v-text="user.hospital.name"></td>
         <td>
-            <div class="form-group">
-                <select class="form-control" @change="editStatus(user, $event.target.value)">
-                    <option v-for="item in status" :value="item.name" :selected="item.name == user.status">{{ item.name
-                    }}
-                    </option>
-                </select>
-            </div>
+            <select class="form-control" @change="editStatus(user, $event.target.value)">
+                <option v-for="item in status" :value="item.name" :selected="item.name == user.status">{{ item.name
+                }}
+                </option>
+            </select>
         </td>
         <td class="text-center">
-            <button @click="edit(user)" class="btn btn-link"><i class="fas fa-edit    "></i></button>
-            <button @click="deleteUser(user)" class="btn btn-link"><i class="fa fa-trash text-danger"></i></button>
+            <button @click="edit(user)" class="btn btn-link btn-sm"><i class="fas fa-edit    "></i></button>
+            <button @click="deleteUser(user)" class="btn btn-link btn-sm"><i class="fa fa-trash text-danger"></i></button>
         </td>
     </tr>
 </template>

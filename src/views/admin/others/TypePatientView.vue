@@ -1,18 +1,16 @@
 <script setup>
 import AdminLayout from '../../../layouts/AdminLayout.vue';
-import axios from 'axios';
-import { ref, reactive, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Form, Field } from 'vee-validate'
 import * as yup from 'yup'
 import { useToastr } from '../../../../src/widgets/toastr.js'
-import ItemListRoleWidget from './widgets/ItemListRoleWidget.vue';
-import RoleApi from '../../../services/Admin/RoleApi';
+import TypeApi from '../../../services/Admin/TypeApi';
 import NetworkError from '../../../components/errors/Network.vue';
+import ItemListTypePatientWidgetVue from './widgets/ItemListTypePatientWidget.vue';
 import Swal from 'sweetalert2'
 
-
-const listRoles = ref([])
-const roleToEdit = ref({})
+const listTypes = ref([])
+const typeToEdit = ref({})
 
 const token = ref('')
 let errors = ref({})
@@ -34,7 +32,7 @@ const schema = yup.object({
 
 const add = async () => {
     isEditing.value = false;
-    $('#addRoleModal').modal('show');
+    $('#addTypeModal').modal('show');
     form.value.resetForm()
 }
 
@@ -42,8 +40,8 @@ const getData = async () => {
     isDataLoanding.value = true;
     isNetWorkError.value = false
     try {
-        const response = await RoleApi.getRoles();
-        listRoles.value = response.data.data;
+        const response = await TypeApi.getTypes();
+        listTypes.value = response.data.data;
         isDataLoanding.value = false
     } catch (error) {
         console.log(error)
@@ -55,13 +53,13 @@ const getData = async () => {
     }
 }
 
-const edit = (role) => {
+const edit = (type) => {
     isEditing.value = true;
-    $('#addRoleModal').modal('show');
+    $('#addTypeModal').modal('show');
     form.value.resetForm()
     formValues.value = {
-        id: role.id,
-        name: role.name,
+        id: type.id,
+        name: type.name,
     }
 }
 
@@ -69,16 +67,22 @@ const edit = (role) => {
 const create = async (values) => {
     isLoanding.value = true
     try {
-        const response = await RoleApi.createRole(values);
+        const response = await TypeApi.createType(values);
+
         if (response.data.success) {
             isLoanding.value = false
-            listRoles.value.unshift(response.data.role)
+            listTypes.value.unshift(response.data.type)
             toastr.success(response.data.message, 'Validation')
-            $('#addRoleModal').modal('hide');
+            $('#addTypeModal').modal('hide');
             form.value.resetForm()
         } else {
-            errorResp.value = response.data.message
+            if (response.data.errors) {
+                errorResp.value = response.data.errors
+            } else {
+                errorResp.value = response.data.message
+            }
             isLoanding.value = false
+            toastr.error(errorResp.value, 'Validation')
         }
     } catch (error) {
         console.log(error);
@@ -89,12 +93,12 @@ const create = async (values) => {
 const update = async (values) => {
     isLoanding.value = true
     try {
-        const response = await RoleApi.updateRole(formValues.value.id, values)
+        const response = await TypeApi.updateType(formValues.value.id, values)
         if (response.data.success) {
             isLoanding.value = false
-            getRoles()
+            getTypes()
             toastr.success(response.data.message, 'Validation')
-            $('#addRoleModal').modal('hide');
+            $('#addTypeModal').modal('hide');
             form.value.resetForm()
         } else {
             errorResp.value = response.data.message
@@ -116,52 +120,51 @@ const handlerSubmit = (values) => {
     }
 }
 
-const changeStatus = async (role, status) => {
-    try {
-        const response = await RoleApi.changeStatus(role.id, { status: status });
-        toastr.success(response.data.message, 'Validation')
-    } catch (error) {
-        console / log(error)
-    }
-}
-
-const deleteRole = async (id) => {
+const deleteType = async (id) => {
     Swal.fire({
         title: 'Are you sure?',
-        text: "You won't delete this role!",
+        text: "You won't delete this type patient!",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
         confirmButtonText: 'Yes'
     }).then(async (result) => {
-        if (result.isConfirmed) {
-            const response = await RoleApi.deleteRole(id)
-            if (response.data.success) {
-                Swal.fire(
-                    'Deleted!',
-                    response.data.message,
-                    'success'
-                )
-                getRoles()
-            } else {
-                Swal.fire(
-                    'Warning',
-                    response.data.message,
-                    'error'
-                )
-            }
+        try {
+            if (result.isConfirmed) {
+                const response = await TypeApi.deleteType(id)
+                if (response.data.success) {
+                    Swal.fire(
+                        'Deleted!',
+                        response.data.message,
+                        'success'
+                    )
+                    getTypes()
+                } else {
+                    Swal.fire(
+                        'Warning',
+                        response.data.message,
+                        'error'
+                    )
+                }
 
+            }
+        } catch (error) {
+            Swal.fire(
+                'Warning',
+                error.message,
+                'error'
+            )
         }
     })
 }
 
-const getRoles = async () => {
+const getTypes = async () => {
     isDataLoanding.value = true;
     isNetWorkError.value = false;
     try {
-        const response = await RoleApi.getRoles();
-        listRoles.value = response.data.data;
+        const response = await TypeApi.getTypes();
+        listTypes.value = response.data.data;
         isDataLoanding.value = false
     } catch (error) {
         console.log(error)
@@ -175,7 +178,7 @@ const getRoles = async () => {
 
 onMounted(async () => {
     token.value = localStorage.getItem('token')
-    getRoles()
+    getTypes()
 })
 </script>
 <template>
@@ -187,7 +190,7 @@ onMounted(async () => {
             <div class="card-header">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h5 class="m-0"><i class="fa fa-list" aria-hidden="true"></i> List of roles</h5>
+                        <h5 class="m-0"><i class="fa fa-list" aria-hidden="true"></i> List of communes</h5>
                     </div>
                     <div>
                         <button @click="add" type="button" class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"
@@ -207,37 +210,36 @@ onMounted(async () => {
                         <tr>
                             <th>#</th>
                             <th>NAME</th>
-                            <th>STATUS</th>
                             <th class="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <ItemListRoleWidget v-for="(role, index) in listRoles" :key="role.id" :role=role :index=index
-                            @edit-role="edit" @change-status="changeStatus" @delete-role="deleteRole(role.id)" />
+                        <ItemListTypePatientWidgetVue v-for="(type, index) in listTypes" :key="type.id" :type=type
+                            :index=index @edit-type="edit" @delete-type="deleteType(type.id)" />
                     </tbody>
                 </table>
             </div>
         </div>
         <!--Add Modal -->
-        <div class="modal fade" id="addRoleModal" tabindex="-1" aria-labelledby="addRoleModalLabel" aria-hidden="true">
+        <div class="modal fade" id="addTypeModal" tabindex="-1" aria-labelledby="addTypeModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <Form ref="form" @submit="handlerSubmit" :validation-schema="schema" v-slot="{ errors }"
                     :initial-values="formValues">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 v-if="isEditing" class="modal-title" id="addRoleModalLabel">
-                                <i class="fa fa-plus-circle" aria-hidden="true"></i> EDIT ROLE
+                            <h5 v-if="isEditing" class="modal-title" id="addTypeModalLabel">
+                                <i class="fa fa-plus-circle" aria-hidden="true"></i> EDIT TYPE PATIENT
                             </h5>
-                            <h5 v-else class="modal-title" id="addRoleModalLabel">
+                            <h5 v-else class="modal-title" id="addTypeModalLabel">
                                 <i class="fas fa-edit    "></i>
-                                CREATE ROLE
+                                CREATE TYPE PATIENT
                             </h5>
                         </div>
                         <div class="modal-body">
                             <div class="form-group">
-                                <label>Clinic Name</label>
+                                <label>Commune Name</label>
                                 <Field name="name" type="text" class="form-control" :class="{ 'is-invalid': errors.name }"
-                                    placeholder="Name of clinic" />
+                                    placeholder="Name of commune" />
                                 <span class="invalid-feedback">{{ errors.name }}</span>
                             </div>
                         </div>

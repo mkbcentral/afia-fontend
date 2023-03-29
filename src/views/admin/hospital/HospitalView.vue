@@ -6,14 +6,21 @@ import { Form, Field } from 'vee-validate'
 import * as yup from 'yup'
 import { useToastr } from '../../../../src/widgets/toastr.js'
 import HospitalItemList from './widgets/HospitalItemList.vue';
+import HospitalApi from '../../../services/Admin/HospitalApi';
+import NetworkError from '../../../components/errors/Network.vue'
+import Swal from 'sweetalert2';
 
 const listHospitals = ref([])
 const hospitalToEdit = ref({})
 const token = ref('')
 let errors = ref({})
 let errorResp = ref('')
+
 const isLoanding = ref(false)
+const isDataLoanding = ref(false)
 const isEditing = ref(true)
+const isNetWorkError = ref(false)
+
 const formValues = ref()
 const form = ref(null)
 const toastr = useToastr()
@@ -33,76 +40,63 @@ const add = async () => {
   form.value.resetForm()
 }
 
-const getHospitals = async () => {
-  await axios.get('http://127.0.0.1:8000/api/v1/hospital', {
-    headers: {
-      'Authorization': `Bearer ${token.value}`
-    }
-  }).then((response) => {
+const getData = async () => {
+  isDataLoanding.value = true
+  isNetWorkError.value = false
+  try {
+    const response = await HospitalApi.getHospials()
     listHospitals.value = response.data.data
-  });
+    isDataLoanding.value = false
+  } catch (error) {
+    console.log(error);
+    if (error.code) {
+      isNetWorkError.value = true
+    }
+    isDataLoanding.value = false
+  }
 }
-
 
 const create = async (values) => {
   isLoanding.value = true
-  await axios
-    .post('http://127.0.0.1:8000/api/v1/hospital', values, {
-      headers: {
-        'Authorization': `Bearer ${token.value}`
-      }
-    })
-    .then((response) => {
-      if (response.data.success) {
-        console.log(response.data)
-        isLoanding.value = false
-        getHospitals()
-        toastr.success(response.data.message, 'Validation')
-        $('#addHospitalModal').modal('hide');
-        form.value.resetForm()
-      } else {
-        errorResp.value = response.data.message
-        isLoanding.value = false
-      }
-    })
-    .catch((error) => {
-      if (error.response.status == 422) {
-        errors.value = error.response.data.errors
-        isLoanding.value = false
-      }
-
-    }).finally(() => {
+  try {
+    const response = await HospitalApi.creteHospital(values);
+    console.log(response);
+    if (response.data.success) {
+      console.log(response.data)
+      isLoanding.value = false
+      listHospitals.value.unshift(response.data.hospital)
+      toastr.success(response.data.message, 'Validation')
+      $('#addHospitalModal').modal('hide');
       form.value.resetForm()
-    })
+    } else {
+      errorResp.value = response.data.message
+      isLoanding.value = false
+    }
+  } catch (error) {
+    console.log(error)
+  } finally {
+    form.value.resetForm()
+  }
 }
 const update = async (values) => {
   isLoanding.value = true
-  await axios
-    .put('http://127.0.0.1:8000/api/v1/hospital/' + formValues.value.id, values, {
-      headers: {
-        'Authorization': `Bearer ${token.value}`
-      }
-    })
-    .then((response) => {
-      if (response.data.success) {
-        isLoanding.value = false
-        getHospitals()
-        toastr.success(response.data.message, 'Validation')
-        $('#addHospitalModal').modal('hide');
-        form.value.resetForm()
-      } else {
-        errorResp.value = response.data.message
-        isLoanding.value = false
-      }
-    })
-    .catch((error) => {
-      if (error.response.status == 422) {
-        errors.value = error.response.data.errors
-        isLoanding.value = false
-      }
-    }).finally(() => {
+  try {
+    const response = await HospitalApi.updateHopital(formValues.value.id, values);
+    if (response.data.success) {
+      isLoanding.value = false
+      getHospitals()
+      toastr.success(response.data.message, 'Validation')
+      $('#addHospitalModal').modal('hide');
       form.value.resetForm()
-    })
+    } else {
+      errorResp.value = response.data.message
+      isLoanding.value = false
+    }
+  } catch (error) {
+    console.log(error)
+  } finally {
+    form.value.resetForm()
+  }
 }
 
 
@@ -131,38 +125,45 @@ const showDeleteDialogue = async (hospital) => {
   $('#deleteHospitalModal').modal('show');
 }
 
-const deleteHospital = async () => {
-  isLoanding.value = true
-  await axios.delete('http://127.0.0.1:8000/api/v1/hospital/' + hospitalToEdit.value.id, {
-    headers: {
-      'Authorization': `Bearer ${token.value}`
-    }
-  }).then((response) => {
-    if (response.data.success) {
-      isLoanding.value = false
-      toastr.success(response.data.message, 'Validation')
-      $('#deleteHospitalModal').modal('hide');
-      getHospitals()
-    } else {
-      errorResp.value = response.data.message
-      toastr.error(response.data.message, 'Validation')
-      isLoanding.value = false
-      $('#deleteHospitalModal').modal('hide');
+const deleteHospital = async (id) => {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: "You won't delete this role!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Yes'
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      const response = await HospitalApi.deleHospital(id);
+      if (response.data.success) {
+        Swal.fire(
+          'Deleted!',
+          response.data.message,
+          'success'
+        )
+        getHospitals()
+      } else {
+        Swal.fire(
+          'Warning',
+          response.data.message,
+          'error'
+        )
+      }
     }
   });
 }
 
 const changeStatus = async (hospital, status) => {
-  console.log(status)
-  await axios.put('http://127.0.0.1:8000/api/v1/hospital/status/' + hospital.id, { status: status }, {
-    headers: {
-      'Authorization': `Bearer ${token.value}`
-    }
-  }).then((response) => {
+  console.log({ status: status });
+  try {
+    const response = await HospitalApi.changeStutus(hospital.id, { status: status });
     toastr.success(response.data.message, 'Validation')
-  });
+  } catch (error) {
+    console.log(error)
+  }
 }
-
 const changeLogo = async (hospital) => {
   hospitalToEdit.value = hospital
   $('#changeHospitalModal').modal('show');
@@ -175,10 +176,10 @@ const updateLogo = async (e) => {
   console.log(logo.value)
   const data = new FormData();
   data.append('logo', logo.value);
-  
+
   isLoanding.value = true
   await axios.put('http://127.0.0.1:8000/api/v1/hospital/logo/' + hospitalToEdit.value.id
-    ,data, {
+    , data, {
     headers: {
       'Authorization': `Bearer ${token.value}`,
     }
@@ -197,6 +198,23 @@ const updateLogo = async (e) => {
     }
   });
 }
+
+const getHospitals = async () => {
+  isDataLoanding.value = true
+  isNetWorkError.value = false
+  try {
+    const response = await HospitalApi.getHospials()
+    listHospitals.value = response.data.data
+    isDataLoanding.value = false
+  } catch (error) {
+    console.log(error);
+    if (error.code) {
+      isNetWorkError.value = true
+      errorResp.value = error.message
+    }
+    isDataLoanding.value = false
+  }
+}
 onMounted(async () => {
   token.value = localStorage.getItem('token')
   await getHospitals()
@@ -205,44 +223,45 @@ onMounted(async () => {
 </script>
 <template>
   <AdminLayout>
-    <div class="card card-primary card-outline">
+    <div v-if="isNetWorkError">
+      <NetworkError :message=errorResp @load-data="getData" />
+    </div>
+    <div v-else class="card card-primary card-outline">
       <div class="card-header">
         <div class="d-flex justify-content-between">
           <div>
-            <h5 class="m-0">List of clinics</h5>
+            <h5 class="m-0"><i class="fa fa-list" aria-hidden="true"></i> List of clinics</h5>
           </div>
           <div>
             <button @click="add" type="button" class="btn btn-primary btn-sm">New</button>
           </div>
         </div>
       </div>
-      <Suspense>
-        <template #default>
-          <div class="card-body">
-            <table class="table table-bordered table-sm">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>NAME</th>
-                  <th>EMAIL</th>
-                  <th>PHONE</th>
-                  <th>STATUS</th>
-                  <th>LOGO</th>
-                  <th class="text-center">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <HospitalItemList v-for="(hospital, index) in listHospitals" :key="hospital.id" :hospital=hospital
-                  :index=index @edit-hospital="edit" @change-status="changeStatus" @delete-hospital="showDeleteDialogue"
-                  @change-logo="changeLogo" />
-              </tbody>
-            </table>
+      <div class="card-body">
+        <div v-if="isDataLoanding" class="d-flex justify-content-center">
+          <div class="spinner-border" role="status">
+            <span hidden class="visually-hidden">Loading...</span>
           </div>
-        </template>
-        <template #fellback>
-          <h1 class="text-center">Loadin...</h1>
-        </template>
-      </Suspense>
+        </div>
+        <table v-else class="table table-bordered table-sm">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>NAME</th>
+              <th>EMAIL</th>
+              <th>PHONE</th>
+              <th>STATUS</th>
+              <th>LOGO</th>
+              <th class="text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <HospitalItemList v-for="(hospital, index) in listHospitals" :key="hospital.id" :hospital=hospital
+              :index=index @edit-hospital="edit" @change-status="changeStatus"
+              @delete-hospital="deleteHospital(hospital.id)" @change-logo="changeLogo" />
+          </tbody>
+        </table>
+      </div>
     </div>
     <!-- Modal -->
     <div class="modal fade" id="addHospitalModal" tabindex="-1" aria-labelledby="addHospitalModalLabel"

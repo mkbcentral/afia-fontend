@@ -5,14 +5,18 @@ import { ref, reactive, onMounted } from 'vue'
 import { Form, Field } from 'vee-validate'
 import * as yup from 'yup'
 import { useToastr } from '../../../../src/widgets/toastr.js'
-import ItemListRoleWidget from './widgets/ItemListRoleWidget.vue';
-import RoleApi from '../../../services/Admin/RoleApi';
-import NetworkError from '../../../components/errors/Network.vue';
+import BranchItemWidget from './widgets/BranchItemWidget.vue';
+import BranchApi from '../../../services/Admin/BranchApi';
+import NetworkError from '../../../components/errors/Network.vue'
 import Swal from 'sweetalert2'
 
+const listBranches = ref([])
+const branchToEdit = ref({})
 
-const listRoles = ref([])
-const roleToEdit = ref({})
+const defaulthHospital = ref()
+const hospitalId = reactive({
+    branch_id: 0
+})
 
 const token = ref('')
 let errors = ref({})
@@ -27,23 +31,22 @@ const formValues = ref()
 const form = ref(null)
 const toastr = useToastr()
 
-
 const schema = yup.object({
     name: yup.string().required(),
 })
 
 const add = async () => {
     isEditing.value = false;
-    $('#addRoleModal').modal('show');
+    $('#addBranchModal').modal('show');
     form.value.resetForm()
 }
 
 const getData = async () => {
-    isDataLoanding.value = true;
+    isDataLoanding.value = true
     isNetWorkError.value = false
     try {
-        const response = await RoleApi.getRoles();
-        listRoles.value = response.data.data;
+        const response = await BranchApi.getBranches();
+        listBranches.value = response.data.data
         isDataLoanding.value = false
     } catch (error) {
         console.log(error)
@@ -55,46 +58,27 @@ const getData = async () => {
     }
 }
 
-const edit = (role) => {
+const edit = (branch) => {
     isEditing.value = true;
-    $('#addRoleModal').modal('show');
+    $('#addBranchModal').modal('show');
     form.value.resetForm()
     formValues.value = {
-        id: role.id,
-        name: role.name,
+        id: branch.id,
+        name: branch.name,
     }
 }
-
 
 const create = async (values) => {
     isLoanding.value = true
+    values.hospital_id = hospitalId.id
     try {
-        const response = await RoleApi.createRole(values);
+        const response = await BranchApi.createBranch(values);
         if (response.data.success) {
+            console.log(response.data)
             isLoanding.value = false
-            listRoles.value.unshift(response.data.role)
+            getBranches()
             toastr.success(response.data.message, 'Validation')
-            $('#addRoleModal').modal('hide');
-            form.value.resetForm()
-        } else {
-            errorResp.value = response.data.message
-            isLoanding.value = false
-        }
-    } catch (error) {
-        console.log(error);
-    } finally {
-        form.value.resetForm()
-    }
-}
-const update = async (values) => {
-    isLoanding.value = true
-    try {
-        const response = await RoleApi.updateRole(formValues.value.id, values)
-        if (response.data.success) {
-            isLoanding.value = false
-            getRoles()
-            toastr.success(response.data.message, 'Validation')
-            $('#addRoleModal').modal('hide');
+            $('#addBranchModal').modal('hide');
             form.value.resetForm()
         } else {
             errorResp.value = response.data.message
@@ -103,9 +87,28 @@ const update = async (values) => {
     } catch (error) {
         console.log(error)
     } finally {
-        form.resetForm()
+        form.value.resetForm()
     }
-
+}
+const update = async (values) => {
+    isLoanding.value = true
+    try {
+        const response = await BranchApi.updateBranch(formValues.value.id, values)
+        if (response.data.success) {
+            isLoanding.value = false
+            getBranches()
+            toastr.success(response.data.message, 'Validation')
+            $('#addBranchModal').modal('hide');
+            form.value.resetForm()
+        } else {
+            errorResp.value = response.data.message
+            isLoanding.value = false
+        }
+    } catch (error) {
+        console.log(error)
+    } finally {
+        form.value.resetForm()
+    }
 }
 
 const handlerSubmit = (values) => {
@@ -116,52 +119,52 @@ const handlerSubmit = (values) => {
     }
 }
 
-const changeStatus = async (role, status) => {
+const changeStatus = async (branch, status) => {
+    console.log(status)
     try {
-        const response = await RoleApi.changeStatus(role.id, { status: status });
+        const response = await BranchApi.changeStatus(branch.id, { status: status })
         toastr.success(response.data.message, 'Validation')
     } catch (error) {
-        console / log(error)
+        console.log(error)
     }
 }
 
-const deleteRole = async (id) => {
+const deleteBranch = async (id) => {
     Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't delete this role!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes'
-    }).then(async (result) => {
-        if (result.isConfirmed) {
-            const response = await RoleApi.deleteRole(id)
-            if (response.data.success) {
-                Swal.fire(
-                    'Deleted!',
-                    response.data.message,
-                    'success'
-                )
-                getRoles()
-            } else {
-                Swal.fire(
-                    'Warning',
-                    response.data.message,
-                    'error'
-                )
-            }
-
-        }
-    })
+    title: 'Are you sure?',
+    text: "You won't delete this role!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Yes'
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+        const response = await BranchApi.deleteBranch(id)
+      if (response.data.success) {
+        Swal.fire(
+          'Deleted!',
+          response.data.message,
+          'success'
+        )
+        getBranches()
+      } else {
+        Swal.fire(
+          'Warning',
+          response.data.message,
+          'error'
+        )
+      }
+    }
+  });
 }
 
-const getRoles = async () => {
-    isDataLoanding.value = true;
-    isNetWorkError.value = false;
+const getBranches = async () => {
+    isDataLoanding.value = true
+    isNetWorkError.value = false
     try {
-        const response = await RoleApi.getRoles();
-        listRoles.value = response.data.data;
+        const response = await BranchApi.getBranches();
+        listBranches.value = response.data.data
         isDataLoanding.value = false
     } catch (error) {
         console.log(error)
@@ -175,9 +178,12 @@ const getRoles = async () => {
 
 onMounted(async () => {
     token.value = localStorage.getItem('token')
-    getRoles()
+    defaulthHospital.value = JSON.parse(localStorage.getItem('hospital'))
+    hospitalId.id = defaulthHospital.value.id
+    getBranches()
 })
 </script>
+
 <template>
     <AdminLayout>
         <div v-if="isNetWorkError">
@@ -187,11 +193,10 @@ onMounted(async () => {
             <div class="card-header">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h5 class="m-0"><i class="fa fa-list" aria-hidden="true"></i> List of roles</h5>
+                        <h5 class="m-0"><i class="fa fa-list" aria-hidden="true"></i> List of branches</h5>
                     </div>
                     <div>
-                        <button @click="add" type="button" class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"
-                                aria-hidden="true"></i>New</button>
+                        <button @click="add" type="button" class="btn btn-primary btn-sm">New</button>
                     </div>
 
                 </div>
@@ -212,23 +217,24 @@ onMounted(async () => {
                         </tr>
                     </thead>
                     <tbody>
-                        <ItemListRoleWidget v-for="(role, index) in listRoles" :key="role.id" :role=role :index=index
-                            @edit-role="edit" @change-status="changeStatus" @delete-role="deleteRole(role.id)" />
+                        <BranchItemWidget v-for="(branch, index) in listBranches" :key="branch.id" :branch=branch
+                            :index=index @edit-branch="edit" @change-status="changeStatus"
+                            @delete-branch="deleteBranch(branch.id)" />
                     </tbody>
                 </table>
             </div>
         </div>
         <!--Add Modal -->
-        <div class="modal fade" id="addRoleModal" tabindex="-1" aria-labelledby="addRoleModalLabel" aria-hidden="true">
+        <div class="modal fade" id="addBranchModal" tabindex="-1" aria-labelledby="addBranchModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <Form ref="form" @submit="handlerSubmit" :validation-schema="schema" v-slot="{ errors }"
                     :initial-values="formValues">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 v-if="isEditing" class="modal-title" id="addRoleModalLabel">
+                            <h5 v-if="isEditing" class="modal-title" id="addBranchModalLabel">
                                 <i class="fa fa-plus-circle" aria-hidden="true"></i> EDIT ROLE
                             </h5>
-                            <h5 v-else class="modal-title" id="addRoleModalLabel">
+                            <h5 v-else class="modal-title" id="addBranchModalLabel">
                                 <i class="fas fa-edit    "></i>
                                 CREATE ROLE
                             </h5>

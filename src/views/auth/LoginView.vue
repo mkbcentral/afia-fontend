@@ -19,10 +19,12 @@ const login = async () => {
   await axios
     .post('http://127.0.0.1:8000/api/v1/login', form)
     .then((response) => {
+      
       if (response.data.success) {
         localStorage.setItem('token', response.data.data.token)
         localStorage.setItem('role', JSON.stringify(response.data.data.role))
         localStorage.setItem('hospital', JSON.stringify(response.data.data.hospital))
+        localStorage.setItem('branch', JSON.stringify(response.data.data.branch))
         router.push('/')
         isLoanding.value = false
       } else {

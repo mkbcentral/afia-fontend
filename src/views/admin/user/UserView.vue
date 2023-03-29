@@ -7,23 +7,33 @@ import { ref, reactive, onMounted } from 'vue'
 import { Form, Field } from 'vee-validate'
 import * as yup from 'yup'
 import { useToastr } from '../../../../src/widgets/toastr.js'
-
+import UserApi from '../../../services/Admin/UserApi';
 import ItemListUserWdgetVue from './widgets/ItemListUserWdget.vue';
+import NetworkError from '../../../components/errors/Network.vue';
+import Swal from 'sweetalert2'
+
 
 const listUsers = ref([])
 const listRoles = ref([])
-const listHospitals = ref([])
 
 const token = ref('')
-const defaulHospital = ref()
+const defaultHospital = ref()
+const defaultBranch = ref()
 const hospitalId = reactive({
-  hosîtal_id: 0
+  hospital_id: 0
+})
+const branchId = reactive({
+  branch_id: 0
 })
 const userToEdit = ref({})
 let errors = ref({})
 let errorResp = ref('')
+
 const isLoanding = ref(false)
+const isDataLoanding = ref(false)
 const isEditing = ref(true)
+const isNetWorkError = ref(false)
+
 const formValues = ref()
 const form = ref(null)
 const toastr = useToastr()
@@ -42,14 +52,21 @@ const add = async () => {
   form.value.resetForm()
 }
 
-const getUsers = async () => {
-  await axios.get('http://127.0.0.1:8000/api/v1/user', {
-    headers: {
-      'Authorization': `Bearer ${token.value}`
-    }
-  }).then((response) => {
+const getData = async () => {
+  isDataLoanding.value = true
+  isNetWorkError.value = false
+  try {
+    const response = await UserApi.getUsers()
     listUsers.value = response.data.data
-  });
+    isDataLoanding.value = false
+  } catch (error) {
+    console.log(error)
+    if (error.code) {
+      isNetWorkError.value = true
+      errorResp.value = error.message
+    }
+    isDataLoanding.value = false
+  }
 }
 
 const getRoles = async () => {
@@ -65,63 +82,45 @@ const getRoles = async () => {
 const create = async (values) => {
   isLoanding.value = true;
   values.hospital_id = hospitalId.id;
-  await axios
-    .post('http://127.0.0.1:8000/api/v1/user', values, {
-      headers: {
-        'Authorization': `Bearer ${token.value}`
-      }
-    })
-    .then((response) => {
-      if (response.data.success) {
-        console.log(response.data);
-        isLoanding.value = false;
-        getUsers();
-        toastr.success(response.data.message, 'Validation');
-        $('#adduserModal').modal('hide');
-        form.value.resetForm()
-      } else {
-        errorResp.value = response.data.message
-        isLoanding.value = false
-      }
-    })
-    .catch((error) => {
-      if (error.response.status == 422) {
-        errors.value = error.response.data.errors
-        isLoanding.value = false
-      }
-
-    }).finally(() => {
+  values.branch_id = branchId.id
+  try {
+    const response = await UserApi.createUser(values)
+    if (response.data.success) {
+      console.log(response.data);
+      isLoanding.value = false;
+      getUsers();
+      toastr.success(response.data.message, 'Validation');
+      $('#adduserModal').modal('hide');
       form.value.resetForm()
-    })
+    } else {
+      errorResp.value = response.data.message
+      isLoanding.value = false
+    }
+  } catch (error) {
+    console.log(error)
+  } finally {
+    form.resetForm()
+  }
 }
 const update = async (values) => {
   isLoanding.value = true
-  await axios
-    .put('http://127.0.0.1:8000/api/v1/user/' + formValues.value.id, values, {
-      headers: {
-        'Authorization': `Bearer ${token.value}`
-      }
-    })
-    .then((response) => {
-      if (response.data.success) {
-        isLoanding.value = false
-        getUsers()
-        toastr.success(response.data.message, 'Validation')
-        $('#adduserModal').modal('hide');
-        form.value.resetForm()
-      } else {
-        errorResp.value = response.data.message
-        isLoanding.value = false
-      }
-    })
-    .catch((error) => {
-      if (error.response.status == 422) {
-        errors.value = error.response.data.errors
-        isLoanding.value = false
-      }
-    }).finally(() => {
+  try {
+    const response = await UserApi.updateUser(formValues.value.id, values)
+    if (response.data.success) {
+      isLoanding.value = false
+      getUsers()
+      toastr.success(response.data.message, 'Validation')
+      $('#adduserModal').modal('hide');
       form.value.resetForm()
-    })
+    } else {
+      errorResp.value = response.data.message
+      isLoanding.value = false
+    }
+  } catch (error) {
+    console.log(error)
+  } finally {
+    form.value.resetForm()
+  }
 }
 
 const edit = (user) => {
@@ -132,7 +131,8 @@ const edit = (user) => {
     id: user.id,
     name: user.name,
     email: user.email,
-    phone: user.phone
+    phone: user.phone,
+    role_id: user.role.id
   }
 }
 
@@ -144,49 +144,67 @@ const handlerSubmit = (values) => {
   }
 }
 
-const showDeleteDialogue = async (user) => {
-  $('#deleteUserModal').modal('show');
-  userToEdit.value = user;
-}
+const deleteUser = async (id) => {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: "You won't be able to revert this!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Yes'
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      const response = await UserApi.deleteUser(id)
+      if (response.data.success) {
+        Swal.fire(
+          'Deleted!',
+          response.data.message,
+          'success'
+        )
+        getUsers()
+      } else {
+        Swal.fire(
+          'Warning',
+          response.data.message,
+          'error'
+        )
+      }
 
-const deleteRole = async () => {
-  isLoanding.value = true
-  await axios.delete('http://127.0.0.1:8000/api/v1/user/' + userToEdit.value.id, {
-    headers: {
-      'Authorization': `Bearer ${token.value}`
     }
-  }).then((response) => {
-    if (response.data.success) {
-      isLoanding.value = false
-      toastr.success(response.data.message, 'Validation')
-      $('#deleteUserModal').modal('hide');
-      getUsers()
-    } else {
-      errorResp.value = response.data.message
-      toastr.error(response.data.message, 'Validation')
-      isLoanding.value = false
-      $('#deleteUserModal').modal('hide');
-    }
-  });
+  })
 }
-
-
 const changeStatus = async (user, status) => {
-  console.log(user)
-  console.log(status)
-  await axios.put('http://127.0.0.1:8000/api/v1/user/status/' + user.id, { status: status }, {
-    headers: {
-      'Authorization': `Bearer ${token.value}`
-    }
-  }).then((response) => {
+  try {
+    const response = await UserApi.changeStatus(user.id, { status: status })
     toastr.success(response.data.message, 'Validation')
-  });
+  } catch (error) {
+    console.log(error)
+  }
 }
 
+const getUsers = async () => {
+  isDataLoanding.value = true
+  isNetWorkError.value = false
+  try {
+    const response = await UserApi.getUsers()
+    listUsers.value = response.data.data
+    isDataLoanding.value = false
+  } catch (error) {
+    console.log(error)
+    if (error.code) {
+      isNetWorkError.value = true
+      errorResp.value = error.message
+    }
+    isDataLoanding.value = false
+  }
+}
 onMounted(async () => {
   token.value = localStorage.getItem('token')
-  defaulHospital.value = JSON.parse(localStorage.getItem('hospital'))
-  hospitalId.id = defaulHospital.value.id
+  defaultHospital.value = JSON.parse(localStorage.getItem('hospital'))
+  defaultBranch.value = JSON.parse(localStorage.getItem('branch'))
+  hospitalId.id = defaultHospital.value.id
+  branchId.id = defaultBranch.value.id
   await getUsers()
   await getRoles()
 })
@@ -194,44 +212,46 @@ onMounted(async () => {
 </script>
 <template>
   <AdminLayout>
-    <div class="card card-primary card-outline">
+    <div v-if="isNetWorkError">
+      <NetworkError :message=errorResp @load-data="getData" />
+    </div>
+    <div v-else class="card card-primary card-outline">
       <div class="card-header">
         <div class="d-flex justify-content-between">
           <div>
-            <h5 class="m-0">List of clinics</h5>
+            <h5 class="m-0"><i class="fa fa-list" aria-hidden="true"></i> List of users</h5>
           </div>
           <div>
-            <button @click="add" type="button" class="btn btn-primary btn-sm">New</button>
+            <button @click="add" type="button" class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"
+                aria-hidden="true"></i> New</button>
           </div>
         </div>
       </div>
-      <Suspense>
-        <template #default>
-          <div class="card-body">
-            <table class="table table-sm table-borded">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>NAME</th>
-                  <th>EMAIL</th>
-                  <th>PHONE</th>
-                  <th>PHONE</th>
-                  <th>STATUS</th>
-                  <th class="text-center">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <ItemListUserWdgetVue v-for="(user, index) in listUsers" :key="user.id" :user=user :index=index
-                  @edit-user="edit" @change-status="changeStatus" 
-                  @delete-user="showDeleteDialogue" />
-              </tbody>
-            </table>
+      <div class="card-body">
+        <div v-if="isDataLoanding" class="d-flex justify-content-center">
+          <div class="spinner-border" role="status">
+            <span hidden class="visually-hidden">Loading...</span>
           </div>
-        </template>
-        <template #fellback>
-          <h1 class="text-center">Loadin...</h1>
-        </template>
-      </Suspense>
+        </div>
+        <table v-else class="table table-bordered table-sm">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>NAME</th>
+              <th>EMAIL</th>
+              <th>PHONE</th>
+              <th>PHONE</th>
+              <th>CLINIC</th>
+              <th>STATUS</th>
+              <th class="text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ItemListUserWdgetVue v-for="(user, index) in listUsers" :key="user.id" :user=user :index=index
+              @edit-user="edit" @change-status="changeStatus" @delete-user="deleteUser(user.id)" />
+          </tbody>
+        </table>
+      </div>
     </div>
     <!-- Modal -->
     <div class="modal fade" id="adduserModal" tabindex="-1" aria-labelledby="adduserModalLabel" aria-hidden="true">
@@ -265,9 +285,9 @@ onMounted(async () => {
                 <span class="invalid-feedback">{{ errors.phone }}</span>
               </div>
               <div class="form-group">
-                <label for="">Roles</label>
-                <Field class="form-control" name="role_id" as="select">
-                  <option selected value="">Choose her...</option>
+                <label for="">Role</label>
+                <Field class="form-control" name="role_id" as="select" :class="{ 'is-invalid': errors.role_id }">
+                  <option :value="null">Choose here</option>
                   <option v-for="role in listRoles" :value="role.id">{{ role.name }}</option>
                 </Field>
                 <span class="invalid-feedback">{{ errors.role_id }}</span>
@@ -285,33 +305,6 @@ onMounted(async () => {
             </div>
           </div>
         </Form>
-      </div>
-    </div>
-
-    <!--Delete Modal -->
-    <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="addRoleModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 v-if="isEditing" class="modal-title text-info" id="addRoleModalLabel">
-              Voulez-vous vraiment supprimer ?
-            </h5>
-          </div>
-          <div class="modal-body">
-            <h1 class="text-center text-danger">
-              <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-            </h1>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Non</button>
-            <button type="button" @click="deleteRole" class="btn btn-danger btn-sm">
-              <div class="d-flex justify-content-center">
-                <div v-if="isLoanding" class="spinner-border text-light spinner-sm" role="status"></div>
-                <div class="pl-2">Oui</div>
-              </div>
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   </AdminLayout>

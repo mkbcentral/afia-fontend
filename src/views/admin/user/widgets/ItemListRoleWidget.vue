@@ -11,7 +11,7 @@ defineProps({
 const status = ref([
   {
     value: 1,
-    name: 'ACTIVE'
+    name: 'ENABLE'
   },
   {
     value: 2,
@@ -42,8 +42,8 @@ const editStatus = async (role, status) => {
             </div>
         </td>
         <td class="text-center">
-            <button @click="edit(role)" class="btn btn-link"><i class="fas fa-edit"></i></button>
-            <button @click="deleteDialog(role)" class="btn btn-link"><i class="fa fa-trash text-danger" aria-hidden="true"></i></button>
+            <button @click="edit(role)" class="btn btn-link btn-sm"><i class="fas fa-edit"></i></button>
+            <button @click="deleteDialog(role)" class="btn btn-link btn-sm"><i class="fa fa-trash text-danger" aria-hidden="true"></i></button>
         </td>
     </tr>
 </template>
