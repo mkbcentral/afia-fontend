@@ -52,6 +52,13 @@ import MenuHospital from '../components/Navs/MenuHospital.vue'
               </RouterLink>
             </li>
             <li class="nav-item">
+              <RouterLink to="/admin/service" class="nav-link" active-class="active">
+                  <i class="fas fa-hospital"></i>
+                  <p> Services</p>
+              </RouterLink>
+          </li>
+            <MenuHospital/>
+            <li class="nav-item">
               <RouterLink to="/about" class="nav-link" active-class="active">
                 <i class="fa fa-info-circle" aria-hidden="true"></i>
                 <p> About</p>

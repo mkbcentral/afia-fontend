@@ -22,12 +22,7 @@
                     <p> Surcussales</p>
                 </RouterLink>
             </li>
-            <li class="nav-item">
-                <RouterLink to="/admin/branch" class="nav-link" active-class="active">
-                    <i class="fas fa-hospital"></i>
-                    <p> Services</p>
-                </RouterLink>
-            </li>
+            
             <li class="nav-item">
                 <RouterLink to="/admin/branch" class="nav-link" active-class="active">
                     <i class="fas fa-hospital"></i>

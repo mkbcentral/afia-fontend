@@ -71,6 +71,15 @@ const router = createRouter({
         requireAuth: true
       }
     },
+    //AGENT SERVICE ROUTE
+    {
+      path: '/admin/service',
+      name: 'service',
+      component: () => import('../views/admin/others/AgentServiceView.vue'),
+      meta: {
+        requireAuth: true
+      }
+    },
     {
       path: '/about',
       name: 'about',
