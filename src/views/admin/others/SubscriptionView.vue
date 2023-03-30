@@ -31,6 +31,8 @@ const toastr = useToastr()
 
 const schema = yup.object({
     name: yup.string().required(),
+    amount: yup.number().required(),
+    familly_quota: yup.sbkjvhtring().required(),
 })
 
 const add = async () => {

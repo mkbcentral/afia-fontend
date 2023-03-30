@@ -1,6 +1,5 @@
 <script setup>
 import AdminLayout from '../../../layouts/AdminLayout.vue';
-import axios from 'axios';
 import { ref, reactive, onMounted } from 'vue'
 import { Form, Field } from 'vee-validate'
 import * as yup from 'yup'
