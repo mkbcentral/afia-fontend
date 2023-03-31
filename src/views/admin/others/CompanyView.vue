@@ -8,7 +8,7 @@ import NetworkError from '../../../components/errors/Network.vue'
 import Swal from 'sweetalert2'
 import CompanyApi from '../../../services/Admin/CompanyApi'
 import SubscriptionApi from '../../../services/Admin/SubscriptionApi';
-//import SubscriptionItemWidget from '../others/widgets/SubscriptionItemWidget.vue'
+import CompanyItemListViewVue from './widgets/CompanyItemListView.vue';
 
 const listCompanies = ref([])
 const listSubscriptions = ref([])
@@ -82,7 +82,7 @@ const create = async (values) => {
         if (response.data.success) {
             console.log(response.data)
             isLoanding.value = false
-            getCompanies()
+            listCompanies.value.unshift(response.data.company)
             toastr.success(response.data.message, 'Validation')
             $('#addCompanyModal').modal('hide');
             form.value.resetForm()
@@ -94,6 +94,7 @@ const create = async (values) => {
         console.log(error)
         isLoanding.value = false
         toastr.success(error.message, 'Validation')
+        console.log(error)
     } finally {
         form.value.resetForm()
         isLoanding.value = false
@@ -105,8 +106,9 @@ const update = async (values) => {
         const response = await CompanyApi.updateCompany(formValues.value.id, values)
         if (response.data.success) {
             isLoanding.value = false
-            getSubscriptions()
-            toastr.success(response.data.message, 'Validation')
+            const index=listCompanies.value.findIndex(company=>company.id==response.data.company.id)
+            listCompanies.value[index] = response.data.company
+            toastr.info(response.data.message, 'Validation')
             $('#addCompanyModal').modal('hide');
             form.value.resetForm()
         } else {
@@ -126,7 +128,7 @@ const handlerSubmit = (values) => {
         create(values)
     }
 }
-const deleteSubscription = async (id) => {
+const deleteCompany = async (id) => {
     Swal.fire({
         title: 'Are you sure?',
         text: "You won't delete this role!",
@@ -144,7 +146,7 @@ const deleteSubscription = async (id) => {
                     response.data.message,
                     'success'
                 )
-                getSubscriptions()
+                listCompanies.value=listCompanies.value.filter(company=>company.id !=id);
             } else {
                 Swal.fire(
                     'Warning',
@@ -160,7 +162,7 @@ const getCompanies = async () => {
     isNetWorkError.value = false
     try {
         const response = await CompanyApi.getCompanies();
-        listSubscriptions.value = response.data.data
+        listCompanies.value = response.data.data
         isDataLoanding.value = false
     } catch (error) {
         console.log(error)
@@ -175,8 +177,8 @@ onMounted(async () => {
     token.value = localStorage.getItem('token')
     defaulthHospital.value = JSON.parse(localStorage.getItem('hospital'))
     hospitalId.id = defaulthHospital.value.id
-    getSubscriptions()
     getCompanies()
+    getSubscriptions()
 })
 </script>
 
@@ -210,14 +212,13 @@ onMounted(async () => {
                         <tr>
                             <th class="text-center">#</th>
                             <th>NAME</th>
-                            <th class="text-center">AMOUNT</th>
-                            <th class="text-center">QUOTA FAMILLY</th>
-                            <th>STATUS</th>
+                            <th>SUBSCRIPTION</th>
                             <th class="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-
+                        <CompanyItemListViewVue v-for="(company, index) in listCompanies" :key="company.id" :company=company
+                            :index=index @edit-company="edit" @delete-company="deleteCompany(company.id)" />
                     </tbody>
                 </table>
             </div>

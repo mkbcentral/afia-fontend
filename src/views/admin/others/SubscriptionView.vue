@@ -27,15 +27,9 @@ const toastr = useToastr()
 const schema = yup.object({
     name: yup.string().required(),
     amount: yup.number().required(),
-<<<<<<< HEAD
-<<<<<<< HEAD
     familly_quota: yup.number().required(),
-=======
-    familly_quota: yup.sbkjvhtring().required(),
->>>>>>> e454a47145e5409cb2f09dffba58beecc9d1fbd4
-=======
+    familly_quota: yup.string().required(),
     familly_quota: yup.number().required(),
->>>>>>> 4915c3729554ed577ff2658c8fef2c5f1af8f01e
 })
 const add = async () => {
     isEditing.value = false;
@@ -58,10 +52,6 @@ const getData = async () => {
         isDataLoanding.value = false
     }
 }
-<<<<<<< HEAD
-
-=======
->>>>>>> 4915c3729554ed577ff2658c8fef2c5f1af8f01e
 const edit = (subscription) => {
     isEditing.value = true;
     $('#addSubscriptionhModal').modal('show');
@@ -79,7 +69,6 @@ const create = async (values) => {
     try {
         const response = await SubscrptionApi.createSubscription(values);
         if (response.data.success) {
-            console.log(response.data)
             isLoanding.value = false
             getSubscriptions()
             toastr.success(response.data.message, 'Validation')
@@ -106,7 +95,7 @@ const update = async (values) => {
         if (response.data.success) {
             isLoanding.value = false
             getSubscriptions()
-            toastr.success(response.data.message, 'Validation')
+            toastr.info(response.data.message, 'Validation')
             $('#addSubscriptionhModal').modal('hide');
             form.value.resetForm()
         } else {
@@ -126,10 +115,6 @@ const handlerSubmit = (values) => {
         create(values)
     }
 }
-<<<<<<< HEAD
-
-=======
->>>>>>> 4915c3729554ed577ff2658c8fef2c5f1af8f01e
 const changeStatus = async (subscription, status) => {
     try {
         const response = await SubscrptionApi.changeStatus(subscription.id, { status: status })
@@ -138,10 +123,6 @@ const changeStatus = async (subscription, status) => {
         console.log(error)
     }
 }
-<<<<<<< HEAD
-
-=======
->>>>>>> 4915c3729554ed577ff2658c8fef2c5f1af8f01e
 const deleteSubscription = async (id) => {
     Swal.fire({
         title: 'Are you sure?',
@@ -171,10 +152,7 @@ const deleteSubscription = async (id) => {
         }
     });
 }
-<<<<<<< HEAD
 
-=======
->>>>>>> 4915c3729554ed577ff2658c8fef2c5f1af8f01e
 const getSubscriptions = async () => {
     isDataLoanding.value = true
     isNetWorkError.value = false
@@ -209,17 +187,13 @@ onMounted(async () => {
                 <div class="card-header">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h5 class="m-0"><i class="fa fa-list" aria-hidden="true"></i> List of branches</h5>
+                            <h5 class="m-0"><i class="fa fa-list" aria-hidden="true"></i> List of subcriptions</h5>
                         </div>
                         <div>
-<<<<<<< HEAD
-                            <button @click="add" type="button" class="btn btn-primary btn-sm">New</button>
-=======
                             <button @click="add" type="button" class="btn btn-primary btn-sm">
                                 <i class="fa fa-plus-circle" aria-hidden="true"></i>
                                 New
                             </button>
->>>>>>> 4915c3729554ed577ff2658c8fef2c5f1af8f01e
                         </div>
                     </div>
                 </div>
@@ -232,11 +206,7 @@ onMounted(async () => {
                     <table v-else class="table table-bordered table-sm">
                         <thead>
                             <tr>
-<<<<<<< HEAD
-                                <th>#</th>
-=======
                                 <th class="text-center">#</th>
->>>>>>> 4915c3729554ed577ff2658c8fef2c5f1af8f01e
                                 <th>NAME</th>
                                 <th class="text-center">AMOUNT</th>
                                 <th class="text-center">QUOTA FAMILLY</th>
@@ -262,41 +232,20 @@ onMounted(async () => {
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 v-if="isEditing" class="modal-title" id="addSubscriptionhModalLabel">
-<<<<<<< HEAD
                                     <i class="fa fa-plus-circle" aria-hidden="true"></i> EDIT ROLE
                                 </h5>
                                 <h5 v-else class="modal-title" id="addSubscriptionhModalLabel">
                                     <i class="fas fa-edit    "></i>
                                     CREATE ROLE
-=======
                                     <i class="fa fa-plus-circle" aria-hidden="true"></i> EDIT SUBSCRIPTION
                                 </h5>
                                 <h5 v-else class="modal-title" id="addSubscriptionhModalLabel">
                                     <i class="fas fa-edit    "></i>
                                     CREATE SUBSCRIPTION
->>>>>>> 4915c3729554ed577ff2658c8fef2c5f1af8f01e
                                 </h5>
                             </div>
                             <div class="modal-body">
                                 <div class="form-group">
-<<<<<<< HEAD
-                                    <label>Clinic Name</label>
-                                    <Field name="name" type="text" class="form-control"
-                                        :class="{ 'is-invalid': errors.name }" placeholder="Name of clinic" />
-                                    <span class="invalid-feedback">{{ errors.name }}</span>
-                                </div>
-                                <div class="form-group">
-                                    <label>Clinic Name</label>
-                                    <Field name="amount" type="number" class="form-control"
-                                        :class="{ 'is-invalid': errors.amount }" placeholder="amount of clinic" />
-                                    <span class="invalid-feedback">{{ errors.amount }}</span>
-                                </div>
-                                <div class="form-group">
-                                    <label>Clinic Name</label>
-                                    <Field name="familly_quota" type="number" class="form-control"
-                                        :class="{ 'is-invalid': errors.familly_quota }"
-                                        placeholder="familly_quota of clinic" />
-=======
                                     <label>Name</label>
                                     <Field name="name" type="text" class="form-control"
                                         :class="{ 'is-invalid': errors.name }" placeholder="subscription name" />
@@ -313,7 +262,6 @@ onMounted(async () => {
                                     <Field name="familly_quota" type="number" class="form-control"
                                         :class="{ 'is-invalid': errors.familly_quota }"
                                         placeholder="Familly quota" />
->>>>>>> 4915c3729554ed577ff2658c8fef2c5f1af8f01e
                                     <span class="invalid-feedback">{{ errors.familly_quota }}</span>
                                 </div>
                             </div>

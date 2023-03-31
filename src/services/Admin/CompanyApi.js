@@ -12,7 +12,4 @@ export default {
     deleteCompany(id) {
         return API().delete('/company/' + id);
     },
-    changeStatus(id, status) {
-        return API().put('/company/status/' + id,status)
-    }
 }

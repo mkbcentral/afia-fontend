@@ -19,31 +19,6 @@ const toastr = useToastr()
 const login = async () => {
   isLoanding.value = true
   form.value = ''
-<<<<<<< HEAD
-  await axios
-    .post('http://127.0.0.1:8000/api/v1/login', form)
-    .then((response) => {
-      
-      if (response.data.success) {
-        localStorage.setItem('token', response.data.data.token)
-        localStorage.setItem('role', JSON.stringify(response.data.data.role))
-        localStorage.setItem('hospital', JSON.stringify(response.data.data.hospital))
-        localStorage.setItem('branch', JSON.stringify(response.data.data.branch))
-        router.push('/menu')
-        isLoanding.value = false
-      } else {
-        errorResp.value = response.data.message
-        isLoanding.value = false
-      }
-    })
-    .catch((error) => {
-      if (error.response.status == 422) {
-        errors.value = error.response.data.errors
-        isLoanding.value = false
-      }
-      
-    })
-=======
   try {
     const response = await AuthApi.login(form)
     if (response.data.success) {
@@ -67,7 +42,6 @@ const login = async () => {
       isLoanding.value = false
     }
   }
->>>>>>> 4915c3729554ed577ff2658c8fef2c5f1af8f01e
 }
 </script>
 <template>

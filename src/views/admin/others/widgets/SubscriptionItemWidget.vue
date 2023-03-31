@@ -31,11 +31,7 @@ const editStatus = async (subscription, status) => {
 </script>
 <template>
   <tr>
-<<<<<<< HEAD
-    <td v-text="index + 1" scope="row"></td>
-=======
     <td class="text-center" v-text="index + 1" scope="row"></td>
->>>>>>> 4915c3729554ed577ff2658c8fef2c5f1af8f01e
     <td v-text="subscription.name"></td>
     <td class="text-center" v-text="subscription.amount"></td>
     <td class="text-center" v-text="subscription.familly_quota"></td>

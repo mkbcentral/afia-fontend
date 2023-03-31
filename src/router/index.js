@@ -17,11 +17,7 @@ const router = createRouter({
     //SETTINGS
     {
       path: '/admin/settings',
-<<<<<<< HEAD
       name: 'home',
-=======
-      name: 'settings',
->>>>>>> 4915c3729554ed577ff2658c8fef2c5f1af8f01e
       component: HomeView,
       meta: {
         requireAuth: true
@@ -86,19 +82,11 @@ const router = createRouter({
         requireAuth: true
       }
     },
-<<<<<<< HEAD
-    //AGENT SERVICE ROUTE
-    {
-      path: '/admin/service',
-      name: 'service',
-      component: () => import('../views/admin/others/AgentServiceView.vue'),
-=======
     //COMPANY ROUTE
     {
       path: '/admin/company',
       name: 'company',
       component: () => import('../views/admin/others/CompanyView.vue'),
->>>>>>> 4915c3729554ed577ff2658c8fef2c5f1af8f01e
       meta: {
         requireAuth: true
       }

@@ -211,6 +211,7 @@ onMounted(async () => {
                         <tr>
                             <th>#</th>
                             <th>NAME</th>
+                            <th>SUBSCRIPTION</th>
                             <th class="text-center">Actions</th>
                         </tr>
                     </thead>
