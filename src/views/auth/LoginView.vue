@@ -3,6 +3,8 @@ import GuestLayout from '../../layouts/GuestLayout.vue'
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
+import { useToastr } from '../../widgets/toastr.js'
+import AuthApi from '../../services/Auth/AuthApi.js'
 const router = useRouter()
 
 let form = reactive({
@@ -12,33 +14,34 @@ let form = reactive({
 let errors = ref({})
 let errorResp = ref('')
 const isLoanding = ref(false)
+const toastr = useToastr()
 
 const login = async () => {
   isLoanding.value = true
   form.value = ''
-  await axios
-    .post('http://127.0.0.1:8000/api/v1/login', form)
-    .then((response) => {
-      
-      if (response.data.success) {
-        localStorage.setItem('token', response.data.data.token)
-        localStorage.setItem('role', JSON.stringify(response.data.data.role))
-        localStorage.setItem('hospital', JSON.stringify(response.data.data.hospital))
-        localStorage.setItem('branch', JSON.stringify(response.data.data.branch))
-        router.push('/')
-        isLoanding.value = false
-      } else {
-        errorResp.value = response.data.message
-        isLoanding.value = false
-      }
-    })
-    .catch((error) => {
-      if (error.response.status == 422) {
-        errors.value = error.response.data.errors
-        isLoanding.value = false
-      }
-      
-    })
+  try {
+    const response = await AuthApi.login(form)
+    if (response.data.success) {
+      localStorage.setItem('token', response.data.data.token)
+      localStorage.setItem('role', JSON.stringify(response.data.data.role))
+      localStorage.setItem('hospital', JSON.stringify(response.data.data.hospital))
+      localStorage.setItem('branch', JSON.stringify(response.data.data.branch))
+      router.push('/menu')
+      isLoanding.value = false
+    } else {
+      errorResp.value = response.data.message
+      isLoanding.value = false
+      console.log(response)
+    }
+  } catch (error) {
+    if (error.code == "ERR_NETWORK") {
+      toastr.error(error.message, 'ERROR');
+      isLoanding.value = false
+    }else if(error.response.status == 422) {
+      errors.value = error.response.data.errors
+      isLoanding.value = false
+    }
+  }
 }
 </script>
 <template>
@@ -46,8 +49,10 @@ const login = async () => {
     <div class="login-box">
       <div class="card">
         <div class="card-body login-card-body">
-          <div class="text-center"><i class="fa fa-lock" aria-hidden="true"></i></div>
-          <p class="login-box-msg text-bold">Login</p>
+          <div class="text-center"><i class="fa fa-lock text-primary fa-2x" aria-hidden="true"></i></div>
+          <p class="login-box-msg text-bold text-primary">
+          <h4>Login</h4>
+          </p>
           <form @submit.prevent="login">
             <div class="input-group">
               <input v-model="form.email" type="email" class="form-control" placeholder="Email" />
@@ -59,12 +64,7 @@ const login = async () => {
             </div>
             <span v-if="errors.email" v-text="errors.email[0]" class="text-danger"></span>
             <div class="input-group mt-3">
-              <input
-                v-model="form.password"
-                type="password"
-                class="form-control"
-                placeholder="Password"
-              />
+              <input v-model="form.password" type="password" class="form-control" placeholder="Password" />
               <div class="input-group-append">
                 <div class="input-group-text">
                   <span class="fas fa-lock"></span>

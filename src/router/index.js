@@ -14,8 +14,8 @@ const router = createRouter({
       }
     },
     {
-      path: '/',
-      name: 'home',
+      path: '/admin/settings',
+      name: 'settings',
       component: HomeView,
       meta: {
         requireAuth: true
@@ -76,6 +76,15 @@ const router = createRouter({
       path: '/admin/subscription',
       name: 'subscription',
       component: () => import('../views/admin/others/SubscriptionView.vue'),
+      meta: {
+        requireAuth: true
+      }
+    },
+    //COMPANY ROUTE
+    {
+      path: '/admin/company',
+      name: 'company',
+      component: () => import('../views/admin/others/CompanyView.vue'),
       meta: {
         requireAuth: true
       }

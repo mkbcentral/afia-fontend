@@ -49,11 +49,14 @@
                     <p>Statistiques</p>
                 </div>
             </div>
+
             <div class="box">
-                <div class="content">
-                    <i class="fas fa-tools fa-solid fa-3x"></i>
-                    <p>Pramètres</p>
-                </div>
+                <RouterLink to="/admin/settings">
+                    <div class="content">
+                        <i class="fas fa-tools fa-solid fa-3x"></i>
+                        <p>Pramètres</p>
+                    </div>
+                </RouterLink>
             </div>
         </div>
     </div>
@@ -66,7 +69,7 @@
     align-self: center;
     min-height: 100vh;
     background-image: url('../assets/images/bg1.jpg');
-   background-size: cover;
+    background-size: cover;
 }
 
 .container {
@@ -99,12 +102,13 @@
 
 .container .box i {
     position: relative;
-    max-width: 150px;
+    color: white;
     margin-bottom: 10px;
 }
 
 .container .box p {
     font-weight: bold;
+    color: white;
     text-transform: uppercase;
 }
 
@@ -113,50 +117,63 @@
     grid-row: span 1;
     background: #6b92ec72;
 }
+
 .container .box:nth-child(1):hover {
     background: #f328a5ac;
 }
+
 .container .box:nth-child(2) {
     background: #4842045c;
 }
+
 .container .box:nth-child(2):hover {
     background: #f328a5ac;
 }
+
 .container .box:nth-child(4) {
     background: #6094f564;
 }
+
 .container .box:nth-child(4):hover {
     background: #f328a5ac;
 }
+
 .container .box:nth-child(3) {
     grid-column: span 1;
     grid-row: span 2;
     background: #94040494;
 }
+
 .container .box:nth-child(3):hover {
     background: #f328a5ac;
 }
+
 .container .box:nth-child(5) {
     grid-column: span 1;
     grid-row: span 2;
     background: rgba(65, 111, 27, 0.719);
 }
+
 .container .box:nth-child(5):hover {
     background: #f328a5ac;
 }
+
 .container .box:nth-child(7) {
     grid-column: span 2;
     grid-row: span 1;
     background: #19491888;
 }
+
 .container .box:nth-child(7):hover {
     background: #f328a5ac;
 }
+
 .container .box:nth-child(8) {
     grid-column: span 1;
     grid-row: span 2;
     background: rgba(91, 14, 86, 0.606);
 }
+
 .container .box:nth-child(8):hover {
     background: #f328a5ac;
 }
@@ -167,13 +184,18 @@
     background: rgba(170, 75, 2, 0.554);
 }
 
+.container .box:nth-child(9):hover {
+    background: #f328a5ac;
+}
+
 @media(max-width: 891px) {
     .container {
         grid-template-columns: repeat(auto-fill, minmax(50%, 1fr));
         grid-template-rows: minmax(auto, auto);
     }
-    .container .box{
-        grid-column: unset  !important;
+
+    .container .box {
+        grid-column: unset !important;
         grid-row: unset !important;
     }
 }</style>
