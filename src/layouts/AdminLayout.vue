@@ -16,21 +16,21 @@ import MenuHospital from '../components/Navs/MenuHospital.vue'
         <nav class="mt-2">
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
             <li class="nav-item">
-              <RouterLink to="/" class="nav-link" active-class="active">
+              <RouterLink to="/admin/settings" class="nav-link" active-class="active">
                 <i class="nav-icon fas fa-th"></i>
-                <p>Dashboard</p>
-              </RouterLink>
-            </li>
-            <li class="nav-item">
-              <RouterLink to="/admin/role" class="nav-link" active-class="active">
-                <i class="fa fa-list" aria-hidden="true"></i>
-                <p> Role</p>
+                <p>Settings</p>
               </RouterLink>
             </li>
             <li class="nav-item">
               <RouterLink to="/admin/user" class="nav-link" active-class="active">
                 <i class="fas fa-users-cog"></i>
                 <p> Users</p>
+              </RouterLink>
+            </li>
+            <li class="nav-item">
+              <RouterLink to="/admin/role" class="nav-link" active-class="active">
+                <i class="fa fa-list" aria-hidden="true"></i>
+                <p> Role</p>
               </RouterLink>
             </li>
             <li class="nav-item">
@@ -52,6 +52,7 @@ import MenuHospital from '../components/Navs/MenuHospital.vue'
               </RouterLink>
             </li>
             <li class="nav-item">
+<<<<<<< HEAD
               <RouterLink to="/admin/service" class="nav-link" active-class="active">
                   <i class="fas fa-hospital"></i>
                   <p> Services</p>
@@ -62,6 +63,11 @@ import MenuHospital from '../components/Navs/MenuHospital.vue'
               <RouterLink to="/about" class="nav-link" active-class="active">
                 <i class="fa fa-info-circle" aria-hidden="true"></i>
                 <p> About</p>
+=======
+              <RouterLink to="/admin/company" class="nav-link" active-class="active">
+                <i class="fas fa-house-damage"></i>
+                <p> Companies</p>
+>>>>>>> 4915c3729554ed577ff2658c8fef2c5f1af8f01e
               </RouterLink>
             </li>
           </ul>

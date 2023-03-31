@@ -10,6 +10,7 @@ import { useToastr } from '../../../../src/widgets/toastr.js'
 import UserApi from '../../../services/Admin/UserApi';
 import ItemListUserWdgetVue from './widgets/ItemListUserWdget.vue';
 import NetworkError from '../../../components/errors/Network.vue';
+import RoleApi from '../../../services/Admin/RoleApi.js'
 import Swal from 'sweetalert2'
 
 
@@ -25,7 +26,6 @@ const hospitalId = reactive({
 const branchId = reactive({
   branch_id: 0
 })
-const userToEdit = ref({})
 let errors = ref({})
 let errorResp = ref('')
 
@@ -60,7 +60,6 @@ const getData = async () => {
     listUsers.value = response.data.data
     isDataLoanding.value = false
   } catch (error) {
-    console.log(error)
     if (error.code) {
       isNetWorkError.value = true
       errorResp.value = error.message
@@ -70,13 +69,15 @@ const getData = async () => {
 }
 
 const getRoles = async () => {
-  await axios.get('http://127.0.0.1:8000/api/v1/role', {
-    headers: {
-      'Authorization': `Bearer ${token.value}`
-    }
-  }).then((response) => {
+  try {
+    const response = await RoleApi.getRoles();
     listRoles.value = response.data.data
-  });
+  } catch (error) {
+    if (error.code) {
+      isNetWorkError.value = true
+      errorResp.value = error.message
+    }
+  }
 }
 
 const create = async (values) => {
