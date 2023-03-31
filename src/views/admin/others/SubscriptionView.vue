@@ -31,7 +31,11 @@ const toastr = useToastr()
 const schema = yup.object({
     name: yup.string().required(),
     amount: yup.number().required(),
+<<<<<<< HEAD
     familly_quota: yup.number().required(),
+=======
+    familly_quota: yup.sbkjvhtring().required(),
+>>>>>>> e454a47145e5409cb2f09dffba58beecc9d1fbd4
 })
 const add = async () => {
     isEditing.value = false;
