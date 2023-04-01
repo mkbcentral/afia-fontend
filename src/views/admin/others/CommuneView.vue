@@ -62,8 +62,6 @@ const edit = (commune) => {
         name: commune.name,
     }
 }
-
-
 const create = async (values) => {
     isLoanding.value = true
     try {
@@ -96,7 +94,8 @@ const update = async (values) => {
         const response = await CommuneApi.updateCommune(formValues.value.id, values)
         if (response.data.success) {
             isLoanding.value = false
-            getCommunes()
+            const index=listCommunes.value.findIndex(commune=>commune.id==response.data.commune.id)
+            listCommunes.value[index]= response.data.commune
             toastr.success(response.data.message, 'Validation')
             $('#addCommuneModal').modal('hide');
             form.value.resetForm()
@@ -139,7 +138,7 @@ const deleteCommune = async (id) => {
                         response.data.message,
                         'success'
                     )
-                    getCommunes()
+                    listCommunes.value = listCommunes.value.filter(type => type.id != id);
                 } else {
                     Swal.fire(
                         'Warning',
@@ -209,9 +208,8 @@ onMounted(async () => {
                 <table v-else class="table table-bordered table-sm">
                     <thead>
                         <tr>
-                            <th>#</th>
+                            <th class="text-center">#</th>
                             <th>NAME</th>
-                            <th>SUBSCRIPTION</th>
                             <th class="text-center">Actions</th>
                         </tr>
                     </thead>

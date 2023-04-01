@@ -103,8 +103,9 @@ const update = async (values) => {
         const response = await CompanyApi.updateCompany(formValues.value.id, values)
         if (response.data.success) {
             isLoanding.value = false
-            const index=listCompanies.value.findIndex(company=>company.id==response.data.company.id)
-            listCompanies.value[index] = response.data.company
+            //const index=listCompanies.value.findIndex(company=>company.id==response.data.company.id)
+            //listCompanies.value[index].id = response.data.company.id
+            getCompanies()
             toastr.info(response.data.message, 'Validation')
             $('#addCompanyModal').modal('hide');
             form.value.resetForm()

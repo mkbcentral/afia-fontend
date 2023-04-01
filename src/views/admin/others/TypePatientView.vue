@@ -96,7 +96,8 @@ const update = async (values) => {
         const response = await TypeApi.updateType(formValues.value.id, values)
         if (response.data.success) {
             isLoanding.value = false
-            getTypes()
+            const index=listTypes.value.findIndex(type=>type.id==response.data.type.id)
+            listTypes.value[index]= response.data.type
             toastr.success(response.data.message, 'Validation')
             $('#addTypeModal').modal('hide');
             form.value.resetForm()
@@ -139,7 +140,7 @@ const deleteType = async (id) => {
                         response.data.message,
                         'success'
                     )
-                    getTypes()
+                    listTypes.value = listTypes.value.filter(type => type.id != id);
                 } else {
                     Swal.fire(
                         'Warning',
@@ -190,7 +191,7 @@ onMounted(async () => {
             <div class="card-header">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h5 class="m-0"><i class="fa fa-list" aria-hidden="true"></i> List of communes</h5>
+                        <h5 class="m-0"><i class="fa fa-list" aria-hidden="true"></i> List of type patients</h5>
                     </div>
                     <div>
                         <button @click="add" type="button" class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"
@@ -208,7 +209,7 @@ onMounted(async () => {
                 <table v-else class="table table-bordered table-sm">
                     <thead>
                         <tr>
-                            <th>#</th>
+                            <th  class="text-center">#</th>
                             <th>NAME</th>
                             <th class="text-center">Actions</th>
                         </tr>

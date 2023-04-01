@@ -92,7 +92,8 @@ const update = async (values) => {
         const response = await RoleApi.updateRole(formValues.value.id, values)
         if (response.data.success) {
             isLoanding.value = false
-            getRoles()
+            const index = listRoles.value.findIndex(role => role.id == response.data.role.id)
+            listRoles.value[index] = response.data.role
             toastr.success(response.data.message, 'Validation')
             $('#addRoleModal').modal('hide');
             form.value.resetForm()
@@ -143,7 +144,7 @@ const deleteRole = async (id) => {
                     response.data.message,
                     'success'
                 )
-                getRoles()
+                listRoles.value = listRoles.value.filter(role => role.id != id);
             } else {
                 Swal.fire(
                     'Warning',

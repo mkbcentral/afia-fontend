@@ -19,7 +19,7 @@ const deleteDialog = (role) => {
 </script>
 <template>
     <tr>
-        <td v-text="index + 1" scope="row"></td>
+        <td class="text-center" v-text="index + 1" scope="row"></td>
         <td v-text="commune.name"></td>
         <td class="text-center">
             <button @click="edit(commune)" class="btn btn-link btn-sm"><i class="fas fa-edit"></i></button>

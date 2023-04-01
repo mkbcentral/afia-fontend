@@ -70,7 +70,7 @@ const create = async (values) => {
         const response = await SubscrptionApi.createSubscription(values);
         if (response.data.success) {
             isLoanding.value = false
-            getSubscriptions()
+            listSubscriptions.value.unshift(response.data.subscription)
             toastr.success(response.data.message, 'Validation')
             $('#addSubscriptionhModal').modal('hide');
             form.value.resetForm()
@@ -94,7 +94,8 @@ const update = async (values) => {
         const response = await SubscrptionApi.updateSubscription(formValues.value.id, values)
         if (response.data.success) {
             isLoanding.value = false
-            getSubscriptions()
+            const index = listSubscriptions.value.findIndex(subscription => subscription.id == response.data.subscription.id)
+            listSubscriptions.value[index] = response.data.subscription
             toastr.info(response.data.message, 'Validation')
             $('#addSubscriptionhModal').modal('hide');
             form.value.resetForm()
@@ -141,7 +142,7 @@ const deleteSubscription = async (id) => {
                     response.data.message,
                     'success'
                 )
-                getSubscriptions()
+                listSubscriptions.value = listSubscriptions.value.filter(subscription => subscription.id != id);
             } else {
                 Swal.fire(
                     'Warning',
@@ -152,7 +153,6 @@ const deleteSubscription = async (id) => {
         }
     });
 }
-
 const getSubscriptions = async () => {
     isDataLoanding.value = true
     isNetWorkError.value = false
@@ -215,9 +215,9 @@ onMounted(async () => {
                             </tr>
                         </thead>
                         <tbody>
-                            <SubscriptionItemWidget v-for="(subscription, index) in listSubscriptions" :key="subscription.id" :subscription=subscription
-                                :index=index @edit-subscription="edit" @change-status="changeStatus"
-                                @delete-subscription="deleteSubscription(subscription.id)" />
+                            <SubscriptionItemWidget v-for="(subscription, index) in listSubscriptions"
+                                :key="subscription.id" :subscription=subscription :index=index @edit-subscription="edit"
+                                @change-status="changeStatus" @delete-subscription="deleteSubscription(subscription.id)" />
                         </tbody>
                     </table>
                 </div>
@@ -260,8 +260,7 @@ onMounted(async () => {
                                 <div class="form-group">
                                     <label>Fammily quota</label>
                                     <Field name="familly_quota" type="number" class="form-control"
-                                        :class="{ 'is-invalid': errors.familly_quota }"
-                                        placeholder="Familly quota" />
+                                        :class="{ 'is-invalid': errors.familly_quota }" placeholder="Familly quota" />
                                     <span class="invalid-feedback">{{ errors.familly_quota }}</span>
                                 </div>
                             </div>
@@ -279,4 +278,5 @@ onMounted(async () => {
                 </div>
             </div>
         </div>
-    </AdminLayout></template>
+    </AdminLayout>
+</template>

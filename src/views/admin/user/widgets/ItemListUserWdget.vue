@@ -42,7 +42,7 @@ const editStatus = async (user, status) => {
         <td v-text="user.name"></td>
         <td v-text="user.email"></td>
         <td v-text="user.phone"></td>
-        <td v-text="user.role.name"></td>
+        <td class="text-center" v-text="user.role.name"></td>
         <td v-text="user.hospital.name"></td>
         <td>
             <select class="form-control" @change="editStatus(user, $event.target.value)">

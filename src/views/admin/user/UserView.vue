@@ -87,9 +87,9 @@ const create = async (values) => {
   try {
     const response = await UserApi.createUser(values)
     if (response.data.success) {
-      console.log(response.data);
       isLoanding.value = false;
-      getUsers();
+      console.log(response.data.user)
+      listUsers.value.unshift(response.data.user)
       toastr.success(response.data.message, 'Validation');
       $('#adduserModal').modal('hide');
       form.value.resetForm()
@@ -241,7 +241,7 @@ onMounted(async () => {
               <th>NAME</th>
               <th>EMAIL</th>
               <th>PHONE</th>
-              <th>PHONE</th>
+              <th class="text-cnter">ROLE</th>
               <th>CLINIC</th>
               <th>STATUS</th>
               <th class="text-center">Actions</th>
@@ -268,21 +268,21 @@ onMounted(async () => {
             </div>
             <div class="modal-body">
               <div class="form-group">
-                <label>Clinic Name</label>
+                <label>User Name</label>
                 <Field name="name" type="text" class="form-control" :class="{ 'is-invalid': errors.name }"
-                  placeholder="Name of clinic" />
+                  placeholder="Name of User" />
                 <span class="invalid-feedback">{{ errors.name }}</span>
               </div>
               <div class="form-group">
-                <label>Clinic Email</label>
+                <label>User Email</label>
                 <Field name="email" type="text" class="form-control" :class="{ 'is-invalid': errors.email }"
-                  placeholder="Email of clinic" />
+                  placeholder="Email of user" />
                 <span class="invalid-feedback">{{ errors.email }}</span>
               </div>
               <div class="form-group">
-                <label>Clinic Phone</label>
+                <label>User Phone</label>
                 <Field name="phone" type="text" class="form-control" :class="{ 'is-invalid': errors.phone }"
-                  placeholder="Phone of clinic" />
+                  placeholder="Phone of user" />
                 <span class="invalid-feedback">{{ errors.phone }}</span>
               </div>
               <div class="form-group">

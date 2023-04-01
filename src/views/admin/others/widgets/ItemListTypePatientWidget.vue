@@ -18,7 +18,7 @@ const deleteDialog = (type) => {
 </script>
 <template>
   <tr>
-    <td v-text="index + 1" scope="row"></td>
+    <td  class="text-center" v-text="index + 1" scope="row"></td>
     <td v-text="type.name"></td>
     <td class="text-center">
       <button @click="edit(type)" class="btn btn-link btn-sm"><i class="fas fa-edit"></i></button>
