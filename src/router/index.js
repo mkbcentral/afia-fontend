@@ -7,7 +7,7 @@ const router = createRouter({
   routes: [
     //MENU
     {
-      path: '/menu',
+      path: '/',
       name: 'menu',
       component: MainMenuView,
       meta: {

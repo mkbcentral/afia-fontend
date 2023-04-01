@@ -26,7 +26,7 @@ const login = async () => {
       localStorage.setItem('role', JSON.stringify(response.data.data.role))
       localStorage.setItem('hospital', JSON.stringify(response.data.data.hospital))
       localStorage.setItem('branch', JSON.stringify(response.data.data.branch))
-      router.push('/menu')
+      router.push('/')
       isLoanding.value = false
     } else {
       errorResp.value = response.data.message

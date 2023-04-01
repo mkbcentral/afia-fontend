@@ -80,21 +80,18 @@ const create = async (values) => {
     try {
         const response = await CompanyApi.createCompany(values);
         if (response.data.success) {
-            console.log(response.data)
             isLoanding.value = false
             listCompanies.value.unshift(response.data.company)
             toastr.success(response.data.message, 'Validation')
             $('#addCompanyModal').modal('hide');
-            form.value.resetForm()
+            form.value.resetForm()//Ben MWILA
         } else {
             errorResp.value = response.data.message
             isLoanding.value = false
         }
     } catch (error) {
-        console.log(error)
         isLoanding.value = false
         toastr.success(error.message, 'Validation')
-        console.log(error)
     } finally {
         form.value.resetForm()
         isLoanding.value = false
