@@ -1,17 +1,17 @@
 <script setup>
 import AdminLayout from '../../../layouts/AdminLayout.vue';
-import { ref, onMounted } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { Form, Field } from 'vee-validate'
 import * as yup from 'yup'
 import { useToastr } from '../../../../src/widgets/toastr.js'
-import ItemListRoleWidget from './widgets/ItemListRoleWidget.vue';
-import RoleApi from '../../../services/Admin/RoleApi';
+import CurrencyApi from '../../../services/Admin/CurrencyApi'
 import NetworkError from '../../../components/errors/Network.vue';
 import Swal from 'sweetalert2'
+import CurrencyItemListWidget from './widgets/CurrencyItemListWidget.vue'
 
+const listCurrencies = ref([])
 
-const listRoles = ref([])
-const roleToEdit = ref({})
+const defaulthHospital = ref()
 
 const token = ref('')
 let errors = ref({})
@@ -25,7 +25,9 @@ const isNetWorkError = ref(false)
 const formValues = ref()
 const form = ref(null)
 const toastr = useToastr()
-
+const hospitalId = reactive({
+    branch_id: 0
+})
 
 const schema = yup.object({
     name: yup.string().required(),
@@ -33,7 +35,7 @@ const schema = yup.object({
 
 const add = async () => {
     isEditing.value = false;
-    $('#addRoleModal').modal('show');
+    $('#addCurrencyModal').modal('show');
     form.value.resetForm()
 }
 
@@ -41,8 +43,8 @@ const getData = async () => {
     isDataLoanding.value = true;
     isNetWorkError.value = false
     try {
-        const response = await RoleApi.getRoles();
-        listRoles.value = response.data.data;
+        const response = await CurrencyApi.getCurrencies();
+        listCurrencies.value = response.data.data;
         isDataLoanding.value = false
     } catch (error) {
         console.log(error)
@@ -54,13 +56,13 @@ const getData = async () => {
     }
 }
 
-const edit = (role) => {
+const edit = (currency) => {
     isEditing.value = true;
-    $('#addRoleModal').modal('show');
+    $('#addCurrencyModal').modal('show');
     form.value.resetForm()
     formValues.value = {
-        id: role.id,
-        name: role.name,
+        id: currency.id,
+        name: currency.name,
     }
 }
 
@@ -68,12 +70,12 @@ const edit = (role) => {
 const create = async (values) => {
     isLoanding.value = true
     try {
-        const response = await RoleApi.createRole(values);
+        const response = await CurrencyApi.createCurrency(values);
         if (response.data.success) {
             isLoanding.value = false
-            listRoles.value.unshift(response.data.role)
+            listCurrencies.value.unshift(response.data.currency)
             toastr.success(response.data.message, 'Validation')
-            $('#addRoleModal').modal('hide');
+            $('#addCurrencyModal').modal('hide');
             form.value.resetForm()
         } else {
             errorResp.value = response.data.message
@@ -88,13 +90,13 @@ const create = async (values) => {
 const update = async (values) => {
     isLoanding.value = true
     try {
-        const response = await RoleApi.updateRole(formValues.value.id, values)
+        const response = await CurrencyApi.updateCurrency(formValues.value.id, values)
         if (response.data.success) {
             isLoanding.value = false
-            const index = listRoles.value.findIndex(role => role.id == response.data.role.id)
-            listRoles.value[index] = response.data.role
+            const index = listCurrencies.value.findIndex(currency => currency.id == response.data.currency.id)
+            listCurrencies.value[index] = response.data.currency
             toastr.success(response.data.message, 'Validation')
-            $('#addRoleModal').modal('hide');
+            $('#addCurrecnyModal').modal('hide');
             form.value.resetForm()
         } else {
             errorResp.value = response.data.message
@@ -103,7 +105,7 @@ const update = async (values) => {
     } catch (error) {
         console.log(error)
     } finally {
-        form.resetForm()
+        form.value.resetForm()
     }
 
 }
@@ -116,19 +118,10 @@ const handlerSubmit = (values) => {
     }
 }
 
-const changeStatus = async (role, status) => {
-    try {
-        const response = await RoleApi.changeStatus(role.id, { status: status });
-        toastr.success(response.data.message, 'Validation')
-    } catch (error) {
-        console / log(error)
-    }
-}
-
-const deleteRole = async (id) => {
+const deleteCurrency = async (id) => {
     Swal.fire({
         title: 'Are you sure?',
-        text: "You won't delete this role!",
+        text: "You won't delete this currency!",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
@@ -136,14 +129,14 @@ const deleteRole = async (id) => {
         confirmButtonText: 'Yes'
     }).then(async (result) => {
         if (result.isConfirmed) {
-            const response = await RoleApi.deleteRole(id)
+            const response = await CurrencyApi.deleteCurrency(id)
             if (response.data.success) {
                 Swal.fire(
                     'Deleted!',
                     response.data.message,
                     'success'
                 )
-                listRoles.value = listRoles.value.filter(role => role.id != id);
+                listCurrencies.value = listCurrencies.value.filter(currency => currency.id != id);
             } else {
                 Swal.fire(
                     'Warning',
@@ -156,12 +149,12 @@ const deleteRole = async (id) => {
     })
 }
 
-const getRoles = async () => {
+const getCurrencies = async () => {
     isDataLoanding.value = true;
     isNetWorkError.value = false;
     try {
-        const response = await RoleApi.getRoles();
-        listRoles.value = response.data.data;
+        const response = await CurrencyApi.getCurrencies();
+        listCurrencies.value = response.data.data;
         isDataLoanding.value = false
     } catch (error) {
         console.log(error)
@@ -175,8 +168,11 @@ const getRoles = async () => {
 
 onMounted(async () => {
     token.value = localStorage.getItem('token')
-    getRoles()
+    defaulthHospital.value = JSON.parse(localStorage.getItem('hospital'))
+    hospitalId.id = defaulthHospital.value.id
+    getCurrencies()
 })
+
 </script>
 <template>
     <AdminLayout>
@@ -187,7 +183,7 @@ onMounted(async () => {
             <div class="card-header">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h5 class="m-0"><i class="fa fa-list" aria-hidden="true"></i> List of roles</h5>
+                        <h5 class="m-0"><i class="fa fa-list" aria-hidden="true"></i> List of currencies</h5>
                     </div>
                     <div>
                         <button @click="add" type="button" class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"
@@ -207,37 +203,36 @@ onMounted(async () => {
                         <tr>
                             <th>#</th>
                             <th>NAME</th>
-                            <th>STATUS</th>
                             <th class="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <ItemListRoleWidget v-for="(role, index) in listRoles" :key="role.id" :role=role :index=index
-                            @edit-role="edit" @change-status="changeStatus" @delete-role="deleteRole(role.id)" />
+                        <CurrencyItemListWidget v-for="(currency, index) in listCurrencies" :key="currency.id" :currency=currency :index=index
+                            @edit-currency="edit" @delete-currency="deleteCurrency(currency.id)" />
                     </tbody>
                 </table>
             </div>
         </div>
         <!--Add Modal -->
-        <div class="modal fade" id="addRoleModal" tabindex="-1" aria-labelledby="addRoleModalLabel" aria-hidden="true">
+        <div class="modal fade" id="addCurrencyModal" tabindex="-1" aria-labelledby="addCurrencyModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <Form ref="form" @submit="handlerSubmit" :validation-schema="schema" v-slot="{ errors }"
                     :initial-values="formValues">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 v-if="isEditing" class="modal-title" id="addRoleModalLabel">
-                                <i class="fa fa-plus-circle" aria-hidden="true"></i> EDIT ROLE
+                            <h5 v-if="isEditing" class="modal-title" id="addCurrencyModalLabel">
+                                <i class="fa fa-plus-circle" aria-hidden="true"></i> EDIT CURRENCY
                             </h5>
-                            <h5 v-else class="modal-title" id="addRoleModalLabel">
+                            <h5 v-else class="modal-title" id="addCurrencyModalLabel">
                                 <i class="fas fa-edit    "></i>
-                                CREATE ROLE
+                                CREATE CURRENCY
                             </h5>
                         </div>
                         <div class="modal-body">
                             <div class="form-group">
-                                <label>Clinic Name</label>
-                                <Field name="name" type="text" class="form-control" :class="{ 'is-invalid': errors.name }"
-                                    placeholder="Name of clinic" />
+                                <label>Amount</label>
+                                <Field name="name" type="text" class="form-control"
+                                    :class="{ 'is-invalid': errors.name }" placeholder="Name of currency" />
                                 <span class="invalid-feedback">{{ errors.name }}</span>
                             </div>
                         </div>

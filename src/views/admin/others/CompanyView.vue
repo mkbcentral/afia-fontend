@@ -189,7 +189,7 @@ onMounted(async () => {
             <div class="card-header">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h5 class="m-0"><i class="fa fa-list" aria-hidden="true"></i> List of branches</h5>
+                        <h5 class="m-0"><i class="fa fa-list" aria-hidden="true"></i> List of companies</h5>
                     </div>
                     <div>
                         <button @click="add" type="button" class="btn btn-primary btn-sm">

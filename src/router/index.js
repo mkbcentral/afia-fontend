@@ -91,6 +91,24 @@ const router = createRouter({
         requireAuth: true
       }
     },
+    //COMPANY ROUTE
+    {
+      path: '/admin/rate',
+      name: 'rate',
+      component: () => import('../views/admin/others/RateView.vue'),
+      meta: {
+        requireAuth: true
+      }
+    },
+    //COMPANY ROUTE
+    {
+      path: '/admin/currency',
+      name: 'currency',
+      component: () => import('../views/admin/others/CurrencyView.vue'),
+      meta: {
+        requireAuth: true
+      }
+    },
     {
       path: '/about',
       name: 'about',

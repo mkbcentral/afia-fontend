@@ -69,6 +69,18 @@ import MenuHospital from '../components/Navs/MenuHospital.vue'
                 <p> Companies</p>
               </RouterLink>
             </li>
+            <li class="nav-item">
+              <RouterLink to="/admin/rate" class="nav-link" active-class="active">
+                <i class="fas fa-percent"></i>
+                <p> Rates</p>
+              </RouterLink>
+            </li>
+            <li class="nav-item">
+              <RouterLink to="/admin/currency" class="nav-link" active-class="active">
+                <i class="fas fa-wallet"></i>
+                <p> Currencies</p>
+              </RouterLink>
+            </li>
           </ul>
         </nav>
       </div>

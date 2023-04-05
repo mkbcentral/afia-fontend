@@ -1,17 +1,17 @@
 <script setup>
 import AdminLayout from '../../../layouts/AdminLayout.vue';
-import { ref, onMounted } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { Form, Field } from 'vee-validate'
 import * as yup from 'yup'
 import { useToastr } from '../../../../src/widgets/toastr.js'
-import ItemListRoleWidget from './widgets/ItemListRoleWidget.vue';
-import RoleApi from '../../../services/Admin/RoleApi';
+import RateApi from '../../../services/Admin/RateApi'
 import NetworkError from '../../../components/errors/Network.vue';
 import Swal from 'sweetalert2'
+import ItemListRateWidget from './widgets/ItemListRateWidget.vue';
 
+const listRates = ref([])
 
-const listRoles = ref([])
-const roleToEdit = ref({})
+const defaulthHospital = ref()
 
 const token = ref('')
 let errors = ref({})
@@ -25,15 +25,17 @@ const isNetWorkError = ref(false)
 const formValues = ref()
 const form = ref(null)
 const toastr = useToastr()
-
+const hospitalId = reactive({
+    branch_id: 0
+})
 
 const schema = yup.object({
-    name: yup.string().required(),
+    amount: yup.number().required(),
 })
 
 const add = async () => {
     isEditing.value = false;
-    $('#addRoleModal').modal('show');
+    $('#addRateModal').modal('show');
     form.value.resetForm()
 }
 
@@ -41,8 +43,8 @@ const getData = async () => {
     isDataLoanding.value = true;
     isNetWorkError.value = false
     try {
-        const response = await RoleApi.getRoles();
-        listRoles.value = response.data.data;
+        const response = await RateApi.getRates();
+        listRates.value = response.data.data;
         isDataLoanding.value = false
     } catch (error) {
         console.log(error)
@@ -54,26 +56,27 @@ const getData = async () => {
     }
 }
 
-const edit = (role) => {
+const edit = (rate) => {
     isEditing.value = true;
-    $('#addRoleModal').modal('show');
+    $('#addRateModal').modal('show');
     form.value.resetForm()
     formValues.value = {
-        id: role.id,
-        name: role.name,
+        id: rate.id,
+        amount: rate.amount,
     }
 }
 
 
 const create = async (values) => {
     isLoanding.value = true
+    values.hospital_id = hospitalId.id
     try {
-        const response = await RoleApi.createRole(values);
+        const response = await RateApi.createRate(values);
         if (response.data.success) {
             isLoanding.value = false
-            listRoles.value.unshift(response.data.role)
+            listRates.value.unshift(response.data.rate)
             toastr.success(response.data.message, 'Validation')
-            $('#addRoleModal').modal('hide');
+            $('#addRateModal').modal('hide');
             form.value.resetForm()
         } else {
             errorResp.value = response.data.message
@@ -88,13 +91,13 @@ const create = async (values) => {
 const update = async (values) => {
     isLoanding.value = true
     try {
-        const response = await RoleApi.updateRole(formValues.value.id, values)
+        const response = await RateApi.updateRate(formValues.value.id, values)
         if (response.data.success) {
             isLoanding.value = false
-            const index = listRoles.value.findIndex(role => role.id == response.data.role.id)
-            listRoles.value[index] = response.data.role
+            const index = listRates.value.findIndex(rate => rate.id == response.data.rate.id)
+            listRates.value[index] = response.data.rate
             toastr.success(response.data.message, 'Validation')
-            $('#addRoleModal').modal('hide');
+            $('#addRateModal').modal('hide');
             form.value.resetForm()
         } else {
             errorResp.value = response.data.message
@@ -103,7 +106,7 @@ const update = async (values) => {
     } catch (error) {
         console.log(error)
     } finally {
-        form.resetForm()
+        form.value.resetForm()
     }
 
 }
@@ -116,19 +119,10 @@ const handlerSubmit = (values) => {
     }
 }
 
-const changeStatus = async (role, status) => {
-    try {
-        const response = await RoleApi.changeStatus(role.id, { status: status });
-        toastr.success(response.data.message, 'Validation')
-    } catch (error) {
-        console / log(error)
-    }
-}
-
-const deleteRole = async (id) => {
+const changeStatus = async (id) => {
     Swal.fire({
         title: 'Are you sure?',
-        text: "You won't delete this role!",
+        text: "You won't change status for this rate!",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
@@ -136,14 +130,47 @@ const deleteRole = async (id) => {
         confirmButtonText: 'Yes'
     }).then(async (result) => {
         if (result.isConfirmed) {
-            const response = await RoleApi.deleteRole(id)
+            const response = await RateApi.changeStatus(id);
             if (response.data.success) {
                 Swal.fire(
                     'Deleted!',
                     response.data.message,
                     'success'
                 )
-                listRoles.value = listRoles.value.filter(role => role.id != id);
+                const index = listRates.value.findIndex(rate => rate.id == response.data.rate.id)
+                listRates.value[index] = response.data.rate
+            } else {
+                Swal.fire(
+                    'Warning',
+                    response.data.message,
+                    'error'
+                )
+            }
+
+        }
+    })
+
+}
+
+const deleteRate = async (id) => {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't delete this rate!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes'
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            const response = await RateApi.deletetRate(id)
+            if (response.data.success) {
+                Swal.fire(
+                    'Deleted!',
+                    response.data.message,
+                    'success'
+                )
+                listRates.value = listRates.value.filter(rate => rate.id != id);
             } else {
                 Swal.fire(
                     'Warning',
@@ -156,12 +183,12 @@ const deleteRole = async (id) => {
     })
 }
 
-const getRoles = async () => {
+const getRates = async () => {
     isDataLoanding.value = true;
     isNetWorkError.value = false;
     try {
-        const response = await RoleApi.getRoles();
-        listRoles.value = response.data.data;
+        const response = await RateApi.getRates();
+        listRates.value = response.data.data;
         isDataLoanding.value = false
     } catch (error) {
         console.log(error)
@@ -173,10 +200,15 @@ const getRoles = async () => {
     }
 }
 
+
+
 onMounted(async () => {
     token.value = localStorage.getItem('token')
-    getRoles()
+    defaulthHospital.value = JSON.parse(localStorage.getItem('hospital'))
+    hospitalId.id = defaulthHospital.value.id
+    getRates()
 })
+
 </script>
 <template>
     <AdminLayout>
@@ -187,7 +219,7 @@ onMounted(async () => {
             <div class="card-header">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h5 class="m-0"><i class="fa fa-list" aria-hidden="true"></i> List of roles</h5>
+                        <h5 class="m-0"><i class="fa fa-list" aria-hidden="true"></i> List of rates</h5>
                     </div>
                     <div>
                         <button @click="add" type="button" class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"
@@ -207,38 +239,38 @@ onMounted(async () => {
                         <tr>
                             <th>#</th>
                             <th>NAME</th>
-                            <th>STATUS</th>
+                            <th class="text-center">STATUS</th>
                             <th class="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <ItemListRoleWidget v-for="(role, index) in listRoles" :key="role.id" :role=role :index=index
-                            @edit-role="edit" @change-status="changeStatus" @delete-role="deleteRole(role.id)" />
+                        <ItemListRateWidget v-for="(rate, index) in listRates" :key="rate.id" :rate=rate :index=index
+                            @edit-rate="edit" @change-status="changeStatus(rate.id)" @delete-rate="deleteRate(rate.id)" />
                     </tbody>
                 </table>
             </div>
         </div>
         <!--Add Modal -->
-        <div class="modal fade" id="addRoleModal" tabindex="-1" aria-labelledby="addRoleModalLabel" aria-hidden="true">
+        <div class="modal fade" id="addRateModal" tabindex="-1" aria-labelledby="addRateModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <Form ref="form" @submit="handlerSubmit" :validation-schema="schema" v-slot="{ errors }"
                     :initial-values="formValues">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 v-if="isEditing" class="modal-title" id="addRoleModalLabel">
-                                <i class="fa fa-plus-circle" aria-hidden="true"></i> EDIT ROLE
+                            <h5 v-if="isEditing" class="modal-title" id="addRateModalLabel">
+                                <i class="fa fa-plus-circle" aria-hidden="true"></i> EDIT RATE
                             </h5>
-                            <h5 v-else class="modal-title" id="addRoleModalLabel">
+                            <h5 v-else class="modal-title" id="addRateModalLabel">
                                 <i class="fas fa-edit    "></i>
-                                CREATE ROLE
+                                CREATE RATE
                             </h5>
                         </div>
                         <div class="modal-body">
                             <div class="form-group">
-                                <label>Clinic Name</label>
-                                <Field name="name" type="text" class="form-control" :class="{ 'is-invalid': errors.name }"
-                                    placeholder="Name of clinic" />
-                                <span class="invalid-feedback">{{ errors.name }}</span>
+                                <label>Amount</label>
+                                <Field name="amount" type="text" class="form-control"
+                                    :class="{ 'is-invalid': errors.amount }" placeholder="0" />
+                                <span class="invalid-feedback">{{ errors.amount }}</span>
                             </div>
                         </div>
                         <div class="modal-footer">
