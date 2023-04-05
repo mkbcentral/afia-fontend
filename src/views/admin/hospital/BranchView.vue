@@ -57,15 +57,6 @@ const getData = async () => {
     }
 }
 
-const edit = (branch) => {
-    isEditing.value = true;
-    $('#addBranchModal').modal('show');
-    form.value.resetForm()
-    formValues.value = {
-        id: branch.id,
-        name: branch.name,
-    }
-}
 
 const create = async (values) => {
     isLoanding.value = true
@@ -75,7 +66,7 @@ const create = async (values) => {
         if (response.data.success) {
             console.log(response.data)
             isLoanding.value = false
-            getBranches()
+           listBranches.value.push(response.data.branch)
             toastr.success(response.data.message, 'Validation')
             $('#addBranchModal').modal('hide');
             form.value.resetForm()
@@ -89,13 +80,23 @@ const create = async (values) => {
         form.value.resetForm()
     }
 }
+const edit = (branch) => {
+    isEditing.value = true;
+    $('#addBranchModal').modal('show');
+    form.value.resetForm()
+    formValues.value = {
+        id: branch.id,
+        name: branch.name,
+    }
+}
 const update = async (values) => {
     isLoanding.value = true
     try {
         const response = await BranchApi.updateBranch(formValues.value.id, values)
         if (response.data.success) {
             isLoanding.value = false
-            getBranches()
+            const index = listBranches.value.findIndex(branch => branch.id == response.data.branch.id)
+            listBranches.value[index] = response.data.branch
             toastr.success(response.data.message, 'Validation')
             $('#addBranchModal').modal('hide');
             form.value.resetForm()
@@ -131,7 +132,7 @@ const changeStatus = async (branch, status) => {
 const deleteBranch = async (id) => {
     Swal.fire({
     title: 'Are you sure?',
-    text: "You won't delete this role!",
+    text: "You won't delete this center!",
     icon: 'warning',
     showCancelButton: true,
     confirmButtonColor: '#3085d6',
@@ -146,7 +147,7 @@ const deleteBranch = async (id) => {
           response.data.message,
           'success'
         )
-        getBranches()
+        listBranches.value = listBranches.value.filter(branch => branch.id != id);
       } else {
         Swal.fire(
           'Warning',
@@ -191,7 +192,7 @@ onMounted(async () => {
             <div class="card-header">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h5 class="m-0"><i class="fa fa-list" aria-hidden="true"></i> List of branches</h5>
+                        <h5 class="m-0"><i class="fa fa-list" aria-hidden="true"></i> List of centers</h5>
                     </div>
                     <div>
                         <button @click="add" type="button" class="btn btn-primary btn-sm">New</button>
@@ -208,7 +209,7 @@ onMounted(async () => {
                 <table v-else class="table table-bordered table-sm">
                     <thead>
                         <tr>
-                            <th>#</th>
+                            <th class="text-center">#</th>
                             <th>NAME</th>
                             <th>STATUS</th>
                             <th class="text-center">Actions</th>

@@ -5,6 +5,7 @@ import AdminLayout from '../../../layouts/AdminLayout.vue';
 import axios from 'axios';
 import { ref, reactive, onMounted } from 'vue'
 import { Form, Field } from 'vee-validate'
+import { vMaska } from "maska"
 import * as yup from 'yup'
 import { useToastr } from '../../../../src/widgets/toastr.js'
 import UserApi from '../../../services/Admin/UserApi';
@@ -281,7 +282,7 @@ onMounted(async () => {
               </div>
               <div class="form-group">
                 <label>User Phone</label>
-                <Field name="phone" type="text" class="form-control" :class="{ 'is-invalid': errors.phone }"
+                <Field v-maska data-maska="+243 ### ### ###" name="phone" type="text" class="form-control" :class="{ 'is-invalid': errors.phone }"
                   placeholder="Phone of user" />
                 <span class="invalid-feedback">{{ errors.phone }}</span>
               </div>

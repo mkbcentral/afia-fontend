@@ -22,6 +22,18 @@ import MenuHospital from '../components/Navs/MenuHospital.vue'
               </RouterLink>
             </li>
             <li class="nav-item">
+                <RouterLink to="/admin/hospital" class="nav-link" active-class="active">
+                    <i class="fas fa-hospital"></i>
+                    <p> Hospital</p>
+                </RouterLink>
+            </li>
+            <li class="nav-item">
+                <RouterLink to="/admin/branch" class="nav-link" active-class="active">
+                    <i class="fas fa-hospital"></i>
+                    <p> Centres</p>
+                </RouterLink>
+            </li>
+            <li class="nav-item">
               <RouterLink to="/admin/user" class="nav-link" active-class="active">
                 <i class="fas fa-users-cog"></i>
                 <p> Users</p>

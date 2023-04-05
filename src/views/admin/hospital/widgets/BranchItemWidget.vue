@@ -31,7 +31,7 @@ const editStatus = async (branch, status) => {
 </script>
 <template>
   <tr>
-    <td v-text="index + 1" scope="row"></td>
+    <td class="text-center" v-text="index + 1" scope="row"></td>
     <td v-text="branch.name"></td>
     <td>
       <select class="form-control" @change="editStatus(branch, $event.target.value)">

@@ -3,6 +3,7 @@ import AdminLayout from '../../../layouts/AdminLayout.vue';
 import axios from 'axios';
 import { ref, reactive, onMounted } from 'vue'
 import { Form, Field } from 'vee-validate'
+import { vMaska } from "maska"
 import * as yup from 'yup'
 import { useToastr } from '../../../../src/widgets/toastr.js'
 import HospitalItemList from './widgets/HospitalItemList.vue';
@@ -78,13 +79,26 @@ const create = async (values) => {
     form.value.resetForm()
   }
 }
+
+const edit = (hospital) => {
+  isEditing.value = true;
+  $('#addHospitalModal').modal('show');
+  form.value.resetForm()
+  formValues.value = {
+    id: hospital.id,
+    name: hospital.name,
+    email: hospital.email,
+    phone: hospital.phone
+  }
+}
 const update = async (values) => {
   isLoanding.value = true
   try {
     const response = await HospitalApi.updateHopital(formValues.value.id, values);
     if (response.data.success) {
       isLoanding.value = false
-      getHospitals()
+      const index = listHospitals.value.findIndex(hospital => hospital.id == response.data.hospital.id)
+      listHospitals.value[index] = response.data.hospital
       toastr.success(response.data.message, 'Validation')
       $('#addHospitalModal').modal('hide');
       form.value.resetForm()
@@ -96,19 +110,6 @@ const update = async (values) => {
     console.log(error)
   } finally {
     form.value.resetForm()
-  }
-}
-
-
-const edit = (hospital) => {
-  isEditing.value = true;
-  $('#addHospitalModal').modal('show');
-  form.value.resetForm()
-  formValues.value = {
-    id: hospital.id,
-    name: hospital.name,
-    email: hospital.email,
-    phone: hospital.phone
   }
 }
 
@@ -143,7 +144,7 @@ const deleteHospital = async (id) => {
           response.data.message,
           'success'
         )
-        getHospitals()
+        listHospitals.value = listHospitals.value.filter(hospital => hospital.id != id);
       } else {
         Swal.fire(
           'Warning',
@@ -291,7 +292,7 @@ onMounted(async () => {
               </div>
               <div class="form-group">
                 <label>Clinic Phone</label>
-                <Field name="phone" type="text" class="form-control" :class="{ 'is-invalid': errors.phone }"
+                <Field v-maska data-maska="+243 ### ### ###" name="phone" type="text" class="form-control" :class="{ 'is-invalid': errors.phone }"
                   placeholder="Phone of clinic" />
                 <span class="invalid-feedback">{{ errors.phone }}</span>
               </div>
@@ -310,32 +311,7 @@ onMounted(async () => {
         </Form>
       </div>
     </div>
-    <!--Delete Modal -->
-    <div class="modal fade" id="deleteHospitalModal" tabindex="-1" aria-labelledby="addRoleModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 v-if="isEditing" class="modal-title text-info" id="addRoleModalLabel">
-              Voulez-vous vraiment supprimer ?
-            </h5>
-          </div>
-          <div class="modal-body">
-            <h1 class="text-center text-danger">
-              <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-            </h1>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Non</button>
-            <button type="button" @click="deleteHospital" class="btn btn-danger btn-sm">
-              <div class="d-flex justify-content-center">
-                <div v-if="isLoanding" class="spinner-border text-light spinner-sm" role="status"></div>
-                <div class="pl-2">Oui</div>
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+    
     <!--Delete Modal -->
     <div class="modal fade" id="changeHospitalModal" tabindex="-1" aria-labelledby="addRoleModalLabel" aria-hidden="true">
       <div class="modal-dialog">
