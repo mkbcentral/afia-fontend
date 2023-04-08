@@ -1,9 +1,7 @@
 <script setup>
 
 import AdminLayout from '../../../layouts/AdminLayout.vue';
-
-import axios from 'axios';
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
 import { Form, Field } from 'vee-validate'
 import { vMaska } from "maska"
 import * as yup from 'yup'
@@ -13,6 +11,8 @@ import ItemListUserWdgetVue from './widgets/ItemListUserWdget.vue';
 import NetworkError from '../../../components/errors/Network.vue';
 import RoleApi from '../../../services/Admin/RoleApi.js'
 import Swal from 'sweetalert2'
+import { debounce } from 'lodash'
+import { Bootstrap4Pagination } from 'laravel-vue-pagination';
 
 
 const listUsers = ref([])
@@ -38,6 +38,7 @@ const isNetWorkError = ref(false)
 const formValues = ref()
 const form = ref(null)
 const toastr = useToastr()
+const searchQuary = ref(null)
 
 
 const schema = yup.object({
@@ -189,7 +190,7 @@ const getUsers = async () => {
   isDataLoanding.value = true
   isNetWorkError.value = false
   try {
-    const response = await UserApi.getUsers()
+    const response = await UserApi.getUsers(1)
     listUsers.value = response.data.data
     isDataLoanding.value = false
   } catch (error) {
@@ -201,6 +202,19 @@ const getUsers = async () => {
     isDataLoanding.value = false
   }
 }
+
+const searchData = async () => {
+  try {
+    const response = await UserApi.searchUser(searchQuary.value);
+    listUsers.value = response.data.data;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+watch(searchQuary, debounce(() => {
+  searchData()
+}, 300))
 onMounted(async () => {
   token.value = localStorage.getItem('token')
   defaultHospital.value = JSON.parse(localStorage.getItem('hospital'))
@@ -235,24 +249,39 @@ onMounted(async () => {
             <span hidden class="visually-hidden">Loading...</span>
           </div>
         </div>
-        <table v-else class="table table-bordered table-sm">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>NAME</th>
-              <th>EMAIL</th>
-              <th>PHONE</th>
-              <th class="text-cnter">ROLE</th>
-              <th>CLINIC</th>
-              <th>STATUS</th>
-              <th class="text-center">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <ItemListUserWdgetVue v-for="(user, index) in listUsers" :key="user.id" :user=user :index=index
-              @edit-user="edit" @change-status="changeStatus" @delete-user="deleteUser(user.id)" />
-          </tbody>
-        </table>
+        <div v-else>
+          <div class="d-flex">
+            <div class="form-group">
+              <input v-model="searchQuary" id="my-input" placeholder="Search here..." class="form-control" type="text">
+            </div>
+          </div>
+          <table class="table table-bordered table-sm">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>NAME</th>
+                <th>EMAIL</th>
+                <th>PHONE</th>
+                <th class="text-cnter">ROLE</th>
+                <th>CLINIC</th>
+                <th>STATUS</th>
+                <th class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody v-if="listUsers.length > 0">
+              <ItemListUserWdgetVue v-for="(user, index) in listUsers" :key="user.id" :user=user :index=index
+                @edit-user="edit" @change-status="changeStatus" @delete-user="deleteUser(user.id)" />
+            </tbody>
+            <tbody v-else>
+              <tr>
+                <td colspan="8" class="text-center p-4 text-secondary"> <i class="fas fa-database"></i> Not result
+                  found...</td>
+              </tr>
+            </tbody>
+          </table>
+          <Bootstrap4Pagination :data="listUsers" @pagination-change-page="getUsers" />
+        </div>
+
       </div>
     </div>
     <!-- Modal -->
@@ -282,8 +311,8 @@ onMounted(async () => {
               </div>
               <div class="form-group">
                 <label>User Phone</label>
-                <Field v-maska data-maska="+243 ### ### ###" name="phone" type="text" class="form-control" :class="{ 'is-invalid': errors.phone }"
-                  placeholder="Phone of user" />
+                <Field v-maska data-maska="+243 ### ### ###" name="phone" type="text" class="form-control"
+                  :class="{ 'is-invalid': errors.phone }" placeholder="Phone of user" />
                 <span class="invalid-feedback">{{ errors.phone }}</span>
               </div>
               <div class="form-group">

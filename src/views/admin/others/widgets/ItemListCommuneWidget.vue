@@ -10,11 +10,11 @@ defineProps({
 });
 
 
-const edit = (role) => {
-  emit ('editCommune',role)
+const edit = (commune) => {
+  emit ('editCommune',commune)
 }
-const deleteDialog = (role) => {
-  emit ('deleteCommune',role)
+const deleteDialog = (commune) => {
+  emit ('deleteCommune',commune)
 }
 </script>
 <template>

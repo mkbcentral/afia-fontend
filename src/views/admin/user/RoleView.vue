@@ -11,8 +11,6 @@ import Swal from 'sweetalert2'
 
 
 const listRoles = ref([])
-const roleToEdit = ref({})
-
 const token = ref('')
 let errors = ref({})
 let errorResp = ref('')

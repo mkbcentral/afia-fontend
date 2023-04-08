@@ -138,7 +138,7 @@ const deleteCommune = async (id) => {
                         response.data.message,
                         'success'
                     )
-                    listCommunes.value = listCommunes.value.filter(type => type.id != id);
+                    listCommunes.value = listCommunes.value.filter(commune => commune.id != id);
                 } else {
                     Swal.fire(
                         'Warning',
