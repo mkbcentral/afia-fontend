@@ -66,7 +66,6 @@ const edit = (currency) => {
     }
 }
 
-
 const create = async (values) => {
     isLoanding.value = true
     try {
@@ -78,8 +77,13 @@ const create = async (values) => {
             $('#addCurrencyModal').modal('hide');
             form.value.resetForm()
         } else {
-            errorResp.value = response.data.message
+            if (response.data.errors) {
+                errorResp.value = response.data.errors
+            } else {
+                errorResp.value = response.data.message
+            }
             isLoanding.value = false
+            toastr.error(errorResp.value, 'Validation')
         }
     } catch (error) {
         console.log(error);
@@ -87,6 +91,7 @@ const create = async (values) => {
         form.value.resetForm()
     }
 }
+
 const update = async (values) => {
     isLoanding.value = true
     try {
@@ -96,7 +101,7 @@ const update = async (values) => {
             const index = listCurrencies.value.findIndex(currency => currency.id == response.data.currency.id)
             listCurrencies.value[index] = response.data.currency
             toastr.success(response.data.message, 'Validation')
-            $('#addCurrecnyModal').modal('hide');
+            $('#addCurrencyModal').modal('hide');
             form.value.resetForm()
         } else {
             errorResp.value = response.data.message
@@ -179,6 +184,7 @@ onMounted(async () => {
         <div v-if="isNetWorkError">
             <NetworkError :message=errorResp @load-data="getData" />
         </div>
+         <!--List rates -->
         <div v-else class="card card-primary card-outline">
             <div class="card-header">
                 <div class="d-flex justify-content-between">
@@ -201,20 +207,29 @@ onMounted(async () => {
                 <table v-else class="table table-bordered table-sm">
                     <thead>
                         <tr>
-                            <th>#</th>
+                            <th class="text-center">#</th>
                             <th>NAME</th>
                             <th class="text-center">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <CurrencyItemListWidget v-for="(currency, index) in listCurrencies" :key="currency.id" :currency=currency :index=index
-                            @edit-currency="edit" @delete-currency="deleteCurrency(currency.id)" />
+                    <tbody v-if="listCurrencies.length > 0">
+                        <CurrencyItemListWidget v-for="(currency, index) in listCurrencies" :key="currency.id"
+                            :currency=currency :index=index @edit-currency="edit"
+                            @delete-currency="deleteCurrency(currency.id)" />
+                    </tbody>
+                    <tbody v-else>
+                        <tr>
+                            <td colspan="3" class="text-center p-4 text-secondary"> <i class="fas fa-database"></i> Not
+                                result
+                                found...</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
         </div>
         <!--Add Modal -->
-        <div class="modal fade" id="addCurrencyModal" tabindex="-1" aria-labelledby="addCurrencyModalLabel" aria-hidden="true">
+        <div class="modal fade" id="addCurrencyModal" tabindex="-1" aria-labelledby="addCurrencyModalLabel"
+            aria-hidden="true">
             <div class="modal-dialog">
                 <Form ref="form" @submit="handlerSubmit" :validation-schema="schema" v-slot="{ errors }"
                     :initial-values="formValues">
@@ -231,8 +246,8 @@ onMounted(async () => {
                         <div class="modal-body">
                             <div class="form-group">
                                 <label>Amount</label>
-                                <Field name="name" type="text" class="form-control"
-                                    :class="{ 'is-invalid': errors.name }" placeholder="Name of currency" />
+                                <Field name="name" type="text" class="form-control" :class="{ 'is-invalid': errors.name }"
+                                    placeholder="Name of currency" />
                                 <span class="invalid-feedback">{{ errors.name }}</span>
                             </div>
                         </div>

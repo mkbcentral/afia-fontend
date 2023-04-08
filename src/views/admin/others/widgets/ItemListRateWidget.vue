@@ -21,7 +21,7 @@ const editStatus = async (rate) => {
 </script>
 <template>
     <tr>
-        <td v-text="index + 1" scope="row"></td>
+        <td class="text-center" v-text="index + 1" scope="row"></td>
         <td v-text="rate.amount"></td>
         <td class="text-center" v-text="rate.status"></td>
         <td class="text-center">

@@ -26,6 +26,7 @@ const isNetWorkError = ref(false)
 const formValues = ref()
 const form = ref(null)
 const toastr = useToastr()
+
 const schema = yup.object({
     name: yup.string().required(),
     subscription_id: yup.number().required(),
@@ -76,7 +77,6 @@ const edit = (company) => {
 }
 const create = async (values) => {
     isLoanding.value = true
-    values.hospital_id = hospitalId.id
     try {
         const response = await CompanyApi.createCompany(values);
         if (response.data.success) {
@@ -86,8 +86,13 @@ const create = async (values) => {
             $('#addCompanyModal').modal('hide');
             form.value.resetForm()//Ben MWILA
         } else {
-            errorResp.value = response.data.message
+            if (response.data.errors) {
+                errorResp.value = response.data.errors
+            } else {
+                errorResp.value = response.data.message
+            }
             isLoanding.value = false
+            toastr.error(errorResp.value, 'Validation')
         }
     } catch (error) {
         isLoanding.value = false
@@ -103,8 +108,6 @@ const update = async (values) => {
         const response = await CompanyApi.updateCompany(formValues.value.id, values)
         if (response.data.success) {
             isLoanding.value = false
-            //const index=listCompanies.value.findIndex(company=>company.id==response.data.company.id)
-            //listCompanies.value[index].id = response.data.company.id
             getCompanies()
             toastr.info(response.data.message, 'Validation')
             $('#addCompanyModal').modal('hide');
@@ -144,7 +147,7 @@ const deleteCompany = async (id) => {
                     response.data.message,
                     'success'
                 )
-                listCompanies.value=listCompanies.value.filter(company=>company.id !=id);
+                listCompanies.value = listCompanies.value.filter(company => company.id != id);
             } else {
                 Swal.fire(
                     'Warning',
@@ -214,9 +217,16 @@ onMounted(async () => {
                             <th class="text-center">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody v-if="listCompanies.length>0">
                         <CompanyItemListViewVue v-for="(company, index) in listCompanies" :key="company.id" :company=company
                             :index=index @edit-company="edit" @delete-company="deleteCompany(company.id)" />
+                    </tbody>
+                    <tbody v-else>
+                        <tr>
+                            <td colspan="6" class="text-center p-4 text-secondary"> <i class="fas fa-database"></i> Not
+                                result
+                                found...</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -249,8 +259,8 @@ onMounted(async () => {
                                 <Field class="form-control" name="subscription_id" as="select"
                                     :class="{ 'is-invalid': errors.subscription_id }">
                                     <option :value="null">Choose here</option>
-                                    <option v-for="subscription in listSubscriptions" 
-                                        :value="subscription.id">{{ subscription.name }}
+                                    <option v-for="subscription in listSubscriptions" :value="subscription.id">{{
+                                        subscription.name }}
                                     </option>
                                 </Field>
                                 <span class="invalid-feedback">{{ errors.subscription_id }}</span>

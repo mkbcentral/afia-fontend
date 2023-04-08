@@ -66,10 +66,8 @@ const edit = (rate) => {
     }
 }
 
-
 const create = async (values) => {
     isLoanding.value = true
-    values.hospital_id = hospitalId.id
     try {
         const response = await RateApi.createRate(values);
         if (response.data.success) {
@@ -79,8 +77,13 @@ const create = async (values) => {
             $('#addRateModal').modal('hide');
             form.value.resetForm()
         } else {
-            errorResp.value = response.data.message
+            if (response.data.errors) {
+                errorResp.value = response.data.errors
+            } else {
+                errorResp.value = response.data.message
+            }
             isLoanding.value = false
+            toastr.error(errorResp.value, 'Validation')
         }
     } catch (error) {
         console.log(error);
@@ -200,8 +203,6 @@ const getRates = async () => {
     }
 }
 
-
-
 onMounted(async () => {
     token.value = localStorage.getItem('token')
     defaulthHospital.value = JSON.parse(localStorage.getItem('hospital'))
@@ -237,15 +238,22 @@ onMounted(async () => {
                 <table v-else class="table table-bordered table-sm">
                     <thead>
                         <tr>
-                            <th>#</th>
+                            <th class="text-center">#</th>
                             <th>NAME</th>
                             <th class="text-center">STATUS</th>
                             <th class="text-center">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody v-if="listRates.length > 0">
                         <ItemListRateWidget v-for="(rate, index) in listRates" :key="rate.id" :rate=rate :index=index
                             @edit-rate="edit" @change-status="changeStatus(rate.id)" @delete-rate="deleteRate(rate.id)" />
+                    </tbody>
+                    <tbody v-else>
+                        <tr>
+                            <td colspan="4" class="text-center p-4 text-secondary"> <i class="fas fa-database"></i> Not
+                                result
+                                found...</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>

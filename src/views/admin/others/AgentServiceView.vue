@@ -24,7 +24,6 @@ const formValues = ref()
 const form = ref(null)
 const toastr = useToastr()
 
-
 const schema = yup.object({
     name: yup.string().required(),
 })
@@ -185,6 +184,7 @@ onMounted(async () => {
         <div v-if="isNetWorkError">
             <NetworkError :message=errorResp @load-data="getData" />
         </div>
+         <!--Lis services -->
         <div v-else class="card card-primary card-outline">
             <div class="card-header">
                 <div class="d-flex justify-content-between">
@@ -212,9 +212,16 @@ onMounted(async () => {
                             <th class="text-center">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody v-if="listServices.length>0">
                         <AgentServiceItemListWidget v-for="(service, index) in listServices" :key="service.id" :service=service
                             :index=index @edit-service="edit" @delete-service="deleteService(service.id)" />
+                    </tbody>
+                    <tbody v-else>
+                        <tr>
+                            <td colspan="8" class="text-center p-4 text-secondary"> <i class="fas fa-database"></i> Not
+                                result
+                                found...</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>

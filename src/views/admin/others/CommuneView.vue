@@ -213,9 +213,16 @@ onMounted(async () => {
                             <th class="text-center">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody v-if="listCommunes.length>0">
                         <ItemListCommuneWidget v-for="(commune, index) in listCommunes" :key="commune.id" :commune=commune
                             :index=index @edit-commune="edit" @delete-commune="deleteCommune(commune.id)" />
+                    </tbody>
+                    <tbody v-else>
+                        <tr>
+                            <td colspan="3" class="text-center p-4 text-secondary"> <i class="fas fa-database"></i> Not
+                                result
+                                found...</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>

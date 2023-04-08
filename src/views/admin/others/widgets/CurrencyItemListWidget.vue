@@ -18,7 +18,7 @@ const deleteDialog = (currency) => {
 </script>
 <template>
     <tr>
-        <td v-text="index + 1" scope="row"></td>
+        <td class="text-center" v-text="index + 1" scope="row"></td>
         <td v-text="currency.name"></td>
         <td class="text-center">
             <button @click="edit(currency)" class="btn btn-link btn-sm"><i class="fas fa-edit"></i></button>

@@ -57,10 +57,8 @@ const getData = async () => {
     }
 }
 
-
 const create = async (values) => {
     isLoanding.value = true
-    values.hospital_id = hospitalId.id
     try {
         const response = await BranchApi.createBranch(values);
         if (response.data.success) {
@@ -71,8 +69,13 @@ const create = async (values) => {
             $('#addBranchModal').modal('hide');
             form.value.resetForm()
         } else {
-            errorResp.value = response.data.message
+            if (response.data.errors) {
+                errorResp.value = response.data.errors
+            } else {
+                errorResp.value = response.data.message
+            }
             isLoanding.value = false
+            toastr.error(errorResp.value, 'Validation')
         }
     } catch (error) {
         console.log(error)

@@ -40,7 +40,6 @@ const form = ref(null)
 const toastr = useToastr()
 const searchQuary = ref(null)
 
-
 const schema = yup.object({
   name: yup.string().required(),
   email: yup.string().required().email(),
@@ -84,7 +83,6 @@ const getRoles = async () => {
 
 const create = async (values) => {
   isLoanding.value = true;
-  values.hospital_id = hospitalId.id;
   values.branch_id = branchId.id
   try {
     const response = await UserApi.createUser(values)
@@ -96,8 +94,13 @@ const create = async (values) => {
       $('#adduserModal').modal('hide');
       form.value.resetForm()
     } else {
-      errorResp.value = response.data.message
+      if (response.data.errors) {
+        errorResp.value = response.data.errors
+      } else {
+        errorResp.value = response.data.message
+      }
       isLoanding.value = false
+      toastr.error(errorResp.value, 'Validation')
     }
   } catch (error) {
     console.log(error)
@@ -176,6 +179,7 @@ const deleteUser = async (id) => {
 
     }
   })
+
 }
 const changeStatus = async (user, status) => {
   try {
@@ -215,6 +219,7 @@ const searchData = async () => {
 watch(searchQuary, debounce(() => {
   searchData()
 }, 300))
+
 onMounted(async () => {
   token.value = localStorage.getItem('token')
   defaultHospital.value = JSON.parse(localStorage.getItem('hospital'))

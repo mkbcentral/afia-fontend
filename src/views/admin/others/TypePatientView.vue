@@ -25,7 +25,6 @@ const formValues = ref()
 const form = ref(null)
 const toastr = useToastr()
 
-
 const schema = yup.object({
     name: yup.string().required(),
 })
@@ -63,12 +62,10 @@ const edit = (type) => {
     }
 }
 
-
 const create = async (values) => {
     isLoanding.value = true
     try {
         const response = await TypeApi.createType(values);
-
         if (response.data.success) {
             isLoanding.value = false
             listTypes.value.unshift(response.data.type)
@@ -96,8 +93,8 @@ const update = async (values) => {
         const response = await TypeApi.updateType(formValues.value.id, values)
         if (response.data.success) {
             isLoanding.value = false
-            const index=listTypes.value.findIndex(type=>type.id==response.data.type.id)
-            listTypes.value[index]= response.data.type
+            const index = listTypes.value.findIndex(type => type.id == response.data.type.id)
+            listTypes.value[index] = response.data.type
             toastr.success(response.data.message, 'Validation')
             $('#addTypeModal').modal('hide');
             form.value.resetForm()
@@ -209,14 +206,21 @@ onMounted(async () => {
                 <table v-else class="table table-bordered table-sm">
                     <thead>
                         <tr>
-                            <th  class="text-center">#</th>
+                            <th class="text-center">#</th>
                             <th>NAME</th>
                             <th class="text-center">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody v-if="listTypes.length>0">
                         <ItemListTypePatientWidgetVue v-for="(type, index) in listTypes" :key="type.id" :type=type
                             :index=index @edit-type="edit" @delete-type="deleteType(type.id)" />
+                    </tbody>
+                    <tbody v-else>
+                        <tr>
+                            <td colspan="3" class="text-center p-4 text-secondary"> <i class="fas fa-database"></i> Not
+                                result
+                                found...</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>

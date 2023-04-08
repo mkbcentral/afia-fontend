@@ -62,7 +62,6 @@ const edit = (role) => {
     }
 }
 
-
 const create = async (values) => {
     isLoanding.value = true
     try {
@@ -74,8 +73,13 @@ const create = async (values) => {
             $('#addRoleModal').modal('hide');
             form.value.resetForm()
         } else {
-            errorResp.value = response.data.message
+            if (response.data.errors) {
+                errorResp.value = response.data.errors
+            } else {
+                errorResp.value = response.data.message
+            }
             isLoanding.value = false
+            toastr.error(errorResp.value, 'Validation')
         }
     } catch (error) {
         console.log(error);
@@ -203,15 +207,22 @@ onMounted(async () => {
                 <table v-else class="table table-bordered table-sm">
                     <thead>
                         <tr>
-                            <th>#</th>
+                            <th class="text-center">#</th>
                             <th>NAME</th>
                             <th>STATUS</th>
                             <th class="text-center">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody v-if="listRoles.length>0">
                         <ItemListRoleWidget v-for="(role, index) in listRoles" :key="role.id" :role=role :index=index
                             @edit-role="edit" @change-status="changeStatus" @delete-role="deleteRole(role.id)" />
+                    </tbody>
+                    <tbody v-else>
+                        <tr>
+                            <td colspan="4" class="text-center p-4 text-secondary"> <i class="fas fa-database"></i> Not
+                                result
+                                found...</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>

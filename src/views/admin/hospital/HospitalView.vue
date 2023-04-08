@@ -27,8 +27,6 @@ const form = ref(null)
 const toastr = useToastr()
 const logo = ref(null)
 
-
-
 const schema = yup.object({
   name: yup.string().required(),
   email: yup.string().required().email(),
@@ -70,8 +68,13 @@ const create = async (values) => {
       $('#addHospitalModal').modal('hide');
       form.value.resetForm()
     } else {
-      errorResp.value = response.data.message
+      if (response.data.errors) {
+        errorResp.value = response.data.errors
+      } else {
+        errorResp.value = response.data.message
+      }
       isLoanding.value = false
+      toastr.error(errorResp.value, 'Validation')
     }
   } catch (error) {
     console.log(error)
@@ -165,10 +168,12 @@ const changeStatus = async (hospital, status) => {
     console.log(error)
   }
 }
+
 const changeLogo = async (hospital) => {
   hospitalToEdit.value = hospital
   $('#changeHospitalModal').modal('show');
 }
+
 const onchange = async (e) => {
   logo.value = e.target.files[0];
 }
@@ -292,8 +297,8 @@ onMounted(async () => {
               </div>
               <div class="form-group">
                 <label>Clinic Phone</label>
-                <Field v-maska data-maska="+243 ### ### ###" name="phone" type="text" class="form-control" :class="{ 'is-invalid': errors.phone }"
-                  placeholder="Phone of clinic" />
+                <Field v-maska data-maska="+243 ### ### ###" name="phone" type="text" class="form-control"
+                  :class="{ 'is-invalid': errors.phone }" placeholder="Phone of clinic" />
                 <span class="invalid-feedback">{{ errors.phone }}</span>
               </div>
             </div>
@@ -311,7 +316,7 @@ onMounted(async () => {
         </Form>
       </div>
     </div>
-    
+
     <!--Delete Modal -->
     <div class="modal fade" id="changeHospitalModal" tabindex="-1" aria-labelledby="addRoleModalLabel" aria-hidden="true">
       <div class="modal-dialog">

@@ -65,7 +65,6 @@ const edit = (subscription) => {
 }
 const create = async (values) => {
     isLoanding.value = true
-    values.hospital_id = hospitalId.id
     try {
         const response = await SubscrptionApi.createSubscription(values);
         if (response.data.success) {
@@ -75,8 +74,13 @@ const create = async (values) => {
             $('#addSubscriptionhModal').modal('hide');
             form.value.resetForm()
         } else {
-            errorResp.value = response.data.message
+            if (response.data.errors) {
+                errorResp.value = response.data.errors
+            } else {
+                errorResp.value = response.data.message
+            }
             isLoanding.value = false
+            toastr.error(errorResp.value, 'Validation')
         }
     } catch (error) {
         console.log(error)
