@@ -12,7 +12,6 @@ import NetworkError from '../../../components/errors/Network.vue';
 import RoleApi from '../../../services/Admin/RoleApi.js'
 import Swal from 'sweetalert2'
 import { debounce } from 'lodash'
-import { Bootstrap4Pagination } from 'laravel-vue-pagination';
 
 
 const listUsers = ref([])
@@ -185,6 +184,7 @@ const changeStatus = async (user, status) => {
   try {
     const response = await UserApi.changeStatus(user.id, { status: status })
     toastr.success(response.data.message, 'Validation')
+    getUsers()
   } catch (error) {
     console.log(error)
   }
@@ -197,6 +197,7 @@ const getUsers = async () => {
     const response = await UserApi.getUsers(1)
     listUsers.value = response.data.data
     isDataLoanding.value = false
+    console.log(response.data.data)
   } catch (error) {
     console.log(error)
     if (error.code) {
@@ -284,7 +285,7 @@ onMounted(async () => {
               </tr>
             </tbody>
           </table>
-          <Bootstrap4Pagination :data="listUsers" @pagination-change-page="getUsers" />
+         
         </div>
 
       </div>

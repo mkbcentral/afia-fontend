@@ -1,7 +1,6 @@
 <script setup>
 import Navbar from '../layouts/partials/Navabar.vue'
-import MenuAdmin from '../components/Navs/MenuAdmin.vue'
-import MenuHospital from '../components/Navs/MenuHospital.vue'
+import Footer from './partials/Footer.vue';
 </script>
 <template>
   <div class="wrapper">
@@ -109,12 +108,6 @@ import MenuHospital from '../components/Navs/MenuHospital.vue'
         <p>Sidebar content</p>
       </div>
     </aside>
-
-    <footer class="main-footer">
-      <div class="float-right d-none d-sm-inline">Anything you want</div>
-
-      <strong>Copyright &copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong> All
-      rights reserved.
-    </footer>
+    <Footer/>
   </div>
 </template>

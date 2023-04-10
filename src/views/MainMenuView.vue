@@ -1,12 +1,14 @@
 <template>
     <div class="main">
         <div class="container">
-            <div class="box">
-                <div class="content">
-                    <i class="fas fa-folder-open fa-solid fa-3x"></i>
-                    <p>reception</p>
+            <RouterLink to="/reception/dashboard">
+                <div class="box">
+                    <div class="content">
+                        <i class="fas fa-folder-open fa-solid fa-3x"></i>
+                        <p>reception</p>
+                    </div>
                 </div>
-            </div>
+            </RouterLink>
             <div class="box">
                 <div class="content">
                     <i class="fas fa-medkit fa-solid fa-3x"></i>

@@ -14,11 +14,11 @@ defineProps({
 const status = ref([
     {
         value: 1,
-        name: 'ENABLE'
+        name: 'ENABLE',
     },
     {
         value: 2,
-        name: 'DISABLE'
+        name: 'DISABLE',
     }
 ])
 
@@ -45,9 +45,9 @@ const editStatus = async (user, status) => {
         <td class="text-center" v-text="user.role.name"></td>
         <td v-text="user.hospital.name"></td>
         <td>
-            <select class="form-control" @change="editStatus(user, $event.target.value)">
-                <option v-for="item in status" :value="item.name" :selected="item.name == user.status">{{ item.name
-                }}
+            <select class="form-control "  :class="'text-'+user.color" @change="editStatus(user, $event.target.value)">
+                <option v-for="item in status" :value="item.name" :selected="item.name == user.status" >
+                    <p class="text-danger">{{ item.name}}</p>
                 </option>
             </select>
         </td>
