@@ -219,7 +219,8 @@ onMounted(async () => {
                         </tr>
                     </thead>
                     <tbody>
-                        <BranchItemWidget v-for="(branch, index) in listBranches" :key="branch.id" :branch=branch
+                        <BranchItemWidget v-for="(branch, index) in listBranches" 
+                        :key="branch.id" :branch=branch
                             :index=index @edit-branch="edit" @change-status="changeStatus"
                             @delete-branch="deleteBranch(branch.id)" />
                     </tbody>
