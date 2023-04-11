@@ -1,35 +1,88 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import * as yup from 'yup'
 import { Form, Field } from 'vee-validate'
 import { vMaska } from "maska"
+import CommuneApi from '../../../../services/Admin/CommuneApi.js'
+import ApiAgentService from '../../../../services/Admin/AgentServiceApi.js'
+import ApiTypePatient from '../../../../services/Admin/TypeApi.js'
+import ApiCompany from '../../../../services/Admin/CompanyApi.js'
 const emit = defineEmits(['submitData'])
 let errors = ref({})
 const form = ref(null)
 const formValues = ref()
-const schema = yup.object({
-    name: yup.string().required(),
-    gender: yup.string().required(),
-    data_of_birth: yup.string().required(),
-    phone: yup.string().required(),
-    other_phone: yup.string().required(),
-    commune_id: yup.string().required(),
-    quartier: yup.string().required(),
-    street: yup.string().required(),
-    parcel_number: yup.number().required(),
-    company_id: yup.number().required(),
-    patient_type_id: yup.number().required(),
-})
-
+const listCommunes = ref([])
+const listServices = ref([])
+const listTypes = ref([])
+const listCompanies = ref([])
 defineProps({
     isEditing: false,
     isLoanding: false,
-    listCommunes:[]
+    isAgent: false,
+    isCompany: false,
+    schema: {}
 });
 
-const handlerSubmit = () => {
-    emit('submitData')
+const getCommunes = async () => {
+    try {
+        const response = await CommuneApi.getCommunes();
+        listCommunes.value = response.data.data
+    } catch (error) {
+        if (error.code) {
+            console.log(error.message)
+        }
+    }
 }
+
+const getCompanies = async () => {
+    try {
+        const response = await ApiCompany.getCompanies();
+        listCompanies.value = response.data.data
+    } catch (error) {
+        if (error.code) {
+            isNetWorkError.value = true
+            errorResp.value = error.message
+        }
+        isDataLoanding.value = false
+    }
+}
+
+const getAgentServices = async () => {
+    try {
+        const response = await ApiAgentService.getServices();
+        listServices.value = response.data.data
+
+    } catch (error) {
+        if (error.code) {
+            console.log(error.message)
+        }
+    }
+}
+
+const getTypePatients = async () => {
+    try {
+        const response = await ApiTypePatient.getTypes();
+        listTypes.value = response.data.data
+        console.log(response.data.data)
+    } catch (error) {
+        if (error.code) {
+            console.log(error.message)
+        }
+    }
+}
+
+const handlerSubmit = (values) => {
+    emit('submitData', values)
+}
+
+
+
+onMounted(async () => {
+    await getCommunes()
+    await getAgentServices()
+    await getTypePatients()
+    await getCompanies()
+})
 </script>
 <template>
     <!-- Modal patient -->
@@ -88,7 +141,6 @@ const handlerSubmit = () => {
                                     <span class="invalid-feedback">{{ errors.phone }}</span>
                                 </div>
                             </div>
-
                         </div>
                         <div class="row">
                             <div class="col-md-3">
@@ -138,7 +190,41 @@ const handlerSubmit = () => {
                                     <span class="invalid-feedback">{{ errors.street }}</span>
                                 </div>
                             </div>
-                            
+                            <div class="col-md-3" v-show="isAgent == true || isCompany == true">
+                                <div class="form-group">
+                                    <label>Type patient</label>
+                                    <Field class="form-control" name="patient_type_id" as="select" id=""
+                                        :class="{ 'is-invalid': errors.patient_type_id }">
+                                        <option :value="null">Choose here</option>
+                                        <option v-for="type in listTypes" :value="type.id">{{ type.name }}</option>
+                                    </Field>
+                                    <span class="invalid-feedback">{{ errors.patient_type_id }}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3" v-show="isAgent == true ">
+                                <div class="form-group">
+                                    <label>Services</label>
+                                    <Field class="form-control" name="agent_service_id" as="select" id=""
+                                        :class="{ 'is-invalid': errors.agent_service_id }">
+                                        <option :value="null">Choose here</option>
+                                        <option v-for="service in listServices" :value="service.id">{{ service.name }}
+                                        </option>
+                                    </Field>
+                                    <span class="invalid-feedback">{{ errors.agent_service_id }}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3" v-show="isCompany == true">
+                                <div class="form-group">
+                                    <label>Companies</label>
+                                    <Field class="form-control" name="company_id" as="select" id=""
+                                        :class="{ 'is-invalid': errors.company_id }">
+                                        <option :value="null">Choose here</option>
+                                        <option v-for="company in listCompanies" :value="company.id">{{ company.name }}
+                                        </option>
+                                    </Field>
+                                    <span class="invalid-feedback">{{ errors.company_id }}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">

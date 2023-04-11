@@ -3,14 +3,13 @@ import ReceptionLayout from '../../../layouts/ReceptionLayout.vue';
 import { ref, reactive, onMounted, watch } from 'vue'
 import { useToastr } from '../../../../src/widgets/toastr.js'
 import Swal from 'sweetalert2'
+import * as yup from 'yup'
 import { debounce } from 'lodash'
 import CommuneApi from '../../../services/Admin/CommuneApi';
 import ApiPatient from '../../../services/Patients/PaptientApi.js'
 import FormPatient from './Froms/FormPatient.vue';
-const listPatients = ref([])
-const listCommunes = ref([])
 
-const token = ref('')
+const listPatients = ref([])
 let errorResp = ref('')
 
 const isLoanding = ref(false)
@@ -19,6 +18,17 @@ const isEditing = ref(false)
 const isNetWorkError = ref(false)
 const toastr = useToastr()
 const searchQuary = ref(null)
+const schema = yup.object({
+    name: yup.string().required(),
+    gender: yup.string().required(),
+    data_of_birth: yup.string().required(),
+    phone: yup.string().required(),
+    other_phone: yup.string().required(),
+    commune_id: yup.string().required(),
+    quartier: yup.string().required(),
+    street: yup.string().required(),
+    parcel_number: yup.number().required(),
+})
 
 const add = async () => {
     isEditing.value = false;
@@ -26,22 +36,9 @@ const add = async () => {
     //form.value.resetForm()
 }
 
-const getCommunes = async () => {
-    try {
-        const response = await CommuneApi.getCommunes();
-        listCommunes.value = response.data.data
-        console.log(response.data.data)
-    } catch (error) {
-        if (error.code) {
-            isNetWorkError.value = true
-            errorResp.value = error.message
-            console.log(error)
-        }
-        isDataLoanding.value = false
-    }
-}
 
 const create = async (values) => {
+    console.log(values)
     isLoanding.value = true;
     try {
         const response = await ApiPatient.createPatient(values, '/patient-private')
@@ -76,11 +73,14 @@ const update = async (values) => {
 }
 
 const handlerSubmit = (values) => {
-   alert("Test");
-
+    if (isEditing.value) {
+        update(values)
+    } else {
+        create(values)
+    }
 }
 onMounted(async () => {
-    await getCommunes()
+    //await getCommunes()
 })
 </script>
 <template>
@@ -102,7 +102,9 @@ onMounted(async () => {
             </div>
         </div>
         <div>
-            <FormPatient :isEditing=isEditing :isLoanding=isLoanding :listCommunes=listCommunes @submit-data="handlerSubmit" />
+            <FormPatient :isEditing=isEditing :isLoanding=isLoanding 
+            :isAgent="false" :isCompany="false"
+             :schema=schema  @submit-data="handlerSubmit" />
         </div>
     </ReceptionLayout>
 </template>
