@@ -3,6 +3,9 @@ export default {
     getPatients(path) {
         return API().get(path)
     },
+    getPatient(path,id) {
+        return API().get(path+id)
+    },
     createPatient(data,path) {
         return API().post(path, data)
     },

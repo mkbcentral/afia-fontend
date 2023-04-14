@@ -140,8 +140,8 @@ const router = createRouter({
         requireAuth: true
       }
     },
-     //PATIENT SUBSCRIBED
-     {
+    //PATIENT SUBSCRIBED
+    {
       path: '/reception/patient-subscribed',
       name: 'patient-subscribed',
       component: () => import('../views/reception/patients/PatientSubscribedView.vue'),
@@ -149,11 +149,56 @@ const router = createRouter({
         requireAuth: true
       }
     },
-     //PATIENT AGENT
-     {
+    //PATIENT AGENT
+    {
       path: '/reception/agent-patient',
       name: 'agent-patient',
       component: () => import('../views/reception/patients/AgentPatientView.vue'),
+      meta: {
+        requireAuth: true
+      }
+    },
+    //CREATE PATIENT PRIVATE
+    {
+      path: '/reception/create/patient/private',
+      name: 'create.patient.private',
+      component: () => import('../views/reception/patients/Forms/FormPatientPrivate.vue'),
+      meta: {
+        requireAuth: true
+      }
+    },
+    //EDIT PATIENT PRIVATE
+    {
+      path: '/reception/edit/patient/:id/private',
+      name: 'edit.patient.private',
+      component: () => import('../views/reception/patients/Forms/FormPatientPrivate.vue'),
+      meta: {
+        requireAuth: true
+      }
+    },
+    //CREATE PATIENT SUBSCRIBE
+    {
+      path: '/reception/create/patient/subscribe',
+      name: 'create.patient.subscribe',
+      component: () => import('../views/reception/patients/Forms/FormPatientSubscribe.vue'),
+      meta: {
+        requireAuth: true
+      }
+    },
+    //EDIT PATIENT SUBSCRIBE
+    {
+      path: '/reception/create/patient/:id/subscribe',
+      name: 'edit.patient.subscribe',
+      component: () => import('../views/reception/patients/Forms/FormPatientSubscribe.vue'),
+      meta: {
+        requireAuth: true
+      }
+    },
+    //CREATE AGENT PATIENT
+    {
+      path: '/reception/create/patient/agent',
+      name: 'create.patient.agent',
+      component: () => import('../views/reception/patients/Forms/AgenFormPatient.vue'),
       meta: {
         requireAuth: true
       }

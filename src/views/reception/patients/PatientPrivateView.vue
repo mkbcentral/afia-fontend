@@ -1,91 +1,93 @@
 <script setup>
 import ReceptionLayout from '../../../layouts/ReceptionLayout.vue';
-import { ref, reactive, onMounted, watch } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useToastr } from '../../../../src/widgets/toastr.js'
-import Swal from 'sweetalert2'
+import Swal from 'sweetalert2/dist/sweetalert2.all.min.js'
 import * as yup from 'yup'
-import { debounce } from 'lodash'
-import CommuneApi from '../../../services/Admin/CommuneApi';
-import ApiPatient from '../../../services/Patients/PaptientApi.js'
-import FormPatient from './Froms/FormPatient.vue';
+import ApiPatient from '../../../services/Patients/PatientApi.js'
+import FormPatient from './Forms/FormPatientPrivate.vue';
+import ItemListPatientPrivate from './Widgets/ItemListPatientPrivate.vue';
+import NetworkError from '../../../components/errors/Network.vue';
 
 const listPatients = ref([])
 let errorResp = ref('')
-
-const isLoanding = ref(false)
 const isDataLoanding = ref(false)
-const isEditing = ref(false)
 const isNetWorkError = ref(false)
-const toastr = useToastr()
-const searchQuary = ref(null)
-const schema = yup.object({
-    name: yup.string().required(),
-    gender: yup.string().required(),
-    data_of_birth: yup.string().required(),
-    phone: yup.string().required(),
-    other_phone: yup.string().required(),
-    commune_id: yup.string().required(),
-    quartier: yup.string().required(),
-    street: yup.string().required(),
-    parcel_number: yup.number().required(),
-})
 
-const add = async () => {
-    isEditing.value = false;
-    $('#addPatientPrivateModal').modal('show');
-    //form.value.resetForm()
-}
-
-
-const create = async (values) => {
-    console.log(values)
-    isLoanding.value = true;
+const getData = async () => {
+    isDataLoanding.value = true;
+    isNetWorkError.value = false;
     try {
-        const response = await ApiPatient.createPatient(values, '/patient-private')
-        if (response.data.success) {
-            isLoanding.value = false;
-            console.log(response.data.patient)
-            //listUsers.value.unshift(response.data.user)
-            toastr.success(response.data.message, 'Validation');
-            $('#addPatientPrivateModal').modal('hide');
-            form.value.resetForm()
-        } else {
-            if (response.data.errors) {
-                errorResp.value = response.data.errors
-            } else {
-                errorResp.value = response.data.message
-            }
-            isLoanding.value = false
-            toastr.error(errorResp.value, 'Validation')
-        }
+        const response = await ApiPatient.getPatients('/patient-private');
+        listPatients.value = response.data.data;
+        isDataLoanding.value = false
     } catch (error) {
         if (error.code) {
             isNetWorkError.value = true
             errorResp.value = error.message
-            toastr.error(errorResp.value, 'Errors')
         }
-        isLoanding.value = false;
+        isDataLoanding.value = false
     }
 }
 
-const update = async (values) => {
-    console.log(values)
+const deletePatient = async (patient) => {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't delete patient : " + patient.name + ' ?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes'
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            const response = await ApiPatient.deletePatient(patient.id, '/patient-private/')
+            if (response.data.success) {
+                Swal.fire(
+                    'Deleted!',
+                    response.data.message,
+                    'success'
+                )
+                listPatients.value = listPatients.value.filter(p => p.id != patient.id);
+            } else {
+                Swal.fire(
+                    'Warning',
+                    response.data.message,
+                    'error'
+                )
+            }
+
+        }
+    })
+
 }
 
-const handlerSubmit = (values) => {
-    if (isEditing.value) {
-        update(values)
-    } else {
-        create(values)
+const getPatients = async () => {
+    isDataLoanding.value = true;
+    isNetWorkError.value = false;
+    try {
+        const response = await ApiPatient.getPatients('/patient-private');
+        listPatients.value = response.data.data;
+        isDataLoanding.value = false
+    } catch (error) {
+        if (error.code) {
+            isNetWorkError.value = true
+            errorResp.value = error.message
+        }
+        isDataLoanding.value = false
     }
 }
+
 onMounted(async () => {
-    //await getCommunes()
+    await getPatients()
 })
 </script>
 <template>
     <ReceptionLayout>
-        <div class="card">
+        <div v-if="isNetWorkError">
+            <NetworkError :message=errorResp @load-data="getData" />
+        </div>
+        <div v-else class="card">
             <div class="card-header">
                 <p><i class="fas fa-user-shield text-secondary fa-2x"></i> PATIENTS PRIVATES</p>
             </div>
@@ -95,16 +97,45 @@ onMounted(async () => {
                         <h5 class="m-0"><i class="fa fa-list" aria-hidden="true"></i> List of patients private</h5>
                     </div>
                     <div>
-                        <button @click="add" type="button" class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"
-                                aria-hidden="true"></i> New</button>
+                        <RouterLink to="/reception/create/patient/private" class="btn btn-primary "><i class="fa fa-plus-circle"
+                                aria-hidden="true"></i>New</RouterLink>
                     </div>
+
                 </div>
             </div>
-        </div>
-        <div>
-            <FormPatient :isEditing=isEditing :isLoanding=isLoanding 
-            :isAgent="false" :isCompany="false"
-             :schema=schema  @submit-data="handlerSubmit" />
+            <div class="card-body">
+                <div v-if="isDataLoanding" class="d-flex justify-content-center">
+                    <div class="spinner-border" role="status">
+                        <span hidden class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <table v-else class="table table-bordered table-sm">
+                    <thead>
+                        <tr>
+                            <th class="text-center">#</th>
+                            <th class="text-center">FORM NUMBER</th>
+                            <th>NAME</th>
+                            <th class="text-center">GENDER</th>
+                            <th class="">DATE OF BIRTH</th>
+                            <th class="">PHONE</th>
+                            <th class="">OTHER PHONE</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody v-if="listPatients.length > 0">
+                        <ItemListPatientPrivate v-for="(patient, index) in listPatients" :key="patient.id" :patient=patient
+                            :index=index  @change-status="changeStatus(patient.id)"
+                            @delete-patient="deletePatient(patient)" />
+                    </tbody>
+                    <tbody v-else>
+                        <tr>
+                            <td colspan="8" class="text-center p-4 text-secondary"> <i class="fas fa-database"></i> Not
+                                result
+                                found...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </ReceptionLayout>
 </template>

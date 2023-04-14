@@ -10,10 +10,6 @@ import ItemListTypePatientWidgetVue from './widgets/ItemListTypePatientWidget.vu
 import Swal from 'sweetalert2'
 
 const listTypes = ref([])
-const typeToEdit = ref({})
-
-const token = ref('')
-let errors = ref({})
 let errorResp = ref('')
 
 const isLoanding = ref(false)
@@ -43,7 +39,6 @@ const getData = async () => {
         listTypes.value = response.data.data;
         isDataLoanding.value = false
     } catch (error) {
-        console.log(error)
         if (error.code) {
             isNetWorkError.value = true
             errorResp.value = error.message
@@ -165,7 +160,6 @@ const getTypes = async () => {
         listTypes.value = response.data.data;
         isDataLoanding.value = false
     } catch (error) {
-        console.log(error)
         if (error.code) {
             isNetWorkError.value = true
             errorResp.value = error.message
@@ -175,7 +169,6 @@ const getTypes = async () => {
 }
 
 onMounted(async () => {
-    token.value = localStorage.getItem('token')
     getTypes()
 })
 </script>

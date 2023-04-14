@@ -47,11 +47,12 @@ const getData = async () => {
         listRates.value = response.data.data;
         isDataLoanding.value = false
     } catch (error) {
-        console.log(error)
+        
         if (error.code) {
             isNetWorkError.value = true
             errorResp.value = error.message
         }
+
         isDataLoanding.value = false
     }
 }
@@ -99,7 +100,7 @@ const update = async (values) => {
             isLoanding.value = false
             const index = listRates.value.findIndex(rate => rate.id == response.data.rate.id)
             listRates.value[index] = response.data.rate
-            toastr.success(response.data.message, 'Validation')
+            toastr.info(response.data.message, 'Validation')
             $('#addRateModal').modal('hide');
             form.value.resetForm()
         } else {
@@ -194,7 +195,6 @@ const getRates = async () => {
         listRates.value = response.data.data;
         isDataLoanding.value = false
     } catch (error) {
-        console.log(error)
         if (error.code) {
             isNetWorkError.value = true
             errorResp.value = error.message
