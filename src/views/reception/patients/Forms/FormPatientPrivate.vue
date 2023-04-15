@@ -87,10 +87,6 @@ const update = async (values) => {
             isNetWorkError.value = true
             errorResp.value = error.message
             toastr.error(errorResp.value, 'Errors')
-        } else if (error.response.status == 422) {
-            errors.value = error.response.data.errors
-            isLoanding.value = false
-            toastr.error(error.response.data.errors, 'Error')
         }
         isLoanding.value = false;
     }
@@ -116,7 +112,7 @@ const getCommunes = async () => {
 }
 
 const getPaptient = async () => {
-    isDataLoanding.value=true
+    isDataLoanding.value = true
     try {
         const response = await ApiPatient.getPatient('/patient-private/', route.params.id);
         formValues.value = {
@@ -130,21 +126,21 @@ const getPaptient = async () => {
             street: response.data.data.street,
             parcel_number: response.data.data.parcel_number,
         }
-        isDataLoanding.value=false
+        isDataLoanding.value = false
     } catch (error) {
         if (error.code) {
             console.log(error.message)
         }
-        isDataLoanding.value=false
+        isDataLoanding.value = false
     }
 }
 
 onMounted(async () => {
     if (route.name === 'edit.patient.private') {
-        isEditing.value=true
+        isEditing.value = true
         getPaptient()
     }
-   
+
     await getCommunes()
     flatpickr(".flatpickr", {
         enableTime: false,
@@ -197,7 +193,7 @@ onMounted(async () => {
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Date of birth</label>
-                                <Field name="data_of_birth" type="date" class="form-control flatpickr"
+                                <Field name="data_of_birth" type="date" class="form-control "
                                     :class="{ 'is-invalid': errors.data_of_birth }" placeholder="Date of birth of User" />
                                 <span class="invalid-feedback">{{ errors.data_of_birth }}</span>
                             </div>

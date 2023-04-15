@@ -149,7 +149,7 @@ const getTypePatients = async () => {
 const getPaptient = async () => {
     isDataLoanding.value = true
     try {
-        const response = await ApiPatient.getPatient('/patient-subscribe/', route.params.id);
+        const response = await ApiPatient.getPatient('/agent-patient/', route.params.id);
         console.log(response.data.data)
         formValues.value = {
             name: response.data.data.name,
@@ -161,7 +161,7 @@ const getPaptient = async () => {
             quartier: response.data.data.quartier,
             street: response.data.data.street,
             parcel_number: response.data.data.parcel_number,
-            company_id: response.data.data.company.id,
+            agent_service_id: response.data.data.service.id,
             patient_type_id: response.data.data.type.id,
         }
         isDataLoanding.value = false
@@ -174,7 +174,7 @@ const getPaptient = async () => {
 }
 
 onMounted(async () => {
-    if (route.name === 'edit.patient.subscribe') {
+    if (route.name === 'edit.patient.agent') {
         isEditing.value = true
         getPaptient()
     }
@@ -195,7 +195,7 @@ onMounted(async () => {
                 <span hidden class="visually-hidden">Loading...</span>
             </div>
         </div>
-        <Form ref="form" @submit="handlerSubmit" :validation-schema="schema" v-slot="{ errors }" :initial-values="formValues">
+        <Form v-else ref="form" @submit="handlerSubmit" :validation-schema="schema" v-slot="{ errors }" :initial-values="formValues">
             <div class="modal-content ">
                 <div class="modal-header " style="background-color: #94106C;color: white;">
                     <h5 v-if="isEditing" class="modal-title text-uppercase  text-bold " id="addPatientPrivateModalLabel">

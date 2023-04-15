@@ -203,6 +203,15 @@ const router = createRouter({
         requireAuth: true
       }
     },
+    //EDIT AGENT PATIENT
+    {
+      path: '/reception/edit/patient/:id/agent',
+      name: 'edit.patient.agent',
+      component: () => import('../views/reception/patients/Forms/AgenFormPatient.vue'),
+      meta: {
+        requireAuth: true
+      }
+    },
     {
       path: '/about',
       name: 'about',

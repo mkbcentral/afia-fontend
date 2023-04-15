@@ -27,7 +27,7 @@ import Footer from './partials/Footer.vue';
                 </RouterLink>
             </li>
             <li class="nav-item">
-                <RouterLink to="patient-subscribed" class="nav-link" active-class="active">
+                <RouterLink to="/reception/patient-subscribed" class="nav-link" active-class="active">
                     <i class="fas fa-user-check fa-2x"></i>
                     <p> Patients suscribed</p>
                 </RouterLink>

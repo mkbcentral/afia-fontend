@@ -194,7 +194,7 @@ onMounted(async () => {
                 <span hidden class="visually-hidden">Loading...</span>
             </div>
         </div>
-        <Form ref="form" @submit="handlerSubmit" :validation-schema="schema" v-slot="{ errors }" :initial-values="formValues">
+        <Form v-else ref="form" @submit="handlerSubmit" :validation-schema="schema" v-slot="{ errors }" :initial-values="formValues">
             <div class="modal-content ">
                 <div class="modal-header " style="background-color: #94106C;color: white;">
                     <h5 v-if="isEditing" class="modal-title text-uppercase  text-bold " id="addPatientPrivateModalLabel">
@@ -230,7 +230,7 @@ onMounted(async () => {
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Date of birth</label>
-                                <Field name="data_of_birth" type="date" class="form-control"
+                                <Field name="data_of_birth" type="date" class="form-control "
                                     :class="{ 'is-invalid': errors.data_of_birth }" placeholder="Date of birth of User" />
                                 <span class="invalid-feedback">{{ errors.data_of_birth }}</span>
                             </div>
