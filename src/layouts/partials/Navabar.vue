@@ -15,8 +15,11 @@
           ></a>
         </li>
       </ul>
-
+      <li class="nav-item pl-4 d-none d-sm-inline-block">
+        <h3 class="text-bold text-danger">Taux: 1$=2300 Fc </h3>
+      </li>
       <ul class="navbar-nav ml-auto">
+       
         <li class="nav-item dropdown user-menu">
           <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
             <img

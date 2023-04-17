@@ -15,4 +15,11 @@ export default {
     deletePatient(id,path) {
         return API().delete(path + id)
     },
+    searcchPatient(query,path){
+        return API().get(path,{
+            params:{
+                query:query
+            }
+        });
+    }
 }

@@ -21,6 +21,7 @@
     "toastr": "^2.1.4",
     "vee-validate": "^4.8.3",
     "vue": "^3.2.47",
+    "vue-awesome-paginate": "^1.1.46",
     "vue-lodash": "^2.1.2",
     "vue-router": "^4.1.6",
     "yup": "^1.0.2"
@@ -31,7 +32,6 @@
     "@vue/eslint-config-prettier": "^7.1.0",
     "eslint": "^8.34.0",
     "eslint-plugin-vue": "^9.9.0",
-    "laravel-vue-pagination": "^4.1.0",
     "prettier": "^2.8.4",
     "vite": "^4.1.4"
   }

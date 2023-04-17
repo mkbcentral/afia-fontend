@@ -8,6 +8,20 @@ onMounted(() => {
 </script>
 <template>
   <AdminLayout>
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="d-flex justify-content-end">
+          <div class="">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item">
+                <RouterLink to="/">Menu</RouterLink>
+              </li>
+              <li class="breadcrumb-item active">Settings</li>
+            </ol>
+          </div><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
     <div class="row">
       <div class="col-lg-3">
 

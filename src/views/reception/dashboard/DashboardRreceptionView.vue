@@ -3,6 +3,18 @@ import ReceptionLayout from '../../../layouts/ReceptionLayout.vue';
 </script>
 <template>
     <ReceptionLayout>
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="d-flex justify-content-end">
+                    <div class="">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><RouterLink to="/">Menu</RouterLink></li>
+                            <li class="breadcrumb-item active">Dashboard</li>
+                        </ol>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
         <div class="card">
             <div class="card-header">
                 Dashboard

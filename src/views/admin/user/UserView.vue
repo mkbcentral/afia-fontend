@@ -10,7 +10,7 @@ import UserApi from '../../../services/Admin/UserApi';
 import ItemListUserWdgetVue from './widgets/ItemListUserWdget.vue';
 import NetworkError from '../../../components/errors/Network.vue';
 import RoleApi from '../../../services/Admin/RoleApi.js'
-import Swal from 'sweetalert2'
+import Swal from 'sweetalert2/dist/sweetalert2.all.min.js'
 import { debounce } from 'lodash'
 
 
@@ -234,6 +234,23 @@ onMounted(async () => {
 </script>
 <template>
   <AdminLayout>
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="d-flex justify-content-end">
+          <div class="">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item">
+                <RouterLink to="/">Menu</RouterLink>
+              </li>
+              <li class="breadcrumb-item">
+                <RouterLink to="/admin/settings">Settings</RouterLink>
+              </li>
+              <li class="breadcrumb-item active">Users</li>
+            </ol>
+          </div><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
     <div v-if="isNetWorkError">
       <NetworkError :message=errorResp @load-data="getData" />
     </div>
@@ -285,7 +302,7 @@ onMounted(async () => {
               </tr>
             </tbody>
           </table>
-         
+
         </div>
 
       </div>

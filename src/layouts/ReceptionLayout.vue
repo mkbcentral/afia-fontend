@@ -6,10 +6,10 @@ import Footer from './partials/Footer.vue';
   <div class="wrapper">
     <Navbar />
     <aside class="main-sidebar sidebar-dark-primary elevation-4" style="background-color:#032880;">
-      <a href="index3.html" class="brand-link">
+      <RouterLink to="/"  class="brand-link">
         <img src="@/assets/logo.jpg" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: 0.8" />
         <span class="brand-text font-weight-light">AFIA</span>
-      </a>
+      </RouterLink>
 
       <div class="sidebar">
         <nav class="mt-2">

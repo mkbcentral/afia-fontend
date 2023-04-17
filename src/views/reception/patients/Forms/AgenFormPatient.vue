@@ -34,7 +34,7 @@ const listServices = ref([])
 const schema = yup.object({
     name: yup.string().required(),
     gender: yup.string().required(),
-    data_of_birth: yup.string().required(),
+    date_of_birth: yup.string().required(),
     phone: yup.string().required(),
     other_phone: yup.string().required(),
     commune_id: yup.string().required(),
@@ -154,7 +154,7 @@ const getPaptient = async () => {
         formValues.value = {
             name: response.data.data.name,
             gender: response.data.data.gender,
-            data_of_birth: response.data.data.data_of_birth,
+            date_of_birth: response.data.data.date_of_birth,
             phone: response.data.data.phone,
             commune_id: response.data.data.commune.id,
             other_phone: response.data.data.other_phone,
@@ -190,20 +190,38 @@ onMounted(async () => {
 </script>
 <template>
     <ReceptionLayout>
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="d-flex justify-content-end">
+                    <div class="">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item">
+                                <RouterLink to="/reception/agent-patient">List patients</RouterLink>
+                            </li>
+                            <li class="breadcrumb-item active">
+                                <span v-if="isEditing">Edit patient</span>
+                                <span v-else>Create patient</span>
+                            </li>
+                        </ol>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
         <div v-if="isDataLoanding" class="d-flex justify-content-center">
             <div class="spinner-border" role="status">
                 <span hidden class="visually-hidden">Loading...</span>
             </div>
         </div>
-        <Form v-else ref="form" @submit="handlerSubmit" :validation-schema="schema" v-slot="{ errors }" :initial-values="formValues">
+        <Form v-else ref="form" @submit="handlerSubmit" :validation-schema="schema" v-slot="{ errors }"
+            :initial-values="formValues">
             <div class="modal-content ">
-                <div class="modal-header " style="background-color: #94106C;color: white;">
+                <div class="modal-header " style="background-color: #0C7111;color: white;">
                     <h5 v-if="isEditing" class="modal-title text-uppercase  text-bold " id="addPatientPrivateModalLabel">
                         <i class="fa fa-plus-circle" aria-hidden="true"></i> EDIT PATIENT
                     </h5>
                     <h5 v-else class="modal-title" id="addPatientPrivateModalLabel">
                         <i class="fas fa-user-plus"></i>
-                        CREATE NEW PATIENT
+                        CREATE NEW AGENT PATIENT
                     </h5>
                 </div>
                 <div class="modal-body">
@@ -231,9 +249,9 @@ onMounted(async () => {
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Date of birth</label>
-                                <Field name="data_of_birth" type="date" class="form-control"
-                                    :class="{ 'is-invalid': errors.data_of_birth }" placeholder="Date of birth of User" />
-                                <span class="invalid-feedback">{{ errors.data_of_birth }}</span>
+                                <Field name="date_of_birth" type="date" class="form-control"
+                                    :class="{ 'is-invalid': errors.date_of_birth }" placeholder="Date of birth of User" />
+                                <span class="invalid-feedback">{{ errors.date_of_birth }}</span>
                             </div>
                         </div>
                         <div class="col-md-3">
@@ -319,7 +337,7 @@ onMounted(async () => {
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn" style="background-color: #94106C;color: white;">
+                    <button type="submit" class="btn" style="background-color: #0C7111;color: white;">
                         <div class="d-flex justify-content-center">
                             <div v-if="isLoanding" class="spinner-border text-light" role="status"></div>
                             <div class="pl-2"> Save changes</div>

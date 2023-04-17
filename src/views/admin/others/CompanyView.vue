@@ -185,6 +185,23 @@ onMounted(async () => {
 
 <template>
     <AdminLayoutVue>
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="d-flex justify-content-end">
+                    <div class="">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item">
+                                <RouterLink to="/">Menu</RouterLink>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <RouterLink to="/admin/settings">Settings</RouterLink>
+                            </li>
+                            <li class="breadcrumb-item active">Companies</li>
+                        </ol>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
         <div v-if="isNetWorkError">
             <NetworkError :message=errorResp @load-data="getData" />
         </div>
@@ -217,7 +234,7 @@ onMounted(async () => {
                             <th class="text-center">Actions</th>
                         </tr>
                     </thead>
-                    <tbody v-if="listCompanies.length>0">
+                    <tbody v-if="listCompanies.length > 0">
                         <CompanyItemListViewVue v-for="(company, index) in listCompanies" :key="company.id" :company=company
                             :index=index @edit-company="edit" @delete-company="deleteCompany(company.id)" />
                     </tbody>

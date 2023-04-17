@@ -174,6 +174,23 @@ onMounted(async () => {
 </script>
 <template>
     <AdminLayout>
+        <div class="content-header">
+            <div class="container-fluid">
+              <div class="d-flex justify-content-end">
+                <div class="">
+                  <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item">
+                      <RouterLink to="/">Menu</RouterLink>
+                    </li>
+                    <li class="breadcrumb-item">
+                      <RouterLink to="/admin/settings">Settings</RouterLink>
+                    </li>
+                    <li class="breadcrumb-item active">Type patients</li>
+                  </ol>
+                </div><!-- /.col -->
+              </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+          </div>
         <div v-if="isNetWorkError">
             <NetworkError :message=errorResp @load-data="getData" />
         </div>

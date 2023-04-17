@@ -181,10 +181,27 @@ onMounted(async () => {
 
 <template>
     <AdminLayout>
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="d-flex justify-content-end">
+                    <div class="">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item">
+                                <RouterLink to="/">Menu</RouterLink>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <RouterLink to="/admin/settings">Settings</RouterLink>
+                            </li>
+                            <li class="breadcrumb-item active">Agent services</li>
+                        </ol>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
         <div v-if="isNetWorkError">
             <NetworkError :message=errorResp @load-data="getData" />
         </div>
-         <!--Lis services -->
+        <!--Lis services -->
         <div v-else class="card card-primary card-outline">
             <div class="card-header">
                 <div class="d-flex justify-content-between">
@@ -212,9 +229,10 @@ onMounted(async () => {
                             <th class="text-center">Actions</th>
                         </tr>
                     </thead>
-                    <tbody v-if="listServices.length>0">
-                        <AgentServiceItemListWidget v-for="(service, index) in listServices" :key="service.id" :service=service
-                            :index=index @edit-service="edit" @delete-service="deleteService(service.id)" />
+                    <tbody v-if="listServices.length > 0">
+                        <AgentServiceItemListWidget v-for="(service, index) in listServices" :key="service.id"
+                            :service=service :index=index @edit-service="edit"
+                            @delete-service="deleteService(service.id)" />
                     </tbody>
                     <tbody v-else>
                         <tr>

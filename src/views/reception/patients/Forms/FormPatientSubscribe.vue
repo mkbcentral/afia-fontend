@@ -33,7 +33,7 @@ const listCompanies = ref([])
 const schema = yup.object({
     name: yup.string().required(),
     gender: yup.string().required(),
-    data_of_birth: yup.string().required(),
+    date_of_birth: yup.string().required(),
     phone: yup.string().required(),
     other_phone: yup.string().required(),
     commune_id: yup.string().required(),
@@ -42,6 +42,7 @@ const schema = yup.object({
     parcel_number: yup.number().required(),
     company_id: yup.number().required(),
     patient_type_id: yup.number().required(),
+    registration_number: yup.number().required(),
 })
 const create = async (values) => {
     isLoanding.value = true;
@@ -153,15 +154,17 @@ const getPaptient = async () => {
         formValues.value = {
             name: response.data.data.name,
             gender: response.data.data.gender,
-            data_of_birth: response.data.data.data_of_birth,
+            date_of_birth: response.data.data.date_of_birth,
             phone: response.data.data.phone,
             commune_id: response.data.data.commune.id,
             other_phone: response.data.data.other_phone,
             quartier: response.data.data.quartier,
             street: response.data.data.street,
+            registration_number: response.data.data.registration_number,
             parcel_number: response.data.data.parcel_number,
             company_id: response.data.data.company.id,
             patient_type_id: response.data.data.type.id,
+            
         }
         isDataLoanding.value = false
     } catch (error) {
@@ -189,6 +192,23 @@ onMounted(async () => {
 </script>
 <template>
     <ReceptionLayout>
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="d-flex justify-content-end">
+                    <div class="">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item">
+                                <RouterLink to="/reception/patient-subscribed">List patients</RouterLink>
+                            </li>
+                            <li class="breadcrumb-item active">
+                                <span v-if="isEditing">Edit patient</span>
+                                <span v-else >Create patient</span>
+                            </li>
+                        </ol>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
         <div v-if="isDataLoanding" class="d-flex justify-content-center">
             <div class="spinner-border" role="status">
                 <span hidden class="visually-hidden">Loading...</span>
@@ -230,9 +250,9 @@ onMounted(async () => {
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Date of birth</label>
-                                <Field name="data_of_birth" type="date" class="form-control "
-                                    :class="{ 'is-invalid': errors.data_of_birth }" placeholder="Date of birth of User" />
-                                <span class="invalid-feedback">{{ errors.data_of_birth }}</span>
+                                <Field name="date_of_birth" type="date" class="form-control "
+                                    :class="{ 'is-invalid': errors.date_of_birth }" placeholder="Date of birth of User" />
+                                <span class="invalid-feedback">{{ errors.date_of_birth }}</span>
                             </div>
                         </div>
                         <div class="col-md-3">
@@ -313,6 +333,14 @@ onMounted(async () => {
                                     </option>
                                 </Field>
                                 <span class="invalid-feedback">{{ errors.company_id }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Matricule</label>
+                                <Field name="registration_number" type="number" class="form-control" 
+                                    :class="{ 'is-invalid': errors.registration_number }" placeholder="Matricule" />
+                                <span class="invalid-feedback">{{ errors.registration_number }}</span>
                             </div>
                         </div>
                     </div>

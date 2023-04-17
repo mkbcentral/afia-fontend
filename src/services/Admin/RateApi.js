@@ -14,5 +14,8 @@ export default {
     },
     changeStatus(id) {
         return API().put('/rate/status/' + id)
+    },
+    getCurrentRate() {
+        return API().put('/rate/current/')
     }
 }

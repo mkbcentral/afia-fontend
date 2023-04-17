@@ -19,7 +19,7 @@ const deleteDialog = (patient) => {
         <td class="text-bold text-center" v-text="patient.number"></td>
         <td v-text="patient.name"></td>
         <td class="text-center" v-text="patient.gender"></td>
-        <td v-text="patient.data_of_birth"></td>
+        <td class="text-center" v-text="patient.age"></td>
         <td v-text="patient.phone"></td>
         <td v-text="patient.other_phone"></td>
         <td class="text-center" v-text="patient.company_name"></td>

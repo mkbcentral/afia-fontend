@@ -10,7 +10,6 @@ import NetworkError from '../../../components/errors/Network.vue'
 import Swal from 'sweetalert2'
 
 const listBranches = ref([])
-const branchToEdit = ref({})
 
 const defaulthHospital = ref()
 const hospitalId = reactive({
@@ -64,7 +63,7 @@ const create = async (values) => {
         if (response.data.success) {
             console.log(response.data)
             isLoanding.value = false
-           listBranches.value.push(response.data.branch)
+            listBranches.value.push(response.data.branch)
             toastr.success(response.data.message, 'Validation')
             $('#addBranchModal').modal('hide');
             form.value.resetForm()
@@ -134,32 +133,32 @@ const changeStatus = async (branch, status) => {
 
 const deleteBranch = async (id) => {
     Swal.fire({
-    title: 'Are you sure?',
-    text: "You won't delete this center!",
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#3085d6',
-    cancelButtonColor: '#d33',
-    confirmButtonText: 'Yes'
-  }).then(async (result) => {
-    if (result.isConfirmed) {
-        const response = await BranchApi.deleteBranch(id)
-      if (response.data.success) {
-        Swal.fire(
-          'Deleted!',
-          response.data.message,
-          'success'
-        )
-        listBranches.value = listBranches.value.filter(branch => branch.id != id);
-      } else {
-        Swal.fire(
-          'Warning',
-          response.data.message,
-          'error'
-        )
-      }
-    }
-  });
+        title: 'Are you sure?',
+        text: "You won't delete this center!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes'
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            const response = await BranchApi.deleteBranch(id)
+            if (response.data.success) {
+                Swal.fire(
+                    'Deleted!',
+                    response.data.message,
+                    'success'
+                )
+                listBranches.value = listBranches.value.filter(branch => branch.id != id);
+            } else {
+                Swal.fire(
+                    'Warning',
+                    response.data.message,
+                    'error'
+                )
+            }
+        }
+    });
 }
 
 const getBranches = async () => {
@@ -188,6 +187,23 @@ onMounted(async () => {
 </script>
 <template>
     <AdminLayout>
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="d-flex justify-content-end">
+                    <div class="">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item">
+                                <RouterLink to="/">Menu</RouterLink>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <RouterLink to="/admin/settings">Settings</RouterLink>
+                            </li>
+                            <li class="breadcrumb-item active">Centers</li>
+                        </ol>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
         <div v-if="isNetWorkError">
             <NetworkError :message=errorResp @load-data="getData" />
         </div>
@@ -219,8 +235,7 @@ onMounted(async () => {
                         </tr>
                     </thead>
                     <tbody>
-                        <BranchItemWidget v-for="(branch, index) in listBranches" 
-                        :key="branch.id" :branch=branch
+                        <BranchItemWidget v-for="(branch, index) in listBranches" :key="branch.id" :branch=branch
                             :index=index @edit-branch="edit" @change-status="changeStatus"
                             @delete-branch="deleteBranch(branch.id)" />
                     </tbody>

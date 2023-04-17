@@ -94,8 +94,8 @@ const update = async (values) => {
         const response = await CommuneApi.updateCommune(formValues.value.id, values)
         if (response.data.success) {
             isLoanding.value = false
-            const index=listCommunes.value.findIndex(commune=>commune.id==response.data.commune.id)
-            listCommunes.value[index]= response.data.commune
+            const index = listCommunes.value.findIndex(commune => commune.id == response.data.commune.id)
+            listCommunes.value[index] = response.data.commune
             toastr.success(response.data.message, 'Validation')
             $('#addCommuneModal').modal('hide');
             form.value.resetForm()
@@ -183,6 +183,23 @@ onMounted(async () => {
 </script>
 <template>
     <AdminLayout>
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="d-flex justify-content-end">
+                    <div class="">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item">
+                                <RouterLink to="/">Menu</RouterLink>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <RouterLink to="/admin/settings">Settings</RouterLink>
+                            </li>
+                            <li class="breadcrumb-item active">Communes</li>
+                        </ol>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
         <div v-if="isNetWorkError">
             <NetworkError :message=errorResp @load-data="getData" />
         </div>
@@ -213,7 +230,7 @@ onMounted(async () => {
                             <th class="text-center">Actions</th>
                         </tr>
                     </thead>
-                    <tbody v-if="listCommunes.length>0">
+                    <tbody v-if="listCommunes.length > 0">
                         <ItemListCommuneWidget v-for="(commune, index) in listCommunes" :key="commune.id" :commune=commune
                             :index=index @edit-commune="edit" @delete-commune="deleteCommune(commune.id)" />
                     </tbody>
