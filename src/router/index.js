@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
 import MainMenuView from '../views/MainMenuView.vue';
+import SettingView from '../views/admin/SettingsView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -18,7 +18,7 @@ const router = createRouter({
     {
       path: '/admin/settings',
       name: 'home',
-      component: HomeView,
+      component: SettingView,
       meta: {
         requireAuth: true
       }
@@ -208,14 +208,6 @@ const router = createRouter({
       path: '/reception/edit/patient/:id/agent',
       name: 'edit.patient.agent',
       component: () => import('../views/reception/patients/Forms/AgenFormPatient.vue'),
-      meta: {
-        requireAuth: true
-      }
-    },
-    {
-      path: '/about',
-      name: 'about',
-      component: () => import('../views/AboutView.vue'),
       meta: {
         requireAuth: true
       }

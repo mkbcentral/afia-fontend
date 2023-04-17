@@ -5,7 +5,7 @@ import { Form, Field } from 'vee-validate'
 import * as yup from 'yup'
 import { useToastr } from '../../../../src/widgets/toastr.js'
 import BranchItemWidget from './widgets/BranchItemWidget.vue';
-import BranchApi from '../../../services/Admin/BranchApi';
+import BranchApi from '../../../services/Admin/AdminApi.js';
 import NetworkError from '../../../components/errors/Network.vue'
 import Swal from 'sweetalert2'
 
@@ -43,7 +43,7 @@ const getData = async () => {
     isDataLoanding.value = true
     isNetWorkError.value = false
     try {
-        const response = await BranchApi.getBranches();
+        const response = await BranchApi.getData('branch');
         listBranches.value = response.data.data
         isDataLoanding.value = false
     } catch (error) {
@@ -59,7 +59,7 @@ const getData = async () => {
 const create = async (values) => {
     isLoanding.value = true
     try {
-        const response = await BranchApi.createBranch(values);
+        const response = await BranchApi.create('branch',values);
         if (response.data.success) {
             console.log(response.data)
             isLoanding.value = false
@@ -94,7 +94,7 @@ const edit = (branch) => {
 const update = async (values) => {
     isLoanding.value = true
     try {
-        const response = await BranchApi.updateBranch(formValues.value.id, values)
+        const response = await BranchApi.update('branch/',formValues.value.id, values)
         if (response.data.success) {
             isLoanding.value = false
             const index = listBranches.value.findIndex(branch => branch.id == response.data.branch.id)
@@ -124,7 +124,7 @@ const handlerSubmit = (values) => {
 const changeStatus = async (branch, status) => {
     console.log(status)
     try {
-        const response = await BranchApi.changeStatus(branch.id, { status: status })
+        const response = await BranchApi.changeStatusString('/branch/status/',branch.id, { status: status })
         toastr.success(response.data.message, 'Validation')
     } catch (error) {
         console.log(error)
@@ -142,7 +142,7 @@ const deleteBranch = async (id) => {
         confirmButtonText: 'Yes'
     }).then(async (result) => {
         if (result.isConfirmed) {
-            const response = await BranchApi.deleteBranch(id)
+            const response = await BranchApi.delete('branch/',id)
             if (response.data.success) {
                 Swal.fire(
                     'Deleted!',
@@ -165,7 +165,7 @@ const getBranches = async () => {
     isDataLoanding.value = true
     isNetWorkError.value = false
     try {
-        const response = await BranchApi.getBranches();
+        const response = await BranchApi.getData('branch');
         listBranches.value = response.data.data
         isDataLoanding.value = false
     } catch (error) {

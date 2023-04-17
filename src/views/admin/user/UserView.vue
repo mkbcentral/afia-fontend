@@ -6,10 +6,10 @@ import { Form, Field } from 'vee-validate'
 import { vMaska } from "maska"
 import * as yup from 'yup'
 import { useToastr } from '../../../../src/widgets/toastr.js'
-import UserApi from '../../../services/Admin/UserApi';
+import UserApi from '../../../services/Admin/AdminApi.js';
+import RoleApi from '../../../services/Admin/AdminApi.js';
 import ItemListUserWdgetVue from './widgets/ItemListUserWdget.vue';
 import NetworkError from '../../../components/errors/Network.vue';
-import RoleApi from '../../../services/Admin/RoleApi.js'
 import Swal from 'sweetalert2/dist/sweetalert2.all.min.js'
 import { debounce } from 'lodash'
 
@@ -56,7 +56,7 @@ const getData = async () => {
   isDataLoanding.value = true
   isNetWorkError.value = false
   try {
-    const response = await UserApi.getUsers()
+    const response = await UserApi.getData('user')
     listUsers.value = response.data.data
     isDataLoanding.value = false
   } catch (error) {
@@ -70,7 +70,7 @@ const getData = async () => {
 
 const getRoles = async () => {
   try {
-    const response = await RoleApi.getRoles();
+    const response = await RoleApi.getData('role');
     listRoles.value = response.data.data
   } catch (error) {
     if (error.code) {
@@ -84,7 +84,7 @@ const create = async (values) => {
   isLoanding.value = true;
   values.branch_id = branchId.id
   try {
-    const response = await UserApi.createUser(values)
+    const response = await UserApi.create('user', values)
     if (response.data.success) {
       isLoanding.value = false;
       console.log(response.data.user)
@@ -110,7 +110,7 @@ const create = async (values) => {
 const update = async (values) => {
   isLoanding.value = true
   try {
-    const response = await UserApi.updateUser(formValues.value.id, values)
+    const response = await UserApi.update('user/',formValues.value.id, values)
     if (response.data.success) {
       isLoanding.value = false
       getUsers()
@@ -160,7 +160,7 @@ const deleteUser = async (id) => {
     confirmButtonText: 'Yes'
   }).then(async (result) => {
     if (result.isConfirmed) {
-      const response = await UserApi.deleteUser(id)
+      const response = await UserApi.delete('user/',id)
       if (response.data.success) {
         Swal.fire(
           'Deleted!',
@@ -182,7 +182,7 @@ const deleteUser = async (id) => {
 }
 const changeStatus = async (user, status) => {
   try {
-    const response = await UserApi.changeStatus(user.id, { status: status })
+    const response = await UserApi.changeStatusString('/user/status/', user.id, { status: status })
     toastr.success(response.data.message, 'Validation')
     getUsers()
   } catch (error) {
@@ -194,7 +194,7 @@ const getUsers = async () => {
   isDataLoanding.value = true
   isNetWorkError.value = false
   try {
-    const response = await UserApi.getUsers(1)
+    const response = await UserApi.getData('/user?page='+1)
     listUsers.value = response.data.data
     isDataLoanding.value = false
     console.log(response.data.data)
@@ -210,7 +210,7 @@ const getUsers = async () => {
 
 const searchData = async () => {
   try {
-    const response = await UserApi.searchUser(searchQuary.value);
+    const response = await UserApi.searchData('users/search/', searchQuary.value);
     listUsers.value = response.data.data;
   } catch (error) {
     console.log(error)

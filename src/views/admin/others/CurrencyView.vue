@@ -4,7 +4,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { Form, Field } from 'vee-validate'
 import * as yup from 'yup'
 import { useToastr } from '../../../../src/widgets/toastr.js'
-import CurrencyApi from '../../../services/Admin/CurrencyApi'
+import CurrencyApi from '../../../services/Admin/AdminApi.js'
 import NetworkError from '../../../components/errors/Network.vue';
 import Swal from 'sweetalert2'
 import CurrencyItemListWidget from './widgets/CurrencyItemListWidget.vue'
@@ -43,7 +43,7 @@ const getData = async () => {
     isDataLoanding.value = true;
     isNetWorkError.value = false
     try {
-        const response = await CurrencyApi.getCurrencies();
+        const response = await CurrencyApi.getData('currency');
         listCurrencies.value = response.data.data;
         isDataLoanding.value = false
     } catch (error) {
@@ -69,7 +69,7 @@ const edit = (currency) => {
 const create = async (values) => {
     isLoanding.value = true
     try {
-        const response = await CurrencyApi.createCurrency(values);
+        const response = await CurrencyApi.create('currency',values);
         if (response.data.success) {
             isLoanding.value = false
             listCurrencies.value.unshift(response.data.currency)
@@ -95,7 +95,7 @@ const create = async (values) => {
 const update = async (values) => {
     isLoanding.value = true
     try {
-        const response = await CurrencyApi.updateCurrency(formValues.value.id, values)
+        const response = await CurrencyApi.update('currency/',formValues.value.id, values)
         if (response.data.success) {
             isLoanding.value = false
             const index = listCurrencies.value.findIndex(currency => currency.id == response.data.currency.id)
@@ -134,7 +134,7 @@ const deleteCurrency = async (id) => {
         confirmButtonText: 'Yes'
     }).then(async (result) => {
         if (result.isConfirmed) {
-            const response = await CurrencyApi.deleteCurrency(id)
+            const response = await CurrencyApi.delete('currency/',id)
             if (response.data.success) {
                 Swal.fire(
                     'Deleted!',
@@ -158,7 +158,7 @@ const getCurrencies = async () => {
     isDataLoanding.value = true;
     isNetWorkError.value = false;
     try {
-        const response = await CurrencyApi.getCurrencies();
+        const response = await CurrencyApi.getData('currency');
         listCurrencies.value = response.data.data;
         isDataLoanding.value = false
     } catch (error) {

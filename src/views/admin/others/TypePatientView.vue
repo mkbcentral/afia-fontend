@@ -4,7 +4,7 @@ import { ref, onMounted } from 'vue'
 import { Form, Field } from 'vee-validate'
 import * as yup from 'yup'
 import { useToastr } from '../../../../src/widgets/toastr.js'
-import TypeApi from '../../../services/Admin/TypeApi';
+import TypeApi from '../../../services/Admin/AdminApi.js';
 import NetworkError from '../../../components/errors/Network.vue';
 import ItemListTypePatientWidgetVue from './widgets/ItemListTypePatientWidget.vue';
 import Swal from 'sweetalert2'
@@ -35,7 +35,7 @@ const getData = async () => {
     isDataLoanding.value = true;
     isNetWorkError.value = false
     try {
-        const response = await TypeApi.getTypes();
+        const response = await TypeApi.getData('patient-type');
         listTypes.value = response.data.data;
         isDataLoanding.value = false
     } catch (error) {
@@ -60,7 +60,7 @@ const edit = (type) => {
 const create = async (values) => {
     isLoanding.value = true
     try {
-        const response = await TypeApi.createType(values);
+        const response = await TypeApi.create('patient-type',values);
         if (response.data.success) {
             isLoanding.value = false
             listTypes.value.unshift(response.data.type)
@@ -85,7 +85,7 @@ const create = async (values) => {
 const update = async (values) => {
     isLoanding.value = true
     try {
-        const response = await TypeApi.updateType(formValues.value.id, values)
+        const response = await TypeApi.update('patient-type/',formValues.value.id, values)
         if (response.data.success) {
             isLoanding.value = false
             const index = listTypes.value.findIndex(type => type.id == response.data.type.id)
@@ -125,7 +125,7 @@ const deleteType = async (id) => {
     }).then(async (result) => {
         try {
             if (result.isConfirmed) {
-                const response = await TypeApi.deleteType(id)
+                const response = await TypeApi.delete('patient-type/',id)
                 if (response.data.success) {
                     Swal.fire(
                         'Deleted!',
@@ -156,7 +156,7 @@ const getTypes = async () => {
     isDataLoanding.value = true;
     isNetWorkError.value = false;
     try {
-        const response = await TypeApi.getTypes();
+        const response = await TypeApi.getData('patient-type');
         listTypes.value = response.data.data;
         isDataLoanding.value = false
     } catch (error) {

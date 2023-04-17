@@ -6,8 +6,8 @@ import * as yup from 'yup'
 import { useToastr } from '../../../../src/widgets/toastr.js'
 import NetworkError from '../../../components/errors/Network.vue'
 import Swal from 'sweetalert2'
-import CompanyApi from '../../../services/Admin/CompanyApi'
-import SubscriptionApi from '../../../services/Admin/SubscriptionApi';
+import CompanyApi from '../../../services/Admin/AdminApi.js'
+import SubscriptionApi from '../../../services/Admin/AdminApi.js';
 import CompanyItemListViewVue from './widgets/CompanyItemListView.vue';
 
 const listCompanies = ref([])
@@ -41,7 +41,7 @@ const getData = async () => {
     isDataLoanding.value = true
     isNetWorkError.value = false
     try {
-        const response = await CompanyApi.getCompanies();
+        const response = await CompanyApi.getData('company');
         listCompanies.value = response.data.data
         isDataLoanding.value = false
     } catch (error) {
@@ -55,7 +55,7 @@ const getData = async () => {
 }
 const getSubscriptions = async () => {
     try {
-        const response = await SubscriptionApi.getSubscriptions();
+        const response = await SubscriptionApi.getData('subscription');
         listSubscriptions.value = response.data.data
     } catch (error) {
         console.log(error)
@@ -78,7 +78,7 @@ const edit = (company) => {
 const create = async (values) => {
     isLoanding.value = true
     try {
-        const response = await CompanyApi.createCompany(values);
+        const response = await CompanyApi.create('company',values);
         if (response.data.success) {
             isLoanding.value = false
             listCompanies.value.unshift(response.data.company)
@@ -105,7 +105,7 @@ const create = async (values) => {
 const update = async (values) => {
     isLoanding.value = true
     try {
-        const response = await CompanyApi.updateCompany(formValues.value.id, values)
+        const response = await CompanyApi.update('company/',formValues.value.id, values)
         if (response.data.success) {
             isLoanding.value = false
             getCompanies()
@@ -140,7 +140,7 @@ const deleteCompany = async (id) => {
         confirmButtonText: 'Yes'
     }).then(async (result) => {
         if (result.isConfirmed) {
-            const response = await CompanyApi.deleteCompany(id)
+            const response = await CompanyApi.delete('company/',id)
             if (response.data.success) {
                 Swal.fire(
                     'Deleted!',
@@ -162,7 +162,7 @@ const getCompanies = async () => {
     isDataLoanding.value = true
     isNetWorkError.value = false
     try {
-        const response = await CompanyApi.getCompanies();
+        const response = await CompanyApi.getData('company');
         listCompanies.value = response.data.data
         isDataLoanding.value = false
     } catch (error) {

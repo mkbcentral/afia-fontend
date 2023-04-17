@@ -4,7 +4,7 @@ import { ref, onMounted } from 'vue'
 import { Form, Field } from 'vee-validate'
 import * as yup from 'yup'
 import { useToastr } from '../../../../src/widgets/toastr.js'
-import CommuneApi from '../../../services/Admin/CommuneApi';
+import CommuneApi from '../../../services/Admin/AdminApi.js';
 import NetworkError from '../../../components/errors/Network.vue';
 import ItemListCommuneWidget from './widgets/ItemListCommuneWidget.vue';
 import Swal from 'sweetalert2'
@@ -40,7 +40,7 @@ const getData = async () => {
     isDataLoanding.value = true;
     isNetWorkError.value = false
     try {
-        const response = await CommuneApi.getCommunes();
+        const response = await CommuneApi.getData('commune');
         listCommunes.value = response.data.data;
         isDataLoanding.value = false
     } catch (error) {
@@ -65,7 +65,7 @@ const edit = (commune) => {
 const create = async (values) => {
     isLoanding.value = true
     try {
-        const response = await CommuneApi.createCommune(values);
+        const response = await CommuneApi.create('commune',values);
 
         if (response.data.success) {
             isLoanding.value = false
@@ -91,7 +91,7 @@ const create = async (values) => {
 const update = async (values) => {
     isLoanding.value = true
     try {
-        const response = await CommuneApi.updateCommune(formValues.value.id, values)
+        const response = await CommuneApi.update('commune/',formValues.value.id, values)
         if (response.data.success) {
             isLoanding.value = false
             const index = listCommunes.value.findIndex(commune => commune.id == response.data.commune.id)
@@ -131,7 +131,7 @@ const deleteCommune = async (id) => {
     }).then(async (result) => {
         try {
             if (result.isConfirmed) {
-                const response = await CommuneApi.deleteCommune(id)
+                const response = await CommuneApi.delete('commune/',id)
                 if (response.data.success) {
                     Swal.fire(
                         'Deleted!',

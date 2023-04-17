@@ -6,7 +6,7 @@ import { vMaska } from "maska"
 import * as yup from 'yup'
 import { useToastr } from '../../../../src/widgets/toastr.js'
 import HospitalItemList from './widgets/HospitalItemList.vue';
-import HospitalApi from '../../../services/Admin/HospitalApi';
+import HospitalApi from '../../../services/Admin/AdminApi.js';
 import NetworkError from '../../../components/errors/Network.vue'
 import Swal from 'sweetalert2';
 
@@ -42,7 +42,7 @@ const getData = async () => {
   isDataLoanding.value = true
   isNetWorkError.value = false
   try {
-    const response = await HospitalApi.getHospials()
+    const response = await HospitalApi.getData('/hospital')
     listHospitals.value = response.data.data
     isDataLoanding.value = false
   } catch (error) {
@@ -57,7 +57,7 @@ const getData = async () => {
 const create = async (values) => {
   isLoanding.value = true
   try {
-    const response = await HospitalApi.creteHospital(values);
+    const response = await HospitalApi.create('hospital', values);
     console.log(response);
     if (response.data.success) {
       console.log(response.data)
@@ -96,7 +96,7 @@ const edit = (hospital) => {
 const update = async (values) => {
   isLoanding.value = true
   try {
-    const response = await HospitalApi.updateHopital(formValues.value.id, values);
+    const response = await HospitalApi.update('hospital/', formValues.value.id, values);
     if (response.data.success) {
       isLoanding.value = false
       const index = listHospitals.value.findIndex(hospital => hospital.id == response.data.hospital.id)
@@ -139,7 +139,7 @@ const deleteHospital = async (id) => {
     confirmButtonText: 'Yes'
   }).then(async (result) => {
     if (result.isConfirmed) {
-      const response = await HospitalApi.deleHospital(id);
+      const response = await HospitalApi.delete('hospital/', id);
       if (response.data.success) {
         Swal.fire(
           'Deleted!',
@@ -161,7 +161,7 @@ const deleteHospital = async (id) => {
 const changeStatus = async (hospital, status) => {
   console.log({ status: status });
   try {
-    const response = await HospitalApi.changeStutus(hospital.id, { status: status });
+    const response = await HospitalApi.changeStatusString('/hospital/status/', hospital.id, { status: status });
     toastr.success(response.data.message, 'Validation')
   } catch (error) {
     console.log(error)
@@ -208,7 +208,7 @@ const getHospitals = async () => {
   isDataLoanding.value = true
   isNetWorkError.value = false
   try {
-    const response = await HospitalApi.getHospials()
+    const response = await HospitalApi.getData('/hospital')
     listHospitals.value = response.data.data
     isDataLoanding.value = false
   } catch (error) {
@@ -363,4 +363,5 @@ onMounted(async () => {
       </div>
     </div>
 
-</AdminLayout></template>
+  </AdminLayout>
+</template>

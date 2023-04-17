@@ -4,7 +4,7 @@ import { ref, onMounted } from 'vue'
 import { Form, Field } from 'vee-validate'
 import * as yup from 'yup'
 import { useToastr } from '../../../../src/widgets/toastr.js'
-import ServiceApi from '../../../services/Admin/AgentServiceApi.js';
+import ServiceApi from '../../../services/Admin/AdminApi.js';
 import NetworkError from '../../../components/errors/Network.vue';
 import AgentServiceItemListWidget from './widgets/AgentServiceItemListWidget.vue';
 import Swal from 'sweetalert2'
@@ -38,7 +38,7 @@ const getData = async () => {
     isDataLoanding.value = true;
     isNetWorkError.value = false
     try {
-        const response = await ServiceApi.getServices();
+        const response = await ServiceApi.getData('service-agent');
         listServices.value = response.data.data;
         isDataLoanding.value = false
     } catch (error) {
@@ -63,7 +63,7 @@ const edit = (service) => {
 const create = async (values) => {
     isLoanding.value = true
     try {
-        const response = await ServiceApi.createService(values);
+        const response = await ServiceApi.create('service-agent',values);
 
         if (response.data.success) {
             isLoanding.value = false
@@ -89,7 +89,7 @@ const create = async (values) => {
 const update = async (values) => {
     isLoanding.value = true
     try {
-        const response = await ServiceApi.updateService(formValues.value.id, values)
+        const response = await ServiceApi.update('service-agent/',formValues.value.id, values)
         if (response.data.success) {
             isLoanding.value = false
             const index = listServices.value.findIndex(service => service.id == response.data.service.id)
@@ -129,7 +129,7 @@ const deleteService = async (id) => {
     }).then(async (result) => {
         try {
             if (result.isConfirmed) {
-                const response = await ServiceApi.deleteService(id)
+                const response = await ServiceApi.delete('service-agent/',id)
                 if (response.data.success) {
                     Swal.fire(
                         'Deleted!',
@@ -160,7 +160,7 @@ const getServices = async () => {
     isDataLoanding.value = true;
     isNetWorkError.value = false;
     try {
-        const response = await ServiceApi.getServices();
+        const response = await ServiceApi.getData('service-agent');
         listServices.value = response.data.data;
         isDataLoanding.value = false
     } catch (error) {

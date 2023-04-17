@@ -4,7 +4,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { Form, Field } from 'vee-validate'
 import * as yup from 'yup'
 import { useToastr } from '../../../../src/widgets/toastr.js'
-import RateApi from '../../../services/Admin/RateApi'
+import RateApi from '../../../services/Admin/AdminApi.js'
 import NetworkError from '../../../components/errors/Network.vue';
 import Swal from 'sweetalert2'
 import ItemListRateWidget from './widgets/ItemListRateWidget.vue';
@@ -43,7 +43,7 @@ const getData = async () => {
     isDataLoanding.value = true;
     isNetWorkError.value = false
     try {
-        const response = await RateApi.getRates();
+        const response = await RateApi.getData('rate');
         listRates.value = response.data.data;
         isDataLoanding.value = false
     } catch (error) {
@@ -70,7 +70,7 @@ const edit = (rate) => {
 const create = async (values) => {
     isLoanding.value = true
     try {
-        const response = await RateApi.createRate(values);
+        const response = await RateApi.create('rate',values);
         if (response.data.success) {
             isLoanding.value = false
             listRates.value.unshift(response.data.rate)
@@ -95,7 +95,7 @@ const create = async (values) => {
 const update = async (values) => {
     isLoanding.value = true
     try {
-        const response = await RateApi.updateRate(formValues.value.id, values)
+        const response = await RateApi.update('rate/',formValues.value.id, values)
         if (response.data.success) {
             isLoanding.value = false
             const index = listRates.value.findIndex(rate => rate.id == response.data.rate.id)
@@ -134,7 +134,7 @@ const changeStatus = async (id) => {
         confirmButtonText: 'Yes'
     }).then(async (result) => {
         if (result.isConfirmed) {
-            const response = await RateApi.changeStatus(id);
+            const response = await RateApi.changeStatusBoolean('/rate/status/',id);
             if (response.data.success) {
                 Swal.fire(
                     'Deleted!',
@@ -167,7 +167,7 @@ const deleteRate = async (id) => {
         confirmButtonText: 'Yes'
     }).then(async (result) => {
         if (result.isConfirmed) {
-            const response = await RateApi.deletetRate(id)
+            const response = await RateApi.delete('rate/',id)
             if (response.data.success) {
                 Swal.fire(
                     'Deleted!',
@@ -191,7 +191,7 @@ const getRates = async () => {
     isDataLoanding.value = true;
     isNetWorkError.value = false;
     try {
-        const response = await RateApi.getRates();
+        const response = await RateApi.getData('rate');
         listRates.value = response.data.data;
         isDataLoanding.value = false
     } catch (error) {

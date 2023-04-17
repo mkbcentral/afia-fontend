@@ -6,7 +6,7 @@ import * as yup from 'yup'
 import { useToastr } from '../../../../src/widgets/toastr.js'
 import NetworkError from '../../../components/errors/Network.vue'
 import Swal from 'sweetalert2'
-import SubscrptionApi from '../../../services/Admin/SubscriptionApi'
+import SubscrptionApi from '../../../services/Admin/AdminApi.js'
 import SubscriptionItemWidget from '../others/widgets/SubscriptionItemWidget.vue'
 
 const listSubscriptions = ref([])
@@ -40,7 +40,7 @@ const getData = async () => {
     isDataLoanding.value = true
     isNetWorkError.value = false
     try {
-        const response = await SubscrptionApi.getSubscriptions();
+        const response = await SubscrptionApi.getData('subscription');
         listSubscriptions.value = response.data.data
         isDataLoanding.value = false
     } catch (error) {
@@ -66,7 +66,7 @@ const edit = (subscription) => {
 const create = async (values) => {
     isLoanding.value = true
     try {
-        const response = await SubscrptionApi.createSubscription(values);
+        const response = await SubscrptionApi.create('subscription',values);
         if (response.data.success) {
             isLoanding.value = false
             listSubscriptions.value.unshift(response.data.subscription)
@@ -95,7 +95,7 @@ const create = async (values) => {
 const update = async (values) => {
     isLoanding.value = true
     try {
-        const response = await SubscrptionApi.updateSubscription(formValues.value.id, values)
+        const response = await SubscrptionApi.update('subscription/',formValues.value.id, values)
         if (response.data.success) {
             isLoanding.value = false
             const index = listSubscriptions.value.findIndex(subscription => subscription.id == response.data.subscription.id)
@@ -122,7 +122,7 @@ const handlerSubmit = (values) => {
 }
 const changeStatus = async (subscription, status) => {
     try {
-        const response = await SubscrptionApi.changeStatus(subscription.id, { status: status })
+        const response = await SubscrptionApi.changeStatusString('/subscription/status/',subscription.id, { status: status })
         toastr.success(response.data.message, 'Validation')
     } catch (error) {
         console.log(error)
@@ -139,7 +139,7 @@ const deleteSubscription = async (id) => {
         confirmButtonText: 'Yes'
     }).then(async (result) => {
         if (result.isConfirmed) {
-            const response = await SubscrptionApi.deleteSubscription(id)
+            const response = await SubscrptionApi.delete('subscription/',id)
             if (response.data.success) {
                 Swal.fire(
                     'Deleted!',
@@ -161,7 +161,7 @@ const getSubscriptions = async () => {
     isDataLoanding.value = true
     isNetWorkError.value = false
     try {
-        const response = await SubscrptionApi.getSubscriptions();
+        const response = await SubscrptionApi.getData('subscription');
         listSubscriptions.value = response.data.data
         isDataLoanding.value = false
     } catch (error) {
@@ -235,11 +235,18 @@ onMounted(async () => {
                                 <th class="text-center">Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody v-if="listSubscriptions.length>0">
                             <SubscriptionItemWidget v-for="(subscription, index) in listSubscriptions"
                                 :key="subscription.id" :subscription=subscription :index=index @edit-subscription="edit"
                                 @change-status="changeStatus" @delete-subscription="deleteSubscription(subscription.id)" />
                         </tbody>
+                        <tbody v-else>
+                        <tr>
+                            <td colspan="6" class="text-center p-4 text-secondary"> <i class="fas fa-database"></i> Not
+                                result
+                                found...</td>
+                        </tr>
+                    </tbody>
                     </table>
                 </div>
             </div>

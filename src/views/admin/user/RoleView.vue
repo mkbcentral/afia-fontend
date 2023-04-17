@@ -5,7 +5,7 @@ import { Form, Field } from 'vee-validate'
 import * as yup from 'yup'
 import { useToastr } from '../../../../src/widgets/toastr.js'
 import ItemListRoleWidget from './widgets/ItemListRoleWidget.vue';
-import RoleApi from '../../../services/Admin/RoleApi';
+import RoleApi from '../../../services/Admin/AdminApi';
 import NetworkError from '../../../components/errors/Network.vue';
 import Swal from 'sweetalert2'
 
@@ -39,7 +39,7 @@ const getData = async () => {
     isDataLoanding.value = true;
     isNetWorkError.value = false
     try {
-        const response = await RoleApi.getRoles();
+        const response = await RoleApi.getData('role');
         listRoles.value = response.data.data;
         isDataLoanding.value = false
     } catch (error) {
@@ -65,7 +65,7 @@ const edit = (role) => {
 const create = async (values) => {
     isLoanding.value = true
     try {
-        const response = await RoleApi.createRole(values);
+        const response = await RoleApi.create('role',values);
         if (response.data.success) {
             isLoanding.value = false
             listRoles.value.unshift(response.data.role)
@@ -90,7 +90,7 @@ const create = async (values) => {
 const update = async (values) => {
     isLoanding.value = true
     try {
-        const response = await RoleApi.updateRole(formValues.value.id, values)
+        const response = await RoleApi.update('role/',formValues.value.id, values)
         if (response.data.success) {
             isLoanding.value = false
             const index = listRoles.value.findIndex(role => role.id == response.data.role.id)
@@ -120,7 +120,7 @@ const handlerSubmit = (values) => {
 
 const changeStatus = async (role, status) => {
     try {
-        const response = await RoleApi.changeStatus(role.id, { status: status });
+        const response = await RoleApi.changeStatusString('/role/status/',role.id, { status: status });
         toastr.success(response.data.message, 'Validation')
     } catch (error) {
         console / log(error)
@@ -138,7 +138,7 @@ const deleteRole = async (id) => {
         confirmButtonText: 'Yes'
     }).then(async (result) => {
         if (result.isConfirmed) {
-            const response = await RoleApi.deleteRole(id)
+            const response = await RoleApi.delete('role',id)
             if (response.data.success) {
                 Swal.fire(
                     'Deleted!',
@@ -162,7 +162,7 @@ const getRoles = async () => {
     isDataLoanding.value = true;
     isNetWorkError.value = false;
     try {
-        const response = await RoleApi.getRoles();
+        const response = await RoleApi.getData('role');
         listRoles.value = response.data.data;
         isDataLoanding.value = false
     } catch (error) {
