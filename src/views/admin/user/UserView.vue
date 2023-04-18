@@ -118,14 +118,10 @@ const update = async (values) => {
       isLoanding.value = false
     }
   } catch (error) {
-    if (error.response.status == 422) {
-      isLoanding.value = false;
-      actions.setErrors(error.response.data.errors)
-    } else {
-      isLoanding.value = false
-      toastr.error(error.message, 'Validation')
-    }
-  } 
+    console.log(error)
+  } finally {
+    form.value.resetForm()
+  }
 }
 
 const edit = (user) => {
