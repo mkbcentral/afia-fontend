@@ -46,10 +46,12 @@
                 </div>
             </div>
             <div class="box">
-                <div class="content">
-                    <i class="fas fa-chart-pie fa-solid fa-3x"></i>
-                    <p>Statistiques</p>
-                </div>
+                <RouterLink to="/finance/tarification/list">
+                    <div class="content">
+                        <i class="fas fa-money-check-alt fa-3x"></i>
+                        <p>Tarification</p>
+                    </div>
+                </RouterLink>
             </div>
 
             <div class="box">

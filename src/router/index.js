@@ -212,6 +212,42 @@ const router = createRouter({
         requireAuth: true
       }
     },
+    //LIST TARIFICATION 
+    {
+      path: '/finance/tarification/list',
+      name: 'finance.tarification.list',
+      component: () => import('../views/admin/tarification/PriceListView.vue'),
+      meta: {
+        requireAuth: true
+      }
+    },
+    //CONSULTATION TARIFICATION 
+    {
+      path: '/finance/tarification/consultation',
+      name: 'finance.tarification.consultation',
+      component: () => import('../views/admin/tarification/ConsultationTarifView.vue'),
+      meta: {
+        requireAuth: true
+      }
+    },
+    //OTHER TARIFICATION 
+    {
+      path: '/finance/tarification/other',
+      name: 'finance.tarification.other',
+      component: () => import('../views/admin/tarification/OtherTarifView.vue'),
+      meta: {
+        requireAuth: true
+      }
+    },
+    //OTHER TARIFICATION 
+    {
+      path: '/finance/tarification/category',
+      name: 'finance.tarification.category',
+      component: () => import('../views/admin/tarification/CategoryTarifView.vue'),
+      meta: {
+        requireAuth: true
+      }
+    },
     {
       path: '/login',
       name: 'login',

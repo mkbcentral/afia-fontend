@@ -47,6 +47,7 @@ const schema = yup.object({
 })
 
 const add = async () => {
+  console.log(form.value)
   isEditing.value = false;
   $('#adduserModal').modal('show');
   form.value.resetForm()
@@ -80,7 +81,7 @@ const getRoles = async () => {
   }
 }
 
-const create = async (values) => {
+const create = async (values,actions) => {
   isLoanding.value = true;
   values.branch_id = branchId.id
   try {
@@ -91,26 +92,21 @@ const create = async (values) => {
       listUsers.value.unshift(response.data.user)
       toastr.success(response.data.message, 'Validation');
       $('#adduserModal').modal('hide');
-      form.value.resetForm()
-    } else {
-      if (response.data.errors) {
-        errorResp.value = response.data.errors
-      } else {
-        errorResp.value = response.data.message
-      }
-      isLoanding.value = false
-      toastr.error(errorResp.value, 'Validation')
     }
   } catch (error) {
-    console.log(error)
-  } finally {
-    form.resetForm()
-  }
+    if (error.response.status == 422) {
+      isLoanding.value = false;
+      actions.setErrors(error.response.data.errors)
+    } else {
+      isLoanding.value = false
+      toastr.error(error.message, 'Validation')
+    }
+  } 
 }
 const update = async (values) => {
   isLoanding.value = true
   try {
-    const response = await UserApi.update('user/',formValues.value.id, values)
+    const response = await UserApi.update('user/', formValues.value.id, values)
     if (response.data.success) {
       isLoanding.value = false
       getUsers()
@@ -122,10 +118,14 @@ const update = async (values) => {
       isLoanding.value = false
     }
   } catch (error) {
-    console.log(error)
-  } finally {
-    form.value.resetForm()
-  }
+    if (error.response.status == 422) {
+      isLoanding.value = false;
+      actions.setErrors(error.response.data.errors)
+    } else {
+      isLoanding.value = false
+      toastr.error(error.message, 'Validation')
+    }
+  } 
 }
 
 const edit = (user) => {
@@ -141,11 +141,11 @@ const edit = (user) => {
   }
 }
 
-const handlerSubmit = (values) => {
+const handlerSubmit = (values,actions) => {
   if (isEditing.value) {
-    update(values)
+    update(values,actions)
   } else {
-    create(values)
+    create(values,actions)
   }
 }
 
@@ -160,7 +160,7 @@ const deleteUser = async (id) => {
     confirmButtonText: 'Yes'
   }).then(async (result) => {
     if (result.isConfirmed) {
-      const response = await UserApi.delete('user/',id)
+      const response = await UserApi.delete('user/', id)
       if (response.data.success) {
         Swal.fire(
           'Deleted!',
@@ -194,7 +194,7 @@ const getUsers = async () => {
   isDataLoanding.value = true
   isNetWorkError.value = false
   try {
-    const response = await UserApi.getData('/user?page='+1)
+    const response = await UserApi.getData('/user?page=' + 1)
     listUsers.value = response.data.data
     isDataLoanding.value = false
     console.log(response.data.data)

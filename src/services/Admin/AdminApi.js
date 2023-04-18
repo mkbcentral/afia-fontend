@@ -3,7 +3,9 @@ export default {
     getData(path) {
         return API().get(path);
     },
-
+    getFirstData(path) {
+        return API().get(path);
+    },
     create(path, data) {
         return API().post(path, data);
     },
