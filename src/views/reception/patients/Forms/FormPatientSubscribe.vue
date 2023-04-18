@@ -4,10 +4,10 @@ import { ref, onMounted } from 'vue';
 import * as yup from 'yup'
 import { Form, Field } from 'vee-validate'
 import { vMaska } from "maska"
-import CommuneApi from '../../../../services/Admin/CommuneApi.js'
+import CommuneApi from '../../../../services/Admin/AdminApi.js'
 import ApiPatient from '../../../../services/Patients/PatientApi.js'
-import ApiTypePatient from '../../../../services/Admin/TypeApi.js'
-import ApiCompany from '../../../../services/Admin/CompanyApi.js'
+import ApiTypePatient from '../../../../services/Admin/AdminApi.js'
+import ApiCompany from '../../../../services/Admin/AdminApi.js'
 import { useToastr } from '../../../../widgets/toastr.js'
 import { useRouter, useRoute } from 'vue-router'
 import flatpickr from "flatpickr";
@@ -44,7 +44,7 @@ const schema = yup.object({
     patient_type_id: yup.number().required(),
     registration_number: yup.number().required(),
 })
-const create = async (values) => {
+const create = async (values, actions) => {
     isLoanding.value = true;
     try {
         const response = await ApiPatient.createPatient(values, '/patient-subscribe')
@@ -62,16 +62,17 @@ const create = async (values) => {
             toastr.error(errorResp.value, 'Validation')
         }
     } catch (error) {
-        if (error.code) {
-            isNetWorkError.value = true
-            errorResp.value = error.message
-            toastr.error(errorResp.value, 'Errors')
+        if (error.response.status == 422) {
+            isLoanding.value = false;
+            actions.setErrors(error.response.data.errors)
+        } else {
+            isLoanding.value = false
+            toastr.error(error.message, 'Validation')
         }
-        isLoanding.value = false;
     }
 }
 
-const update = async (values) => {
+const update = async (values,actions) => {
     isLoanding.value = true;
     console.log(values)
     try {
@@ -90,30 +91,27 @@ const update = async (values) => {
             toastr.error(errorResp.value, 'Error')
         }
     } catch (error) {
-        if (error.code) {
-            isNetWorkError.value = true
-            errorResp.value = error.message
-            toastr.error(errorResp.value, 'Errors')
-        } else if (error.response.status == 422) {
-            errors.value = error.response.data.errors
+        if (error.response.status == 422) {
+            isLoanding.value = false;
+            actions.setErrors(error.response.data.errors)
+        } else {
             isLoanding.value = false
-            toastr.error(error.response.data.errors, 'Error')
+            toastr.error(error.message, 'Validation')
         }
-        isLoanding.value = false;
     }
 }
 
-const handlerSubmit = (values) => {
+const handlerSubmit = (values,actions) => {
     if (isEditing.value) {
-        update(values)
+        update(values,actions)
     } else {
-        create(values)
+        create(values,actions)
     }
 }
 
 const getCommunes = async () => {
     try {
-        const response = await CommuneApi.getCommunes();
+        const response = await CommuneApi.getData('commune');
         listCommunes.value = response.data.data
     } catch (error) {
         if (error.code) {
@@ -124,7 +122,7 @@ const getCommunes = async () => {
 
 const getCompanies = async () => {
     try {
-        const response = await ApiCompany.getCompanies();
+        const response = await ApiCompany.getData('company');
         listCompanies.value = response.data.data
     } catch (error) {
         if (error.code) {
@@ -137,7 +135,7 @@ const getCompanies = async () => {
 
 const getTypePatients = async () => {
     try {
-        const response = await ApiTypePatient.getTypes();
+        const response = await ApiTypePatient.getData('patient-type');
         listTypes.value = response.data.data
     } catch (error) {
         if (error.code) {
@@ -164,7 +162,7 @@ const getPaptient = async () => {
             parcel_number: response.data.data.parcel_number,
             company_id: response.data.data.company.id,
             patient_type_id: response.data.data.type.id,
-            
+
         }
         isDataLoanding.value = false
     } catch (error) {
@@ -202,7 +200,7 @@ onMounted(async () => {
                             </li>
                             <li class="breadcrumb-item active">
                                 <span v-if="isEditing">Edit patient</span>
-                                <span v-else >Create patient</span>
+                                <span v-else>Create patient</span>
                             </li>
                         </ol>
                     </div><!-- /.col -->
@@ -214,7 +212,8 @@ onMounted(async () => {
                 <span hidden class="visually-hidden">Loading...</span>
             </div>
         </div>
-        <Form v-else ref="form" @submit="handlerSubmit" :validation-schema="schema" v-slot="{ errors }" :initial-values="formValues">
+        <Form v-else ref="form" @submit="handlerSubmit" :validation-schema="schema" v-slot="{ errors }"
+            :initial-values="formValues">
             <div class="modal-content ">
                 <div class="modal-header " style="background-color: #94106C;color: white;">
                     <h5 v-if="isEditing" class="modal-title text-uppercase  text-bold " id="addPatientPrivateModalLabel">
@@ -338,7 +337,7 @@ onMounted(async () => {
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Matricule</label>
-                                <Field name="registration_number" type="number" class="form-control" 
+                                <Field name="registration_number" type="number" class="form-control"
                                     :class="{ 'is-invalid': errors.registration_number }" placeholder="Matricule" />
                                 <span class="invalid-feedback">{{ errors.registration_number }}</span>
                             </div>

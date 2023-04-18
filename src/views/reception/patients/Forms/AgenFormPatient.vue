@@ -4,14 +4,14 @@ import { ref, onMounted } from 'vue';
 import * as yup from 'yup'
 import { Form, Field } from 'vee-validate'
 import { vMaska } from "maska"
-import CommuneApi from '../../../../services/Admin/CommuneApi.js'
+import CommuneApi from '../../../../services/Admin/AdminApi.js'
 import ApiPatient from '../../../../services/Patients/PatientApi.js'
-import ApiTypePatient from '../../../../services/Admin/TypeApi.js'
+import ApiTypePatient from '../../../../services/Admin/AdminApi.js'
+import ApiAgentService from '../../../../services/Admin/AdminApi.js'
 import { useToastr } from '../../../../widgets/toastr.js'
 import { useRouter, useRoute } from 'vue-router'
-import flatpickr from "flatpickr";
-import 'flatpickr/dist/themes/dark.css'
-import ApiAgentService from '../../../../services/Admin/AgentServiceApi'
+
+
 
 const router = useRouter()
 const route = useRoute()
@@ -113,7 +113,7 @@ const handlerSubmit = (values) => {
 
 const getCommunes = async () => {
     try {
-        const response = await CommuneApi.getCommunes();
+        const response = await CommuneApi.getData('commune');
         listCommunes.value = response.data.data
     } catch (error) {
         if (error.code) {
@@ -124,7 +124,7 @@ const getCommunes = async () => {
 
 const getAgentServices = async () => {
     try {
-        const response = await ApiAgentService.getServices();
+        const response = await ApiAgentService.getData('service-agent');
         listServices.value = response.data.data
     } catch (error) {
         if (error.code) {
@@ -137,7 +137,7 @@ const getAgentServices = async () => {
 
 const getTypePatients = async () => {
     try {
-        const response = await ApiTypePatient.getTypes();
+        const response = await ApiTypePatient.getData('patient-type');
         listTypes.value = response.data.data
     } catch (error) {
         if (error.code) {

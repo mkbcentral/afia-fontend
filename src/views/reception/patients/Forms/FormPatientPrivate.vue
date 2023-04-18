@@ -4,7 +4,7 @@ import { ref, onMounted } from 'vue';
 import * as yup from 'yup'
 import { Form, Field } from 'vee-validate'
 import { vMaska } from "maska"
-import CommuneApi from '../../../../services/Admin/CommuneApi.js'
+import CommuneApi from '../../../../services/Admin/AdminApi.js'
 import ApiPatient from '../../../../services/Patients/PatientApi.js'
 import { useToastr } from '../../../../../src/widgets/toastr.js'
 import { useRouter, useRoute } from 'vue-router'
@@ -37,7 +37,7 @@ const schema = yup.object({
     parcel_number: yup.number().required(),
 })
 
-const create = async (values) => {
+const create = async (values, actions) => {
     isLoanding.value = true;
     try {
         const response = await ApiPatient.createPatient(values, '/patient-private')
@@ -55,16 +55,17 @@ const create = async (values) => {
             toastr.error(errorResp.value, 'Validation')
         }
     } catch (error) {
-        if (error.code) {
-            isNetWorkError.value = true
-            errorResp.value = error.message
-            toastr.error(errorResp.value, 'Errors')
+        if (error.response.status == 422) {
+            isLoanding.value = false;
+            actions.setErrors(error.response.data.errors)
+        } else {
+            isLoanding.value = false
+            toastr.error(error.message, 'Validation')
         }
-        isLoanding.value = false;
     }
 }
 
-const update = async (values) => {
+const update = async (values,actions) => {
     isLoanding.value = true;
     console.log(values)
     try {
@@ -83,26 +84,27 @@ const update = async (values) => {
             toastr.error(errorResp.value, 'Error')
         }
     } catch (error) {
-        if (error.code) {
-            isNetWorkError.value = true
-            errorResp.value = error.message
-            toastr.error(errorResp.value, 'Errors')
+        if (error.response.status == 422) {
+            isLoanding.value = false;
+            actions.setErrors(error.response.data.errors)
+        } else {
+            isLoanding.value = false
+            toastr.error(error.message, 'Validation')
         }
-        isLoanding.value = false;
     }
 }
 
-const handlerSubmit = (values) => {
+const handlerSubmit = (values,actions) => {
     if (isEditing.value) {
-        update(values)
+        update(values,actions)
     } else {
-        create(values)
+        create(values,actions)
     }
 }
 
 const getCommunes = async () => {
     try {
-        const response = await CommuneApi.getCommunes();
+        const response = await CommuneApi.getFirstData('commune');
         listCommunes.value = response.data.data
     } catch (error) {
         if (error.code) {
@@ -161,7 +163,7 @@ onMounted(async () => {
                             </li>
                             <li class="breadcrumb-item active">
                                 <span v-if="isEditing">Edit patient</span>
-                                <span v-else >Create patient</span>
+                                <span v-else>Create patient</span>
                             </li>
                         </ol>
                     </div><!-- /.col -->

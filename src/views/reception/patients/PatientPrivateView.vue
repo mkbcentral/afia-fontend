@@ -12,7 +12,7 @@ let errorResp = ref('')
 const isDataLoanding = ref(false)
 const isNetWorkError = ref(false)
 const searchQuary = ref(null)
-const page = ref(10)
+const page = ref(3)
 const pageCount = ref(null)
 const currentPage = ref(1);
 
@@ -33,10 +33,10 @@ const getData = async () => {
 }
 
 const getDataPagiantion = async (p) => {
+    console.log(p)
     try {
         const response = await ApiPatient.getPatients('/patient-private?page_page=' + page.value + '&page=' + p);
         listPatients.value = response.data.data;
-        pageCount.value = Math.round(response.data.meta.total / page.value)
     } catch (error) {
         if (error.code) {
             isNetWorkError.value = true

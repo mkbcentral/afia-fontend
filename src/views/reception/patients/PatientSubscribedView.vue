@@ -12,7 +12,7 @@ let errorResp = ref('')
 const isDataLoanding = ref(false)
 const isNetWorkError = ref(false)
 const searchQuary = ref(null)
-const page = ref(10)
+const page = ref(3)
 const pageCount = ref(null)
 const currentPage = ref(1);
 

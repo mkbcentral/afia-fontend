@@ -42,8 +42,8 @@ const editStatus = async (user, status) => {
         <td v-text="user.name"></td>
         <td v-text="user.email"></td>
         <td v-text="user.phone"></td>
-        <td class="text-center" v-text="user.role.name"></td>
-        <td v-text="user.hospital.name"></td>
+        <td class="text-center" v-text="user.role_name"></td>
+        <td v-text="user.hospital_name"></td>
         <td>
             <select class="form-control "  :class="'text-'+user.color" @change="editStatus(user, $event.target.value)">
                 <option v-for="item in status" :value="item.name" :selected="item.name == user.status" >

@@ -12,7 +12,7 @@ const listPatients = ref([])
 const isDataLoanding = ref(false)
 const isNetWorkError = ref(false)
 const searchQuary = ref(null)
-const page = ref(10)
+const page = ref(3)
 const pageCount = ref(null)
 const currentPage = ref(1);
 
@@ -33,19 +33,16 @@ const getData = async () => {
     }
 }
 
-const getDataPagination = async () => {
-    isDataLoanding.value = true;
-    isNetWorkError.value = false;
+const getDataPagination = async (p) => {
+
     try {
         const response = await ApiPatient.getPatients('/agent-patient?page_page=' + page.value + '&page=' + p);
         listPatients.value = response.data.data;
-        isDataLoanding.value = false
     } catch (error) {
         if (error.code) {
             isNetWorkError.value = true
             errorResp.value = error.message
         }
-        isDataLoanding.value = false
     }
 }
 
@@ -161,7 +158,8 @@ onMounted(async () => {
                 <div v-else>
                     <div class="d-flex">
                         <div class="form-group">
-                            <input v-model="searchQuary" id="my-input" placeholder="Search here..." class="form-control"
+                            <input v-model="searchQuary" id="my-input"
+                             placeholder="Search here..." class="form-control"
                                 type="text">
                         </div>
                     </div>
