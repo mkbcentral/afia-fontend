@@ -22,7 +22,7 @@ export default {
         return API().put(path + id)
     },
     getCurrentData(path) {
-        return API().put(path)
+        return API().get(path)
     },
     searchData(path,query) {
         return API().get(path, {

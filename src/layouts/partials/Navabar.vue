@@ -1,5 +1,6 @@
 <script setup>
     import { useRouter } from 'vue-router';
+    import CurrentRateView from '../../views/admin/others/CurrentRateView.vue';
     const router=useRouter()
     const logout =async()=>{
         localStorage.removeItem('token');
@@ -16,7 +17,7 @@
         </li>
       </ul>
       <li class="nav-item pl-4 d-none d-sm-inline-block">
-        <h3 class="text-bold text-danger">Taux: 1$=2300 Fc </h3>
+        <CurrentRateView/>
       </li>
       <ul class="navbar-nav ml-auto">
        

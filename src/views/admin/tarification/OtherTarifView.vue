@@ -38,7 +38,7 @@ const schema = yup.object({
 const add = async () => {
     isEditing.value = false;
     $('#addTarifModal').modal('show');
-    console.log(form.value)
+    
 }
 
 const edit = (tarifiaction) => {
@@ -327,9 +327,8 @@ onMounted(async () => {
                                 <tr>
                                     <th class="text-center">#</th>
                                     <th>NAME</th>
-                                    <th>ABREVIATION</th>
-                                    <th>PRICE PRIVATE</th>
-                                    <th>PRICE SUBSCRIBE</th>
+                                    <th class="text-center">PRICE PRIVATE USD</th>
+                                    <th class="text-center">PRICE SUBSCRIBE USD</th>
                                     <th class="text-center">STATUS</th>
                                     <th class="text-center">Actions</th>
                                 </tr>

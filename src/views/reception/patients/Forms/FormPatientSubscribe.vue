@@ -8,9 +8,9 @@ import CommuneApi from '../../../../services/Admin/AdminApi.js'
 import ApiPatient from '../../../../services/Patients/PatientApi.js'
 import ApiTypePatient from '../../../../services/Admin/AdminApi.js'
 import ApiCompany from '../../../../services/Admin/AdminApi.js'
+import ConsultationApi from '../../../../services/Admin/AdminApi.js'
 import { useToastr } from '../../../../widgets/toastr.js'
 import { useRouter, useRoute } from 'vue-router'
-import flatpickr from "flatpickr";
 import 'flatpickr/dist/themes/dark.css'
 
 const router = useRouter()
@@ -22,6 +22,7 @@ const isEditing = ref(false)
 
 const form = ref(null)
 const listCommunes = ref([])
+const lisConsultation = ref([])
 const formValues = ref({})
 const isNetWorkError = ref(false)
 let errorResp = ref('')
@@ -43,6 +44,7 @@ const schema = yup.object({
     company_id: yup.number().required(),
     patient_type_id: yup.number().required(),
     registration_number: yup.number().required(),
+    consultation_id: yup.number().nullable(),
 })
 const create = async (values, actions) => {
     isLoanding.value = true;
@@ -120,6 +122,23 @@ const getCommunes = async () => {
     }
 }
 
+const getConsultations = async () => {
+    isDataLoanding.value = true;
+    isNetWorkError.value = false;
+    try {
+        const response = await ConsultationApi.getData('consultation');
+        lisConsultation.value = response.data.data;
+        isDataLoanding.value = false
+    } catch (error) {
+        if (error.code) {
+            isNetWorkError.value = true
+            errorResp.value = error.message
+        }
+        isDataLoanding.value = false
+    }
+}
+
+
 const getCompanies = async () => {
     try {
         const response = await ApiCompany.getData('company');
@@ -178,10 +197,7 @@ onMounted(async () => {
         isEditing.value = true
         getPaptient()
     }
-    flatpickr(".flatpickr", {
-        enableTime: false,
-        dateFormat: "d/m/Y"
-    })
+    await getConsultations()
     await getCommunes()
     await getTypePatients()
     await getCompanies()
@@ -340,6 +356,20 @@ onMounted(async () => {
                                 <Field name="registration_number" type="number" class="form-control"
                                     :class="{ 'is-invalid': errors.registration_number }" placeholder="Matricule" />
                                 <span class="invalid-feedback">{{ errors.registration_number }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Type conusltation</label>
+                                <Field class="form-control" name="consultation_id" as="select" id=""
+                                    :class="{ 'is-invalid': errors.consultation_id }">
+                                    <option :value="null">Choose here</option>
+                                    <option v-for="consultation in lisConsultation" :value="consultation.id">{{ consultation.name }}
+                                    </option>
+                                </Field>
+                                <span class="invalid-feedback">{{ errors.consultation_id }}</span>
                             </div>
                         </div>
                     </div>

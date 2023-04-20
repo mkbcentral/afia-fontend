@@ -1,20 +1,39 @@
 <script setup>
 import ReceptionLayout from '../../../layouts/ReceptionLayout.vue';
 import { ref, onMounted, watch } from 'vue'
+import { Form, Field } from 'vee-validate'
+import * as yup from 'yup'
 import Swal from 'sweetalert2/dist/sweetalert2.all.min.js'
 import ApiPatient from '../../../services/Patients/PatientApi.js'
+import ConsultationApi from '../../../services/Admin/AdminApi.js'
 import ItemListPatientPrivate from './Widgets/ItemListPatientPrivate.vue';
 import NetworkError from '../../../components/errors/Network.vue';
 import { debounce } from 'lodash';
+import { useToastr } from '../../../widgets/toastr.js'
 
 const listPatients = ref([])
+const lisConsultation = ref([])
 let errorResp = ref('')
+const toastr = useToastr()
+
+const formValues = ref({})
+const isLoanding = ref(false)
+const form = ref(null)
+
 const isDataLoanding = ref(false)
 const isNetWorkError = ref(false)
 const searchQuary = ref(null)
-const page = ref(3)
+
+
+const page = ref(10)
 const pageCount = ref(null)
 const currentPage = ref(1);
+const patientData = ref({})
+let errors = ref({})
+
+const schema = yup.object({
+    consultation_id: yup.string().required(),
+})
 
 const getData = async () => {
     isDataLoanding.value = true;
@@ -103,13 +122,54 @@ const searchData = async () => {
     }
 }
 
+const showFormconsultation = (patient) => {
+    $('#addConsultationModal').modal('show');
+    patientData.value=patient;
+   
+    console.log(patient.form.id)
+}
+
+const makeNewConsulation = async (values,actions) => {
+    values.form_id=patientData.value.form.id;
+    isLoanding.value = true;
+    try {
+        const response = await ApiPatient.createConsultation(values, '/private-resquest-consultation')
+        console.log(response.data)
+        if (response.data.success) {
+            isLoanding.value = false;
+            toastr.success(response.data.message, 'Validation');
+            $('#addConsultationModal').modal('hide');
+        } else {
+            isLoanding.value = false
+            toastr.error(response.data.message, 'Validation')
+            $('#addConsultationModal').modal('hide');
+        }
+    } catch (error) {
+        isLoanding.value = false
+        toastr.error(error.message, 'Validation')
+    }
+}
+
 watch(searchQuary, debounce(() => {
     searchData()
 }, 300))
 
+const getConsultations = async () => {
+    try {
+        const response = await ConsultationApi.getData('consultation');
+        lisConsultation.value = response.data.data;
+    } catch (error) {
+        if (error.code) {
+            isNetWorkError.value = true
+            errorResp.value = error.message
+        }
+    }
+}
+
 
 onMounted(async () => {
     await getPatients()
+    await getConsultations()
 })
 </script>
 <template>
@@ -119,8 +179,12 @@ onMounted(async () => {
                 <div class="d-flex justify-content-end">
                     <div class="">
                         <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item"><RouterLink to="/">Menu</RouterLink></li>
-                            <li class="breadcrumb-item"><RouterLink to="/reception/dashboard">Dashbord</RouterLink></li>
+                            <li class="breadcrumb-item">
+                                <RouterLink to="/">Menu</RouterLink>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <RouterLink to="/reception/dashboard">Dashbord</RouterLink>
+                            </li>
                             <li class="breadcrumb-item active">Patients privates</li>
                         </ol>
                     </div><!-- /.col -->
@@ -178,7 +242,7 @@ onMounted(async () => {
                         <tbody v-if="listPatients.length > 0">
                             <ItemListPatientPrivate v-for="(patient, index) in listPatients" :key="patient.id"
                                 :patient=patient :index=index @change-status="changeStatus(patient.id)"
-                                @delete-patient="deletePatient(patient)" />
+                                @delete-patient="deletePatient(patient)" @make-consultation="showFormconsultation" />
                         </tbody>
                         <tbody v-else>
                             <tr>
@@ -193,6 +257,52 @@ onMounted(async () => {
                     <VueAwesomePaginate :total-items="pageCount" :items-per-page="page" :max-pages-shown="5"
                         v-model="currentPage" :on-click="getDataPagiantion" />
                 </div>
+            </div>
+        </div>
+        <!-- Modal -->
+        <div class="modal fade" id="addConsultationModal" tabindex="-1" aria-labelledby="addConsultationModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <Form ref="form" @submit="makeNewConsulation" :validation-schema="schema" v-slot="{ errors }"
+                    :initial-values="formValues">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addConsultationModalLabel">
+                                <i class="fa fa-user-plus" aria-hidden="true"></i> NEW CONSULTATION
+                            </h5>
+                        </div>
+                        <div class="modal-body" v-show="patientData">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class=""><span class="text-bold">Patient: </span>{{patientData.name}}</h5>
+                                    <h5 class=""><span class="text-bold">Gender: </span>{{patientData.gender}}</h5>
+                                    <h5 class=""><span class="text-bold">Age: </span>{{patientData.age}}</h5>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Type conusltation</label>
+                                <Field class="form-control" name="consultation_id" as="select" id=""
+                                    :class="{ 'is-invalid': errors.consultation_id }">
+                                    <option :value="null">Choose here</option>
+                                    <option v-for="consultation in lisConsultation" :value="consultation.id">{{
+                                        consultation.name }}
+                                    </option>
+                                </Field>
+                                <span class="invalid-feedback">{{ errors.consultation_id }}</span>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">
+                                <div class="d-flex justify-content-center">
+                                    <div v-if="isLoanding" class="spinner-border text-light" role="status"></div>
+                                    <div class="pl-2"> Save changes</div>
+                                </div>
+
+                            </button>
+                        </div>
+                    </div>
+                </Form>
             </div>
         </div>
     </ReceptionLayout>
@@ -225,5 +335,4 @@ onMounted(async () => {
 
 .active-page:hover {
     background-color: #2988c8;
-}
-</style>
+}</style>

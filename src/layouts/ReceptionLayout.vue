@@ -16,25 +16,25 @@ import Footer from './partials/Footer.vue';
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
             <li class="nav-item">
               <RouterLink to="/reception/dashboard" class="nav-link" active-class="active">
-                <i class="fas fa-chart-line fa-2x"></i>
+                <i class="fas fa-chart-line "></i>
                 <p> Dashboard</p>
               </RouterLink>
             </li>
             <li class="nav-item">
                 <RouterLink to="/reception/patient-private" class="nav-link" active-class="active">
-                    <i class="fas fa-user-shield fa-2x"></i> 
+                    <i class="fas fa-user-shield "></i> 
                     <p> Patients privates</p>
                 </RouterLink>
             </li>
             <li class="nav-item">
                 <RouterLink to="/reception/patient-subscribed" class="nav-link" active-class="active">
-                    <i class="fas fa-user-check fa-2x"></i>
+                    <i class="fas fa-user-check "></i>
                     <p> Patients suscribed</p>
                 </RouterLink>
             </li>
             <li class="nav-item">
               <RouterLink to="/reception/agent-patient" class="nav-link" active-class="active">
-                <i class="fas fa-user-tag fa-2x"></i>
+                <i class="fas fa-user-tag "></i>
                 <p> Agents patients</p>
               </RouterLink>
             </li>

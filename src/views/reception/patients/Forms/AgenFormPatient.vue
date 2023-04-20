@@ -4,11 +4,12 @@ import { ref, onMounted } from 'vue';
 import * as yup from 'yup'
 import { Form, Field } from 'vee-validate'
 import { vMaska } from "maska"
-import CommuneApi from '../../../../services/Admin/AdminApi.js'
-import ApiPatient from '../../../../services/Patients/PatientApi.js'
-import ApiTypePatient from '../../../../services/Admin/AdminApi.js'
-import ApiAgentService from '../../../../services/Admin/AdminApi.js'
-import { useToastr } from '../../../../widgets/toastr.js'
+import CommuneApi from '../../../../services/Admin/AdminApi.js';
+import ApiPatient from '../../../../services/Patients/PatientApi.js';
+import ApiTypePatient from '../../../../services/Admin/AdminApi.js';
+import ApiAgentService from '../../../../services/Admin/AdminApi.js';
+import ConsultationApi from '../../../../services/Admin/AdminApi.js';
+import { useToastr } from '../../../../widgets/toastr.js';
 import { useRouter, useRoute } from 'vue-router'
 
 
@@ -22,6 +23,7 @@ const isEditing = ref(false)
 
 const form = ref(null)
 const listCommunes = ref([])
+const lisConsultation = ref([])
 const formValues = ref({})
 const isNetWorkError = ref(false)
 let errorResp = ref('')
@@ -43,8 +45,9 @@ const schema = yup.object({
     parcel_number: yup.number().required(),
     agent_service_id: yup.number().required(),
     patient_type_id: yup.number().required(),
+    consultation_id: yup.number().nullable(),
 })
-const create = async (values) => {
+const create = async (values,actions) => {
     isLoanding.value = true;
     try {
         const response = await ApiPatient.createPatient(values, '/agent-patient')
@@ -62,16 +65,17 @@ const create = async (values) => {
             toastr.error(errorResp.value, 'Validation')
         }
     } catch (error) {
-        if (error.code) {
-            isNetWorkError.value = true
-            errorResp.value = error.message
-            toastr.error(errorResp.value, 'Errors')
+        if (error.response.status == 422) {
+            isLoanding.value = false;
+            actions.setErrors(error.response.data.errors)
+        } else {
+            isLoanding.value = false
+            toastr.error(error.message, 'Validation')
         }
-        isLoanding.value = false;
     }
 }
 
-const update = async (values) => {
+const update = async (values,actions) => {
     isLoanding.value = true;
     console.log(values)
     try {
@@ -90,24 +94,21 @@ const update = async (values) => {
             toastr.error(errorResp.value, 'Error')
         }
     } catch (error) {
-        if (error.code) {
-            isNetWorkError.value = true
-            errorResp.value = error.message
-            toastr.error(errorResp.value, 'Errors')
-        } else if (error.response.status == 422) {
-            errors.value = error.response.data.errors
+        if (error.response.status == 422) {
+            isLoanding.value = false;
+            actions.setErrors(error.response.data.errors)
+        } else {
             isLoanding.value = false
-            toastr.error(error.response.data.errors, 'Error')
+            toastr.error(error.message, 'Validation')
         }
-        isLoanding.value = false;
     }
 }
 
-const handlerSubmit = (values) => {
+const handlerSubmit = (values,actions) => {
     if (isEditing.value) {
-        update(values)
+        update(values,actions)
     } else {
-        create(values)
+        create(values,actions)
     }
 }
 
@@ -146,6 +147,18 @@ const getTypePatients = async () => {
     }
 }
 
+const getConsultations = async () => {
+    try {
+        const response = await ConsultationApi.getData('consultation');
+        lisConsultation.value = response.data.data;
+    } catch (error) {
+        if (error.code) {
+            isNetWorkError.value = true
+            errorResp.value = error.message
+        }
+    }
+}
+
 const getPaptient = async () => {
     isDataLoanding.value = true
     try {
@@ -178,13 +191,10 @@ onMounted(async () => {
         isEditing.value = true
         getPaptient()
     }
-    flatpickr(".flatpickr", {
-        enableTime: false,
-        dateFormat: "d/m/Y"
-    })
     await getCommunes()
     await getTypePatients()
     await getAgentServices()
+    await getConsultations()
 })
 
 </script>
@@ -332,6 +342,19 @@ onMounted(async () => {
                                     </option>
                                 </Field>
                                 <span class="invalid-feedback">{{ errors.agent_service_id }}</span>
+                            </div>
+                        </div>
+                        <div  class="col-md-3">
+                            <div class="form-group">
+                                <label>Type conusltation</label>
+                                <Field class="form-control" name="consultation_id" as="select" id=""
+                                    :class="{ 'is-invalid': errors.consultation_id }">
+                                    <option :value="null">Choose here</option>
+                                    <option v-for="consultation in lisConsultation" :value="consultation.id">{{
+                                        consultation.name }}
+                                    </option>
+                                </Field>
+                                <span class="invalid-feedback">{{ errors.consultation_id }}</span>
                             </div>
                         </div>
                     </div>

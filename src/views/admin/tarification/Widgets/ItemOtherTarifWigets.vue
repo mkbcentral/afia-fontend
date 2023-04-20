@@ -19,9 +19,8 @@ const editStatus = async (tarif) => {
     <tr>
         <td class="text-center" v-text="index + 1" scope="row"></td>
         <td v-text="tarif.name"></td>
-        <td v-text="tarif.abreviation"></td>
-        <td v-text="tarif.price_private"></td>
-        <td v-text="tarif.price_subscribe"></td>
+        <td class="text-center" v-text="tarif.price_private"></td>
+        <td class="text-center" v-text="tarif.price_subscribe"></td>
         <td class="text-center" v-text="tarif.starus_name"></td>
         <td class="text-center">
             <button @click="edit(tarif)" class="btn btn-link btn-sm"><i class="fas fa-edit"></i></button>

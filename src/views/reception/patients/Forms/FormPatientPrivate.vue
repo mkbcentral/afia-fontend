@@ -5,11 +5,10 @@ import * as yup from 'yup'
 import { Form, Field } from 'vee-validate'
 import { vMaska } from "maska"
 import CommuneApi from '../../../../services/Admin/AdminApi.js'
+import ConsultationApi from '../../../../services/Admin/AdminApi.js'
 import ApiPatient from '../../../../services/Patients/PatientApi.js'
 import { useToastr } from '../../../../../src/widgets/toastr.js'
 import { useRouter, useRoute } from 'vue-router'
-import flatpickr from "flatpickr";
-import 'flatpickr/dist/themes/dark.css'
 
 const router = useRouter()
 const route = useRoute()
@@ -20,6 +19,8 @@ const isEditing = ref(false)
 
 const form = ref(null)
 const listCommunes = ref([])
+const lisConsultation = ref([])
+
 const formValues = ref({})
 const isNetWorkError = ref(false)
 let errorResp = ref('')
@@ -35,6 +36,7 @@ const schema = yup.object({
     quartier: yup.string().required(),
     street: yup.string().required(),
     parcel_number: yup.number().required(),
+    consultation_id: yup.number().nullable(),
 })
 
 const create = async (values, actions) => {
@@ -65,7 +67,7 @@ const create = async (values, actions) => {
     }
 }
 
-const update = async (values,actions) => {
+const update = async (values, actions) => {
     isLoanding.value = true;
     console.log(values)
     try {
@@ -94,11 +96,11 @@ const update = async (values,actions) => {
     }
 }
 
-const handlerSubmit = (values,actions) => {
+const handlerSubmit = (values, actions) => {
     if (isEditing.value) {
-        update(values,actions)
+        update(values, actions)
     } else {
-        create(values,actions)
+        create(values, actions)
     }
 }
 
@@ -109,6 +111,18 @@ const getCommunes = async () => {
     } catch (error) {
         if (error.code) {
             console.log(error.message)
+        }
+    }
+}
+
+const getConsultations = async () => {
+    try {
+        const response = await ConsultationApi.getData('consultation');
+        lisConsultation.value = response.data.data;
+    } catch (error) {
+        if (error.code) {
+            isNetWorkError.value = true
+            errorResp.value = error.message
         }
     }
 }
@@ -144,6 +158,7 @@ onMounted(async () => {
     }
 
     await getCommunes()
+    await getConsultations()
     flatpickr(".flatpickr", {
         enableTime: false,
         dateFormat: "d/m/Y"
@@ -266,12 +281,25 @@ onMounted(async () => {
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-3">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label>Street</label>
                                 <Field name="street" type="text" class="form-control"
                                     :class="{ 'is-invalid': errors.street }" placeholder="Street" />
                                 <span class="invalid-feedback">{{ errors.street }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Type conusltation</label>
+                                <Field class="form-control" name="consultation_id" as="select" id=""
+                                    :class="{ 'is-invalid': errors.consultation_id }">
+                                    <option :value="null">Choose here</option>
+                                    <option v-for="consultation in lisConsultation" :value="consultation.id">{{
+                                        consultation.name }}
+                                    </option>
+                                </Field>
+                                <span class="invalid-feedback">{{ errors.consultation_id }}</span>
                             </div>
                         </div>
                     </div>

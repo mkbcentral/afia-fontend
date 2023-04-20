@@ -9,6 +9,9 @@ export default {
     createPatient(data,path) {
         return API().post(path, data)
     },
+    createConsultation(data,path) {
+        return API().post(path, data)
+    },
     updatePatient(id, data,path) {
         return API().put(path + id, data)
     },
