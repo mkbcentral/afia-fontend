@@ -10,6 +10,13 @@ import CompanyApi from '../../../services/Admin/AdminApi.js'
 import SubscriptionApi from '../../../services/Admin/AdminApi.js';
 import CompanyItemListViewVue from './widgets/CompanyItemListView.vue';
 
+import FormModal from '../../../components/from/modals/FormModal.vue';
+import FormGroup from '../../../components/from/FormGroup.vue';
+import FormLabel from '../../../components/from/FormLabel.vue';
+import ButtonLoanding from '../../../components/from/ButtonLoanding.vue';
+import ButtonIcon from '../../../components/from/ButtonIcon.vue';
+import InvalidFeedback from '../../../components/errors/InvalidFeedback.vue';
+
 const listCompanies = ref([])
 const listSubscriptions = ref([])
 const defaulthHospital = ref()
@@ -75,16 +82,16 @@ const edit = (company) => {
         subscription_id: company.subscription.id,
     }
 }
-const create = async (values) => {
+const create = async (values,actions) => {
     isLoanding.value = true
     try {
-        const response = await CompanyApi.create('company',values);
+        const response = await CompanyApi.create('company', values);
         if (response.data.success) {
             isLoanding.value = false
             listCompanies.value.unshift(response.data.company)
             toastr.success(response.data.message, 'Validation')
             $('#addCompanyModal').modal('hide');
-            form.value.resetForm()//Ben MWILA
+            actions.resetForm
         } else {
             if (response.data.errors) {
                 errorResp.value = response.data.errors
@@ -102,31 +109,31 @@ const create = async (values) => {
         isLoanding.value = false
     }
 }
-const update = async (values) => {
+const update = async (values, actions) => {
     isLoanding.value = true
     try {
-        const response = await CompanyApi.update('company/',formValues.value.id, values)
+        const response = await CompanyApi.update('company/', formValues.value.id, values)
         if (response.data.success) {
             isLoanding.value = false
-            getCompanies()
+            const index = listCompanies.value.findIndex(company => company.id == response.data.company.id)
+            listCompanies.value[index] = response.data.company
             toastr.info(response.data.message, 'Validation')
             $('#addCompanyModal').modal('hide');
-            form.value.resetForm()
+            actions.resetForm
         } else {
             errorResp.value = response.data.message
             isLoanding.value = false
         }
     } catch (error) {
-        console.log(error)
-    } finally {
-        form.value.resetForm()
+        isLoanding.value = false
+        toastr.error(error.message, 'Validation')
     }
 }
-const handlerSubmit = (values) => {
+const handlerSubmit = (values,actions) => {
     if (isEditing.value) {
-        update(values)
+        update(values,actions)
     } else {
-        create(values)
+        create(values,actions)
     }
 }
 const deleteCompany = async (id) => {
@@ -140,7 +147,7 @@ const deleteCompany = async (id) => {
         confirmButtonText: 'Yes'
     }).then(async (result) => {
         if (result.isConfirmed) {
-            const response = await CompanyApi.delete('company/',id)
+            const response = await CompanyApi.delete('company/', id)
             if (response.data.success) {
                 Swal.fire(
                     'Deleted!',
@@ -212,10 +219,7 @@ onMounted(async () => {
                         <h5 class="m-0"><i class="fa fa-list" aria-hidden="true"></i> List of companies</h5>
                     </div>
                     <div>
-                        <button @click="add" type="button" class="btn btn-primary btn-sm">
-                            <i class="fa fa-plus-circle" aria-hidden="true"></i>
-                            New
-                        </button>
+                        <ButtonIcon @click="add" type="button" bg="primary" icon="fa fa-plus">New</ButtonIcon>
                     </div>
                 </div>
             </div>
@@ -249,52 +253,31 @@ onMounted(async () => {
             </div>
         </div>
         <!--Add Modal -->
-        <div class="modal fade" id="addCompanyModal" tabindex="-1" aria-labelledby="addCompanyModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog">
-                <Form ref="form" @submit="handlerSubmit" :validation-schema="schema" v-slot="{ errors }"
-                    :initial-values="formValues">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 v-if="isEditing" class="modal-title" id="addCompanyModalLabel">
-                                <i class="fa fa-plus-circle" aria-hidden="true"></i> EDIT COMPANY
-                            </h5>
-                            <h5 v-else class="modal-title" id="addCompanyModalLabel">
-                                <i class="fas fa-edit    "></i>
-                                CREATE COMPANY
-                            </h5>
-                        </div>
-                        <div class="modal-body">
-                            <div class="form-group">
-                                <label>Name</label>
-                                <Field name="name" type="text" class="form-control" :class="{ 'is-invalid': errors.name }"
-                                    placeholder="subscription name" />
-                                <span class="invalid-feedback">{{ errors.name }}</span>
-                            </div>
-                            <div class="form-group">
-                                <label for="">Subscription</label>
-                                <Field class="form-control" name="subscription_id" as="select"
-                                    :class="{ 'is-invalid': errors.subscription_id }">
-                                    <option :value="null">Choose here</option>
-                                    <option v-for="subscription in listSubscriptions" :value="subscription.id">{{
-                                        subscription.name }}
-                                    </option>
-                                </Field>
-                                <span class="invalid-feedback">{{ errors.subscription_id }}</span>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">
-                                <div class="d-flex justify-content-center">
-                                    <div v-if="isLoanding" class="spinner-border text-light" role="status"></div>
-                                    <div class="pl-2"> Save changes</div>
-                                </div>
-                            </button>
-                        </div>
-                    </div>
-                </Form>
-            </div>
-        </div>
+        <FormModal id="addCompanyModal" aniamte="fade" size="" :is-editing="isEditing" modal-title="COMPANY">
+            <Form ref="form" @submit="handlerSubmit" :validation-schema="schema" v-slot="{ errors }"
+                :initial-values="formValues">
+                <FormGroup>
+                    <FormLabel id="name" for-value="name">Name </FormLabel>
+                    <Field name="name" type="text" class="form-control" :class="{ 'is-invalid': errors.name }"
+                        placeholder="Name of company" />
+                    <InvalidFeedback>{{ errors.name }}</InvalidFeedback>
+                </FormGroup>
+                <FormGroup>
+                    <FormLabel id="name" for-value="name">Name role</FormLabel>
+                    <Field class="form-control" name="subscription_id" as="select"
+                        :class="{ 'is-invalid': errors.subscription_id }">
+                        <option :value="null">Choose here</option>
+                        <option v-for="subscription in listSubscriptions" :value="subscription.id">{{
+                            subscription.name }}
+                        </option>
+                    </Field>
+                    <InvalidFeedback>{{ errors.subscription_id }}</InvalidFeedback>
+                </FormGroup>
+                <div class="d-flex justify-content-end">
+                    <ButtonLoanding type="submit" bg="primary" btn-size="btn-md" :is-loanding="isLoanding">Save changes
+                    </ButtonLoanding>
+                </div>
+            </Form>
+        </FormModal>
     </AdminLayoutVue>
 </template>

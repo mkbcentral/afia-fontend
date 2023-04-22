@@ -8,6 +8,12 @@ import BranchItemWidget from './widgets/BranchItemWidget.vue';
 import BranchApi from '../../../services/Admin/AdminApi.js';
 import NetworkError from '../../../components/errors/Network.vue'
 import Swal from 'sweetalert2'
+import FormModal from '../../../components/from/modals/FormModal.vue';
+import FormGroup from '../../../components/from/FormGroup.vue';
+import FormLabel from '../../../components/from/FormLabel.vue';
+import ButtonLoanding from '../../../components/from/ButtonLoanding.vue';
+import ButtonIcon from '../../../components/from/ButtonIcon.vue';
+import InvalidFeedback from '../../../components/errors/InvalidFeedback.vue';
 
 const listBranches = ref([])
 
@@ -22,7 +28,7 @@ let errorResp = ref('')
 
 const isLoanding = ref(false)
 const isDataLoanding = ref(false)
-const isEditing = ref(true)
+const isEditing = ref(false)
 const isNetWorkError = ref(false)
 
 const formValues = ref()
@@ -59,7 +65,7 @@ const getData = async () => {
 const create = async (values) => {
     isLoanding.value = true
     try {
-        const response = await BranchApi.create('branch',values);
+        const response = await BranchApi.create('branch', values);
         if (response.data.success) {
             console.log(response.data)
             isLoanding.value = false
@@ -94,7 +100,7 @@ const edit = (branch) => {
 const update = async (values) => {
     isLoanding.value = true
     try {
-        const response = await BranchApi.update('branch/',formValues.value.id, values)
+        const response = await BranchApi.update('branch/', formValues.value.id, values)
         if (response.data.success) {
             isLoanding.value = false
             const index = listBranches.value.findIndex(branch => branch.id == response.data.branch.id)
@@ -124,7 +130,7 @@ const handlerSubmit = (values) => {
 const changeStatus = async (branch, status) => {
     console.log(status)
     try {
-        const response = await BranchApi.changeStatusString('/branch/status/',branch.id, { status: status })
+        const response = await BranchApi.changeStatusString('/branch/status/', branch.id, { status: status })
         toastr.success(response.data.message, 'Validation')
     } catch (error) {
         console.log(error)
@@ -142,7 +148,7 @@ const deleteBranch = async (id) => {
         confirmButtonText: 'Yes'
     }).then(async (result) => {
         if (result.isConfirmed) {
-            const response = await BranchApi.delete('branch/',id)
+            const response = await BranchApi.delete('branch/', id)
             if (response.data.success) {
                 Swal.fire(
                     'Deleted!',
@@ -214,7 +220,7 @@ onMounted(async () => {
                         <h5 class="m-0"><i class="fa fa-list" aria-hidden="true"></i> List of centers</h5>
                     </div>
                     <div>
-                        <button @click="add" type="button" class="btn btn-primary btn-sm">New</button>
+                        <ButtonIcon @click="add" type="button" bg="primary" icon="fa fa-plus">New</ButtonIcon>
                     </div>
 
                 </div>
@@ -242,41 +248,19 @@ onMounted(async () => {
                 </table>
             </div>
         </div>
-        <!--Add Modal -->
-        <div class="modal fade" id="addBranchModal" tabindex="-1" aria-labelledby="addBranchModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <Form ref="form" @submit="handlerSubmit" :validation-schema="schema" v-slot="{ errors }"
-                    :initial-values="formValues">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 v-if="isEditing" class="modal-title" id="addBranchModalLabel">
-                                <i class="fa fa-plus-circle" aria-hidden="true"></i> EDIT ROLE
-                            </h5>
-                            <h5 v-else class="modal-title" id="addBranchModalLabel">
-                                <i class="fas fa-edit    "></i>
-                                CREATE ROLE
-                            </h5>
-                        </div>
-                        <div class="modal-body">
-                            <div class="form-group">
-                                <label>Clinic Name</label>
-                                <Field name="name" type="text" class="form-control" :class="{ 'is-invalid': errors.name }"
-                                    placeholder="Name of clinic" />
-                                <span class="invalid-feedback">{{ errors.name }}</span>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">
-                                <div class="d-flex justify-content-center">
-                                    <div v-if="isLoanding" class="spinner-border text-light" role="status"></div>
-                                    <div class="pl-2"> Save changes</div>
-                                </div>
-                            </button>
-                        </div>
-                    </div>
-                </Form>
-            </div>
-        </div>
+        <FormModal id="addBranchModal" aniamte="fade" size="" :is-editing="isEditing" modal-title="CENTER">
+            <Form ref="form" @submit="handlerSubmit" :validation-schema="schema" v-slot="{ errors }"
+                :initial-values="formValues">
+                <FormGroup>
+                    <FormLabel id="name" for-value="name">Name of clinic</FormLabel>
+                    <Field name="name" type="text" class="form-control" :class="{ 'is-invalid': errors.name }"
+                        placeholder="Name of center" />
+                        <InvalidFeedback>{{ errors.name }}</InvalidFeedback>
+                </FormGroup>
+                <div class="d-flex justify-content-end">
+                    <ButtonLoanding type="submit" bg="primary" btn-size="btn-md" :is-loanding="isLoanding">Save changes</ButtonLoanding>
+                </div>
+            </Form>
+        </FormModal>
     </AdminLayout>
-</template>
+</template> 

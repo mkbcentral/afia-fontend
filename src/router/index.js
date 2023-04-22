@@ -126,7 +126,7 @@ const router = createRouter({
     {
       path: '/reception/dashboard',
       name: 'dashboard-reception',
-      component: () => import('../views/reception/dashboard/DashboardRreceptionView.vue'),
+      component: () => import('../views/reception/dashboard/DashboardReceptionView.vue'),
       meta: {
         requireAuth: true
       }

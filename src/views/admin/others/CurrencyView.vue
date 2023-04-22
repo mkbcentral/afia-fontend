@@ -9,6 +9,13 @@ import NetworkError from '../../../components/errors/Network.vue';
 import Swal from 'sweetalert2'
 import CurrencyItemListWidget from './widgets/CurrencyItemListWidget.vue'
 
+import FormModal from '../../../components/from/modals/FormModal.vue';
+import FormGroup from '../../../components/from/FormGroup.vue';
+import FormLabel from '../../../components/from/FormLabel.vue';
+import ButtonLoanding from '../../../components/from/ButtonLoanding.vue';
+import ButtonIcon from '../../../components/from/ButtonIcon.vue';
+import InvalidFeedback from '../../../components/errors/InvalidFeedback.vue';
+
 const listCurrencies = ref([])
 
 const defaulthHospital = ref()
@@ -209,8 +216,7 @@ onMounted(async () => {
                         <h5 class="m-0"><i class="fa fa-list" aria-hidden="true"></i> List of currencies</h5>
                     </div>
                     <div>
-                        <button @click="add" type="button" class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"
-                                aria-hidden="true"></i>New</button>
+                        <ButtonIcon @click="add" type="button" bg="primary" icon="fa fa-plus">New</ButtonIcon>
                     </div>
 
                 </div>
@@ -281,5 +287,19 @@ onMounted(async () => {
                 </Form>
             </div>
         </div>
+        <FormModal id="addCurrencyModal" aniamte="fade" size="" :is-editing="isEditing" modal-title="RATE">
+            <Form ref="form" @submit="handlerSubmit" :validation-schema="schema" v-slot="{ errors }"
+                :initial-values="formValues">
+                <FormGroup>
+                    <FormLabel id="name" for-value="name">Name of currency</FormLabel>
+                    <Field name="name" type="text" class="form-control" :class="{ 'is-invalid': errors.name }"
+                        placeholder="Curreny" />
+                        <InvalidFeedback>{{ errors.name }}</InvalidFeedback>
+                </FormGroup>
+                <div class="d-flex justify-content-end">
+                    <ButtonLoanding type="submit" bg="primary" btn-size="btn-md" :is-loanding="isLoanding">Save changes</ButtonLoanding>
+                </div>
+            </Form>
+        </FormModal>
     </AdminLayout>
 </template>

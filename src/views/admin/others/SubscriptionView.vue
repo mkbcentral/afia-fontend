@@ -8,6 +8,12 @@ import NetworkError from '../../../components/errors/Network.vue'
 import Swal from 'sweetalert2'
 import SubscrptionApi from '../../../services/Admin/AdminApi.js'
 import SubscriptionItemWidget from '../others/widgets/SubscriptionItemWidget.vue'
+import FormModal from '../../../components/from/modals/FormModal.vue';
+import FormGroup from '../../../components/from/FormGroup.vue';
+import FormLabel from '../../../components/from/FormLabel.vue';
+import ButtonLoanding from '../../../components/from/ButtonLoanding.vue';
+import ButtonIcon from '../../../components/from/ButtonIcon.vue';
+import InvalidFeedback from '../../../components/errors/InvalidFeedback.vue';
 
 const listSubscriptions = ref([])
 const defaulthHospital = ref()
@@ -211,10 +217,7 @@ onMounted(async () => {
                             <h5 class="m-0"><i class="fa fa-list" aria-hidden="true"></i> List of subcriptions</h5>
                         </div>
                         <div>
-                            <button @click="add" type="button" class="btn btn-primary btn-sm">
-                                <i class="fa fa-plus-circle" aria-hidden="true"></i>
-                                New
-                            </button>
+                            <ButtonIcon @click="add" type="button" bg="primary" icon="fa fa-plus">New</ButtonIcon>
                         </div>
                     </div>
                 </div>
@@ -252,59 +255,32 @@ onMounted(async () => {
             </div>
 
             <!--Add Modal -->
-            <div class="modal fade" id="addSubscriptionhModal" tabindex="-1" aria-labelledby="addSubscriptionhModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog">
-                    <Form ref="form" @submit="handlerSubmit" :validation-schema="schema" v-slot="{ errors }"
-                        :initial-values="formValues">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 v-if="isEditing" class="modal-title" id="addSubscriptionhModalLabel">
-                                    <i class="fa fa-plus-circle" aria-hidden="true"></i> EDIT ROLE
-                                </h5>
-                                <h5 v-else class="modal-title" id="addSubscriptionhModalLabel">
-                                    <i class="fas fa-edit    "></i>
-                                    CREATE ROLE
-                                    <i class="fa fa-plus-circle" aria-hidden="true"></i> EDIT SUBSCRIPTION
-                                </h5>
-                                <h5 v-else class="modal-title" id="addSubscriptionhModalLabel">
-                                    <i class="fas fa-edit    "></i>
-                                    CREATE SUBSCRIPTION
-                                </h5>
-                            </div>
-                            <div class="modal-body">
-                                <div class="form-group">
-                                    <label>Name</label>
-                                    <Field name="name" type="text" class="form-control"
-                                        :class="{ 'is-invalid': errors.name }" placeholder="subscription name" />
-                                    <span class="invalid-feedback">{{ errors.name }}</span>
-                                </div>
-                                <div class="form-group">
-                                    <label>Amount</label>
-                                    <Field name="amount" type="number" class="form-control"
-                                        :class="{ 'is-invalid': errors.amount }" placeholder="Amount" />
-                                    <span class="invalid-feedback">{{ errors.amount }}</span>
-                                </div>
-                                <div class="form-group">
-                                    <label>Fammily quota</label>
-                                    <Field name="familly_quota" type="number" class="form-control"
-                                        :class="{ 'is-invalid': errors.familly_quota }" placeholder="Familly quota" />
-                                    <span class="invalid-feedback">{{ errors.familly_quota }}</span>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-primary">
-                                    <div class="d-flex justify-content-center">
-                                        <div v-if="isLoanding" class="spinner-border text-light" role="status"></div>
-                                        <div class="pl-2"> Save changes</div>
-                                    </div>
-                                </button>
-                            </div>
-                        </div>
-                    </Form>
-                </div>
-            </div>
+            <FormModal id="addSubscriptionhModal" aniamte="fade" size="" :is-editing="isEditing" modal-title="SUBSCRIPTION">
+                <Form ref="form" @submit="handlerSubmit" :validation-schema="schema" v-slot="{ errors }"
+                    :initial-values="formValues">
+                    <FormGroup>
+                        <FormLabel id="name" for-value="name">Name </FormLabel>
+                        <Field name="name" type="text" class="form-control" :class="{ 'is-invalid': errors.name }"
+                            placeholder="Name of subscription" />
+                            <InvalidFeedback>{{ errors.name }}</InvalidFeedback>
+                    </FormGroup>
+                    <FormGroup>
+                        <FormLabel id="name" for-value="name">Amount</FormLabel>
+                        <Field name="amount" type="number" class="form-control"
+                        :class="{ 'is-invalid': errors.amount }" placeholder="Amount" />
+                            <InvalidFeedback>{{ errors.amount }}</InvalidFeedback>
+                    </FormGroup>
+                    <FormGroup>
+                        <FormLabel id="name" for-value="name">Name role</FormLabel>
+                        <Field name="familly_quota" type="number" class="form-control"
+                        :class="{ 'is-invalid': errors.familly_quota }" placeholder="Familly quota" />
+                            <InvalidFeedback>{{ errors.familly_quota }}</InvalidFeedback>
+                    </FormGroup>
+                    <div class="d-flex justify-content-end">
+                        <ButtonLoanding type="submit" bg="primary" btn-size="btn-md" :is-loanding="isLoanding">Save changes</ButtonLoanding>
+                    </div>
+                </Form>
+            </FormModal>
         </div>
     </AdminLayout>
 </template>

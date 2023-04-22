@@ -8,6 +8,12 @@ import CategoryApi from '../../../services/Admin/AdminApi.js'
 import Swal from 'sweetalert2'
 import NetworkError from '../../../components/errors/Network.vue';
 import CategoryItemWiget from '../../admin/tarification/Widgets/CategoryItemWiget.vue'
+import FormModal from '../../../components/from/modals/FormModal.vue';
+import FormGroup from '../../../components/from/FormGroup.vue';
+import FormLabel from '../../../components/from/FormLabel.vue';
+import ButtonLoanding from '../../../components/from/ButtonLoanding.vue';
+import ButtonIcon from '../../../components/from/ButtonIcon.vue';
+import InvalidFeedback from '../../../components/errors/InvalidFeedback.vue';
 
 const lisCategories = ref([])
 let errors = ref({})
@@ -199,8 +205,7 @@ onMounted(async () => {
                         <h5 class="m-0"><i class="fa fa-list" aria-hidden="true"></i> List of categories</h5>
                     </div>
                     <div>
-                        <button @click="add" type="button" class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"
-                                aria-hidden="true"></i>New</button>
+                        <ButtonIcon @click="add" type="button" bg="primary" icon="fa fa-plus">New</ButtonIcon>
                     </div>
 
                 </div>
@@ -235,42 +240,19 @@ onMounted(async () => {
         </div>
 
         <!--Add Modal -->
-        <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog">
-                <Form ref="form" @submit="handlerSubmit" :validation-schema="schema" v-slot="{ errors }"
-                    :initial-values="formValues">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 v-if="isEditing" class="modal-title" id="addCategoryModalLabel">
-                                <i class="fas fa-edit    "></i> EDIT CATEGORY
-                            </h5>
-                            <h5 v-else class="modal-title" id="addCategoryModalLabel">
-                                
-                                <i class="fa fa-plus-circle" aria-hidden="true"></i>
-                                CREATE CATEGORY
-                            </h5>
-                        </div>
-                        <div class="modal-body">
-                            <div class="form-group">
-                                <label>Name</label>
-                                <Field name="name" type="text" class="form-control"
-                                    :class="{ 'is-invalid': errors.name }" placeholder="Name" />
-                                <span class="invalid-feedback">{{ errors.name }}</span>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">
-                                <div class="d-flex justify-content-center">
-                                    <div v-if="isLoanding" class="spinner-border text-light" role="status"></div>
-                                    <div class="pl-2"> Save changes</div>
-                                </div>
-                            </button>
-                        </div>
-                    </div>
-                </Form>
-            </div>
-        </div>
+        <FormModal id="addCategoryModal" aniamte="fade" size="" :is-editing="isEditing" modal-title="CATEGORY">
+            <Form ref="form" @submit="handlerSubmit" :validation-schema="schema" v-slot="{ errors }"
+                :initial-values="formValues">
+                <FormGroup>
+                    <FormLabel id="name" for-value="name">Category name</FormLabel>
+                    <Field name="name" type="text" class="form-control" :class="{ 'is-invalid': errors.name }"
+                        placeholder="Name of role" />
+                        <InvalidFeedback>{{ errors.name }}</InvalidFeedback>
+                </FormGroup>
+                <div class="d-flex justify-content-end">
+                    <ButtonLoanding type="submit" bg="primary" btn-size="btn-md" :is-loanding="isLoanding">Save changes</ButtonLoanding>
+                </div>
+            </Form>
+        </FormModal>
     </TarificationLayout>
 </template>

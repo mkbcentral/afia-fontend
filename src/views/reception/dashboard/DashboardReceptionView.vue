@@ -1,5 +1,13 @@
-<script setup>
+<script setup >
 import ReceptionLayout from '../../../layouts/ReceptionLayout.vue';
+import { ref } from "vue";
+const form = ref({
+    name: ''
+})
+
+const save=()=>{
+    console.log(form.value);
+}
 </script>
 <template>
     <ReceptionLayout>
@@ -8,7 +16,9 @@ import ReceptionLayout from '../../../layouts/ReceptionLayout.vue';
                 <div class="d-flex justify-content-end">
                     <div class="">
                         <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item"><RouterLink to="/">Menu</RouterLink></li>
+                            <li class="breadcrumb-item">
+                                <RouterLink to="/">Menu</RouterLink>
+                            </li>
                             <li class="breadcrumb-item active">Dashboard</li>
                         </ol>
                     </div><!-- /.col -->
@@ -21,6 +31,7 @@ import ReceptionLayout from '../../../layouts/ReceptionLayout.vue';
             </div>
             <div class="card-body">
                 <p class="card-text">Content</p>
+               
             </div>
         </div>
     </ReceptionLayout>

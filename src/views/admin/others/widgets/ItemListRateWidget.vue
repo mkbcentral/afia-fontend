@@ -23,7 +23,7 @@ const editStatus = async (rate) => {
     <tr>
         <td class="text-center" v-text="index + 1" scope="row"></td>
         <td v-text="rate.amount"></td>
-        <td class="text-center" v-text="rate.status"></td>
+        <td class="text-center"><span  :class="rate.status==true?'badge badge-success':'badge badge-danger'">{{ rate.status_name }}</span></td>
         <td class="text-center">
             <button @click="edit(rate)" class="btn btn-link btn-sm"><i class="fas fa-edit"></i></button>
             <button @click="deleteDialog(rate)" class="btn btn-link btn-sm"><i class="fa fa-trash text-danger" aria-hidden="true"></i></button>

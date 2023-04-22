@@ -9,6 +9,12 @@ import HospitalItemList from './widgets/HospitalItemList.vue';
 import HospitalApi from '../../../services/Admin/AdminApi.js';
 import NetworkError from '../../../components/errors/Network.vue'
 import Swal from 'sweetalert2';
+import FormModal from '../../../components/from/modals/FormModal.vue';
+import FormGroup from '../../../components/from/FormGroup.vue';
+import FormLabel from '../../../components/from/FormLabel.vue';
+import ButtonLoanding from '../../../components/from/ButtonLoanding.vue';
+import ButtonIcon from '../../../components/from/ButtonIcon.vue';
+import InvalidFeedback from '../../../components/errors/InvalidFeedback.vue';
 
 const listHospitals = ref([])
 const hospitalToEdit = ref({})
@@ -255,7 +261,7 @@ onMounted(async () => {
             <h5 class="m-0"><i class="fa fa-list" aria-hidden="true"></i> List of clinics</h5>
           </div>
           <div>
-            <button @click="add" type="button" class="btn btn-primary btn-sm">New</button>
+            <ButtonIcon @click="add" type="button" bg="primary" icon="fa fa-plus">New</ButtonIcon>
           </div>
         </div>
       </div>
@@ -285,83 +291,32 @@ onMounted(async () => {
         </table>
       </div>
     </div>
-    <!-- Modal -->
-    <div class="modal fade" id="addHospitalModal" tabindex="-1" aria-labelledby="addHospitalModalLabel"
-      aria-hidden="true">
-      <div class="modal-dialog">
-        <Form ref="form" @submit="handlerSubmit" :validation-schema="schema" v-slot="{ errors }"
-          :initial-values="formValues">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 v-if="isEditing" class="modal-title" id="addHospitalModalLabel"><i class="fa fa-plus-circle"
-                  aria-hidden="true"></i> EDIT HOSPITAL</h5>
-              <h5 v-else class="modal-title" id="addHospitalModalLabel"><i class="fas fa-edit    "></i> CREATE HOPITAL
-              </h5>
-            </div>
-            <div class="modal-body">
-              <div class="form-group">
-                <label>Clinic Name</label>
-                <Field name="name" type="text" class="form-control" :class="{ 'is-invalid': errors.name }"
-                  placeholder="Name of clinic" />
-                <span class="invalid-feedback">{{ errors.name }}</span>
-              </div>
-              <div class="form-group">
-                <label>Clinic Email</label>
-                <Field name="email" type="text" class="form-control" :class="{ 'is-invalid': errors.email }"
-                  placeholder="Email of clinic" />
-                <span class="invalid-feedback">{{ errors.email }}</span>
-              </div>
-              <div class="form-group">
-                <label>Clinic Phone</label>
-                <Field v-maska data-maska="+243 ### ### ###" name="phone" type="text" class="form-control"
-                  :class="{ 'is-invalid': errors.phone }" placeholder="Phone of clinic" />
-                <span class="invalid-feedback">{{ errors.phone }}</span>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-              <button type="submit" class="btn btn-primary">
-                <div class="d-flex justify-content-center">
-                  <div v-if="isLoanding" class="spinner-border text-light" role="status"></div>
-                  <div class="pl-2"> Save changes</div>
-                </div>
-
-              </button>
-            </div>
-          </div>
-        </Form>
-      </div>
-    </div>
-
-    <!--Delete Modal -->
-    <div class="modal fade" id="changeHospitalModal" tabindex="-1" aria-labelledby="addRoleModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title text-info" id="addRoleModalLabel">
-              CHANGE LOGO
-            </h5>
-          </div>
-          <form @submit.prevent="updateLogo" enctype="multipart/form-data">
-            <div class="modal-body">
-              <div class="mb-3">
-                <label for="formFile" class="form-label">Choisir le logo</label>
-                <input ref="logo" @change="onchange" class="form-control" type="file">
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Non</button>
-              <button type="submit" class="btn btn-danger btn-sm">
-                <div class="d-flex justify-content-center">
-                  <div v-if="isLoanding" class="spinner-border text-light spinner-sm" role="status"></div>
-                  <div class="pl-2">Oui</div>
-                </div>
-              </button>
-            </div>
-          </form>
+    <FormModal id="addHospitalModal" aniamte="fade" size="" :is-editing="isEditing" modal-title="HOSPITAL">
+      <Form ref="form" @submit="handlerSubmit" :validation-schema="schema" v-slot="{ errors }"
+        :initial-values="formValues">
+        <FormGroup>
+          <FormLabel id="name" for-value="name">Name of hospital</FormLabel>
+          <Field name="name" type="text" class="form-control" :class="{ 'is-invalid': errors.name }"
+            placeholder="Name of clinic" />
+            <InvalidFeedback>{{ errors.name }}</InvalidFeedback>
+        </FormGroup>
+        <FormGroup>
+          <FormLabel id="name" for-value="name">Email of hospital</FormLabel>
+          <Field name="email" type="text" class="form-control" :class="{ 'is-invalid': errors.email }"
+            placeholder="Email of clinic" />
+            <InvalidFeedback>{{ errors.email }}</InvalidFeedback>
+        </FormGroup>
+        <FormGroup>
+          <FormLabel id="name" for-value="name">Email of hospital</FormLabel>
+          <Field v-maska data-maska="+243 ### ### ###" name="phone" type="text" class="form-control"
+            :class="{ 'is-invalid': errors.phone }" placeholder="Phone of clinic" />
+            <InvalidFeedback>{{ errors.phone }}</InvalidFeedback>
+        </FormGroup>
+        <div class="d-flex justify-content-end">
+          <ButtonLoanding type="submit" bg="primary" btn-size="btn-md" :is-loanding="isLoanding">Save changes
+          </ButtonLoanding>
         </div>
-      </div>
-    </div>
-
+      </Form>
+    </FormModal>
   </AdminLayout>
 </template>

@@ -1,14 +1,11 @@
 <script setup>
 import { ref } from 'vue';
-import { useToastr } from '../../../../widgets/toastr.js'
-
-const toastr = useToastr()
-
 const emit = defineEmits(['editUser', 'changeStatus', 'deleteUser'])
 
 defineProps({
     user: {},
     index: Number,
+    bg:''
 
 });
 const status = ref([
@@ -45,8 +42,8 @@ const editStatus = async (user, status) => {
         <td class="text-center" v-text="user.role_name"></td>
         <td v-text="user.hospital_name"></td>
         <td>
-            <select class="form-control "  :class="'text-'+user.color" @change="editStatus(user, $event.target.value)">
-                <option v-for="item in status" :value="item.name" :selected="item.name == user.status" >
+            <select class="form-control "  :class="bg=='ENABLE'?'bg-primary':'bg-danger'" @change="editStatus(user, $event.target.value)">
+                <option v-for="item in status" :value="item.name" :selected="item.name == user.status" cl >
                     <p class="text-danger">{{ item.name}}</p>
                 </option>
             </select>
