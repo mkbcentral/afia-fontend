@@ -248,6 +248,34 @@ const router = createRouter({
         requireAuth: true
       }
     },
+    //DASHBOARD INVOICE PRIVATE 
+    {
+      path: '/finance/invoice/private/dashboard',
+      name: 'finance.invoice.dashboard.private',
+      component: () => import('../views/invoices/dashboard/DashboardInvoicePrivate.vue'),
+      meta: {
+        requireAuth: true
+      }
+    },
+    //INVOICE PRIVATE 
+    {
+      path: '/finance/invoice/private',
+      name: 'finance.invoice.private',
+      component: () => import('../views/invoices/privates/InvoicePruvateView.vue'),
+      meta: {
+        requireAuth: true
+      }
+    },
+     //INVOICE PRIVATE 
+     {
+      path: '/finance/invoice/private/:id/create',
+      name: 'finance.invoice.private.create',
+      component: () => import('../views/invoices/privates/CreateInvoicePrivate.vue'),
+      meta: {
+        requireAuth: true
+      }
+    },
+    
     {
       path: '/login',
       name: 'login',

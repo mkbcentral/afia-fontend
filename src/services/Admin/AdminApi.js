@@ -9,7 +9,13 @@ export default {
     create(path, data) {
         return API().post(path, data);
     },
+    createItme(path, data) {
+        return API().post(path, data);
+    },
     update(path, id, data) {
+        return API().put(path + id, data);
+    },
+    updateItem(path, id, data) {
         return API().put(path + id, data);
     },
     delete(path, id) {
@@ -28,6 +34,13 @@ export default {
         return API().get(path, {
             params: {
                 query: query
+            }
+        });
+    },
+    sendByParams(path,items) {
+        return API().get(path, {
+            params: {
+                items: items
             }
         });
     }

@@ -133,7 +133,7 @@ const makeNewConsulation = async (values,actions) => {
     values.form_id=patientData.value.form.id;
     isLoanding.value = true;
     try {
-        const response = await ApiPatient.createConsultation(values, '/private-resquest-consultation')
+        const response = await ApiPatient.createConsultation(values, '/private-make-consultation')
         console.log(response.data)
         if (response.data.success) {
             isLoanding.value = false;

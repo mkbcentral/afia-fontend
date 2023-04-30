@@ -4,51 +4,53 @@
             <RouterLink to="/reception/dashboard">
                 <div class="box">
                     <div class="content">
-                        <i class="fas fa-folder-open fa-solid fa-3x"></i>
+                        <i class="fas fa-folder-open fa-solid fa-2x"></i>
                         <p>reception</p>
                     </div>
                 </div>
             </RouterLink>
             <div class="box">
                 <div class="content">
-                    <i class="fas fa-medkit fa-solid fa-3x"></i>
+                    <i class="fas fa-medkit fa-solid fa-2x"></i>
                     <p>Dispensaire</p>
                 </div>
             </div>
             <div class="box">
-                <div class="content">
-                    <i class="fas fa-capsules fa-solid fa-3x"></i>
-                    <p>Pharmacie</p>
-                </div>
+                <RouterLink to="/finance/invoice/private/dashboard">
+                    <div class="content">
+                        <i class="fas fa-file fa-2x"></i>
+                        <p>Facturation</p>
+                    </div>
+                </RouterLink>
             </div>
             <div class="box">
                 <div class="content">
-                    <i class="fas fa-microscope fa-solid fa-3x "></i>
+                    <i class="fas fa-microscope fa-solid fa-2x "></i>
                     <p>Para clinique</p>
                 </div>
             </div>
             <div class="box">
                 <div class="content">
-                    <i class="fas fa-file-alt fa-solid fa-3x"></i>
+                    <i class="fas fa-file-alt fa-solid fa-2x"></i>
                     <p>Finance</p>
                 </div>
             </div>
             <div class="box">
                 <div class="content">
-                    <i class="fas fa-heartbeat fa-solid fa-3x"></i>
+                    <i class="fas fa-heartbeat fa-solid fa-2x"></i>
                     <p>Méecine spécilisée</p>
                 </div>
             </div>
             <div class="box">
                 <div class="content">
-                    <i class="fas fa-user-md fa-solid fa-3x"></i>
+                    <i class="fas fa-user-md fa-solid fa-2x"></i>
                     <p>Cabinet médical</p>
                 </div>
             </div>
             <div class="box">
                 <RouterLink to="/finance/tarification/list">
                     <div class="content">
-                        <i class="fas fa-money-check-alt fa-3x"></i>
+                        <i class="fas fa-money-check-alt fa-2x"></i>
                         <p>Tarification</p>
                     </div>
                 </RouterLink>
@@ -57,7 +59,7 @@
             <div class="box">
                 <RouterLink to="/admin/settings">
                     <div class="content">
-                        <i class="fas fa-tools fa-solid fa-3x"></i>
+                        <i class="fas fa-tools fa-solid fa-2x"></i>
                         <p>Pramètres</p>
                     </div>
                 </RouterLink>
@@ -72,13 +74,13 @@
     justify-content: center;
     align-self: center;
     min-height: 100vh;
-    background-image: url('../assets/images/bg1.jpg');
+    background-image: url('../assets/images/bg6.jpg');
     background-size: cover;
 }
 
 .container {
     position: relative;
-    max-width: 70%;
+    max-width: 65%;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     grid-template-rows: minmax(100px, auto);
@@ -90,7 +92,7 @@
 
 .container .box {
     background: #71717189;
-    padding: 20px;
+    padding: 10px;
     display: grid;
     font-size: 20px;
     place-items: center;
@@ -116,18 +118,10 @@
     text-transform: uppercase;
 }
 
-.container .box:nth-child(1) {
-    grid-column: span 2;
-    grid-row: span 1;
-    background: #6b92ec72;
-}
 
-.container .box:nth-child(1):hover {
-    background: #f328a5ac;
-}
 
 .container .box:nth-child(2) {
-    background: #4842045c;
+    background: #2421015c;
 }
 
 .container .box:nth-child(2):hover {
@@ -135,7 +129,20 @@
 }
 
 .container .box:nth-child(4) {
-    background: #6094f564;
+    background: #01123264;
+    grid-column: span 2;
+    grid-row: span 1;
+}
+
+.container .box:nth-child(6) {
+    background: #01073564;
+    grid-column: span 2;
+    grid-row: span 1;
+}
+
+.container .box:nth-child(6):hover {
+    background: #06e28e64;
+
 }
 
 .container .box:nth-child(4):hover {
@@ -155,7 +162,7 @@
 .container .box:nth-child(5) {
     grid-column: span 1;
     grid-row: span 2;
-    background: rgba(65, 111, 27, 0.719);
+    background: rgba(27, 30, 25, 0.719);
 }
 
 .container .box:nth-child(5):hover {
@@ -163,19 +170,19 @@
 }
 
 .container .box:nth-child(7) {
-    grid-column: span 2;
-    grid-row: span 1;
-    background: #19491888;
+    grid-column: span 1;
+    grid-row: span 2;
+    background: #022e0188;
 }
 
 .container .box:nth-child(7):hover {
-    background: #f328a5ac;
+    background: #2d031dac;
 }
 
 .container .box:nth-child(8) {
     grid-column: span 1;
     grid-row: span 2;
-    background: rgba(91, 14, 86, 0.606);
+    background: rgba(32, 3, 30, 0.606);
 }
 
 .container .box:nth-child(8):hover {
@@ -183,8 +190,8 @@
 }
 
 .container .box:nth-child(9) {
-    grid-column: span 2;
-    grid-row: span 1;
+    grid-column: span 1;
+    grid-row: span 2;
     background: rgba(170, 75, 2, 0.554);
 }
 
@@ -202,4 +209,5 @@
         grid-column: unset !important;
         grid-row: unset !important;
     }
-}</style>
+}
+</style>

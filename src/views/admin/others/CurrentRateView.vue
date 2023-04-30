@@ -16,5 +16,5 @@ onMounted(async () => {
 })
 </script>
 <template>
-    <h3 class="text-bold text-danger">Rate: 1USD={{rate}} CDF</h3>
+    <h4 class="text-danger text-bold">Rate: 1USD={{rate}} CDF</h4>
 </template>
