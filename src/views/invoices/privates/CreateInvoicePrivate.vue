@@ -27,7 +27,8 @@
                         <h4 class="text-secondary text-uppercase"><i class="fas fa-folder-plus"></i> Create Invoice</h4>
                     </div>
                     <div>
-                        <ButtonIcon @click="show" type="button" bg="primary" icon="fa fa-eye"> Veiw</ButtonIcon>
+                        <span v-if="isLoadInvoice">Loading...</span>
+                        <ButtonIcon v-else @click="show" type="button" bg="primary" icon="fa fa-eye"> Veiw</ButtonIcon>
                     </div>
                 </div>
             </div>
@@ -36,6 +37,7 @@
                     <span hidden class="visually-hidden">Loading...</span>
                 </div>
             </div>
+            
             <div v-else class="row">
                 <div class="col-md-12">
                     <div class="card-body">
@@ -87,6 +89,7 @@ import { useToastr } from '../../../widgets/toastr.js'
 import ButtonLoanding from '../../../components/from/ButtonLoanding.vue';
 import ButtonIcon from '../../../components/from/ButtonIcon.vue'
 import InvoiceModal from '../../../components/modals/invoice/InvoiceModal.vue';
+
 const route = useRoute()
 const idInvoice = ref(0)
 
@@ -103,6 +106,7 @@ const toastr = useToastr()
 const isLoanding = ref(false)
 const isDataLoanding = ref(false)
 const isNetWorkError = ref(false)
+const isLoadInvoice=ref(false)
 
 const amount = ref(0)
 const show = async () => {
@@ -112,7 +116,6 @@ const show = async () => {
 
 //Get list of categories
 const getCategories = async () => {
-
     isNetWorkError.value = false
     try {
         const response = await CategoryApi.getData('category-tarification');
@@ -199,13 +202,15 @@ const getInvoice = async () => {
 }
 //Get item invoice
 const getItemInvoice = async () => {
+    isLoadInvoice.value=true
     try {
         const response = await TarifApi.getData(`/items-invoices-private/${idInvoice.value}?currency=CDF`);
         invoiceItems.value = response.data.items_invoice.data;
         amount.value = response.data.items_invoice.total_invoice
-        console.log(response.data)
+        isLoadInvoice.value=false
     } catch (error) {
-
+        console.log(error)
+        isLoadInvoice.value=false
     }
 }
 onMounted(async () => {

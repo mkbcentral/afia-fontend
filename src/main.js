@@ -4,6 +4,7 @@ import jquery from 'jquery'
 import 'admin-lte/plugins/jquery/jquery.min.js'
 import 'admin-lte/plugins/bootstrap/js/bootstrap.bundle.min.js'
 import  'admin-lte/dist/js/adminlte.min.js'
+
 import App from './App.vue'
 import router from './router'
 import VueAwesomePaginate from "vue-awesome-paginate";

@@ -10,7 +10,7 @@
                     <div class="invoice p-3 mb-3">
                         <HeaderInvoice
                              :name="invoice.patient_name" :gender="invoice.patient_gender"
-                             :age="invoice.patient_age" :phone="invoice.phone" :email="invoice.email"
+                             :age="invoice.patient_age" :phone="invoice.patient_phone" :email="invoice.patient_email"
                              :invoice_number="invoice.invoice_number"
                              :adminted_at="invoice.created_at"
                              :form_number="invoice.form_number"/>
@@ -68,39 +68,14 @@
                             <!-- /.col -->
                         </div>
                         <!-- /.row -->
-
+                        
                         <div class="row">
                             <!-- accepted payments column -->
                             <div class="col-6">
                                 <p class="lead">Payment Methods:</p>
                                 <P>--- Cash ---</P>
                             </div>
-                            <!-- /.col -->
-                            <div class="col-6">
-                                <p class="lead">For pay</p>
-
-                                <div class="table-responsive">
-                                    <table class="table">
-                                        <tr>
-                                            <th style="width:50%">Amount:</th>
-                                            <td>${{ amount }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Reduction (0%)</th>
-                                            <td>$0</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Deposit:</th>
-                                            <td>$5.80</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Total:</th>
-                                            <td>$265.24</td>
-                                        </tr>
-                                    </table>
-                                </div>
-                            </div>
-                            <!-- /.col -->
+                            <AmountInfos :amount="amount"/>
                         </div>
                         <!-- /.row -->
 
@@ -124,25 +99,26 @@
     </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref } from 'vue'
 import InvoiceModalHeaderVue from './InvoiceModalHeader.vue';
 import ApiInvoice from '../../../services/Admin/AdminApi';
 import { useToastr } from '../../../widgets/toastr.js'
 import HeaderInvoice from '../../invoice/HeaderInvoice.vue';
+import AmountInfos from '../../invoice/AmountInfos.vue';
 const toastr = useToastr();
 const isEditable = ref(false)
 const idSelected = ref(0)
 const quantity = ref(1)
 const data = ref({ qty: 1, table: 'invoice_private_tarification' })
 const props = defineProps({
-    id: String,
-    size: String,
-    aniamte: String,
-    modalTitle: String,
-    lisInvoice: Array,
-    amount: Number,
-    invoice:Object
+    id: null,
+    size: null,
+    aniamte: null,
+    modalTitle: null,
+    lisInvoice: null,
+    amount: null,
+    invoice:null
 })
 
 const emit = defineEmits(['refreshData'])

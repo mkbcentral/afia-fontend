@@ -10,6 +10,8 @@ import ItemListPatientPrivate from './Widgets/ItemListPatientPrivate.vue';
 import NetworkError from '../../../components/errors/Network.vue';
 import { debounce } from 'lodash';
 import { useToastr } from '../../../widgets/toastr.js'
+import { useRouter } from 'vue-router';
+const router=useRouter()
 
 const listPatients = ref([])
 const lisConsultation = ref([])
@@ -105,7 +107,11 @@ const getPatients = async () => {
         isDataLoanding.value = false
         pageCount.value = response.data.meta.total
     } catch (error) {
-        if (error.code) {
+        if (error.response.status == 401) {
+            toastr.success(error.response.statusText, 'Logout');
+            localStorage.removeItem('token');
+            router.push('/login');
+        } else {
             isNetWorkError.value = true
             errorResp.value = error.message
         }
@@ -124,13 +130,13 @@ const searchData = async () => {
 
 const showFormconsultation = (patient) => {
     $('#addConsultationModal').modal('show');
-    patientData.value=patient;
-   
+    patientData.value = patient;
+
     console.log(patient.form.id)
 }
 
-const makeNewConsulation = async (values,actions) => {
-    values.form_id=patientData.value.form.id;
+const makeNewConsulation = async (values, actions) => {
+    values.form_id = patientData.value.form.id;
     isLoanding.value = true;
     try {
         const response = await ApiPatient.createConsultation(values, '/private-make-consultation')
@@ -274,9 +280,9 @@ onMounted(async () => {
                         <div class="modal-body" v-show="patientData">
                             <div class="card">
                                 <div class="card-body">
-                                    <h5 class=""><span class="text-bold">Patient: </span>{{patientData.name}}</h5>
-                                    <h5 class=""><span class="text-bold">Gender: </span>{{patientData.gender}}</h5>
-                                    <h5 class=""><span class="text-bold">Age: </span>{{patientData.age}}</h5>
+                                    <h5 class=""><span class="text-bold">Patient: </span>{{ patientData.name }}</h5>
+                                    <h5 class=""><span class="text-bold">Gender: </span>{{ patientData.gender }}</h5>
+                                    <h5 class=""><span class="text-bold">Age: </span>{{ patientData.age }}</h5>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -307,32 +313,3 @@ onMounted(async () => {
         </div>
     </ReceptionLayout>
 </template>
-<style>
-.pagination-container {
-    display: flex;
-    column-gap: 10px;
-}
-
-.paginate-buttons {
-    height: 30px;
-    width: 30px;
-    border-radius: 20px;
-    cursor: pointer;
-    background-color: rgb(242, 242, 242);
-    border: 1px solid rgb(217, 217, 217);
-    color: black;
-}
-
-.paginate-buttons:hover {
-    background-color: #d8d8d8;
-}
-
-.active-page {
-    background-color: #3498db;
-    border: 1px solid #3498db;
-    color: white;
-}
-
-.active-page:hover {
-    background-color: #2988c8;
-}</style>
