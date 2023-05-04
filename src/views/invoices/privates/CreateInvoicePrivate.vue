@@ -37,6 +37,7 @@
                     <span hidden class="visually-hidden">Loading...</span>
                 </div>
             </div>
+            
             <div v-else class="row">
                 <div class="col-md-12">
                     <div class="card-body">
@@ -86,7 +87,11 @@ import { useToastr } from '../../../widgets/toastr.js'
 import ButtonLoanding from '../../../components/form/ButtonLoanding.vue';
 import ButtonIcon from '../../../components/form/ButtonIcon.vue'
 import InvoiceModal from '../../../components/modals/invoice/InvoiceModal.vue';
+<<<<<<< HEAD
 import {postDataParams,getData} from '../../../stores/data/apiRequest'
+=======
+
+>>>>>>> 893ba1a606cf591249531ae185c6d69fb875d750
 const route = useRoute()
 const idInvoice = ref(0)
 const consultation=ref(
@@ -109,7 +114,10 @@ const isLoanding = ref(false)
 const isDataLoanding = ref(false)
 const isNetWorkError = ref(false)
 const isLoadInvoice=ref(false)
+<<<<<<< HEAD
 const isLoadTarif=ref(false)
+=======
+>>>>>>> 893ba1a606cf591249531ae185c6d69fb875d750
 
 const amount = ref(0)
 const show = async () => {
@@ -200,6 +208,7 @@ const getInvoice = async (id) => {
 }
 //Get item invoice
 const getItemInvoice = async () => {
+<<<<<<< HEAD
     const response= await getData(`/items-invoices-private/${route.params.id}?currency=CDF`)
     if (response.error){
         toastr.error(response.error,'ERROR')
@@ -210,6 +219,17 @@ const getItemInvoice = async () => {
         consultation.value.amount=response.data.items_invoice.consultation.amount
         consultation.value.name=response.data.items_invoice.consultation.name
         isLoadInvoice.value = false
+=======
+    isLoadInvoice.value=true
+    try {
+        const response = await TarifApi.getData(`/items-invoices-private/${idInvoice.value}?currency=CDF`);
+        invoiceItems.value = response.data.items_invoice.data;
+        amount.value = response.data.items_invoice.total_invoice
+        isLoadInvoice.value=false
+    } catch (error) {
+        console.log(error)
+        isLoadInvoice.value=false
+>>>>>>> 893ba1a606cf591249531ae185c6d69fb875d750
     }
 }
 onMounted(async () => {

@@ -3,3 +3,4 @@
 @import 'admin-lte/plugins/icheck-bootstrap/icheck-bootstrap.min.css';
 @import 'admin-lte/plugins/toastr/toastr.min.css';
 @import 'admin-lte/plugins/icheck-bootstrap/icheck-bootstrap.min.css';
+@import './pagination.css'
