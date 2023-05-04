@@ -31,7 +31,7 @@
                     <h4><i class="fa fa-list" aria-hidden="true"></i> List of invoices</h4>
                 </div>
                 <div class="card-body">
-                    <table class="table table-light table-sm">
+                    <table class="table table-bordered">
                         <thead class="thead-dark">
                             <tr>
                                 <th>#</th>

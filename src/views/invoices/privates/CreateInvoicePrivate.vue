@@ -1,6 +1,6 @@
 <template>
     <InvoiceLayout>
-        <div class="content-header">
+        <div class="content-header" >
             <div class="container-fluid">
                 <div class="d-flex justify-content-end">
                     <div class="">
@@ -27,7 +27,8 @@
                         <h4 class="text-secondary text-uppercase"><i class="fas fa-folder-plus"></i> Create Invoice</h4>
                     </div>
                     <div>
-                        <ButtonIcon @click="show" type="button" bg="primary" icon="fa fa-eye"> Veiw</ButtonIcon>
+                        <span v-if="isLoadInvoice">Loading...</span>
+                        <ButtonIcon v-else @click="show" type="button" bg="primary" icon="fa fa-eye"> Veiw</ButtonIcon>
                     </div>
                 </div>
             </div>
@@ -51,7 +52,8 @@
                         </div>
                         <div class="card">
                             <div class="card-body">
-                                <div class="row">
+                                <div v-if="isLoadTarif" class="text-center"><span>Loading...</span></div>
+                                <div v-else class="row">
                                     <div class="col-md-4" v-for="tarif in listTarifs" :key="tarif.id">
                                         <div class="form-group clearfix">
                                             <div class="icheck-primary d-inline">
@@ -73,95 +75,90 @@
             </div>
         </div>
     </InvoiceLayout>
-    <InvoiceModal id="showInvoiceModal" aniamte="fade" size="xl" modal-title="VIEW INVOICE DETAIL"
-        :lis-invoice="invoiceItems" :amount="amount" @refresh-data="getItemInvoice" :invoice="invoice"/>
+    <InvoiceModal id="showInvoiceModal" aniamte='fade' size='xl' modal-title="VIEW INVOICE DETAIL"
+        :lis-invoice="invoiceItems" :amount="amount" :amount_cons="consultation.amount" :cons_name="consultation.name" @refresh-data="getItemInvoice" :invoice="invoice"/>
 </template>
 <script setup>
 import InvoiceLayout from '../../../layouts/InvoiceLayout.vue';
-import { useRouter, useRoute } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { ref, onMounted } from 'vue';
-import CategoryApi from '../../../services/Admin/AdminApi.js';
-import TarifApi from '../../../services/Admin/AdminApi.js'
-import InvoiceApi from '../../../services/Admin/AdminApi.js'
 import { useToastr } from '../../../widgets/toastr.js'
-import ButtonLoanding from '../../../components/from/ButtonLoanding.vue';
-import ButtonIcon from '../../../components/from/ButtonIcon.vue'
+import ButtonLoanding from '../../../components/form/ButtonLoanding.vue';
+import ButtonIcon from '../../../components/form/ButtonIcon.vue'
 import InvoiceModal from '../../../components/modals/invoice/InvoiceModal.vue';
+import {postDataParams,getData} from '../../../stores/data/apiRequest'
 const route = useRoute()
 const idInvoice = ref(0)
+const consultation=ref(
+    {name:null,amount:null}
+)
 
 const selectedIndex = ref(2)
 const listTarifs = ref([])
 const listCategories = ref([])
 const itemsTarif = ref([])
+
 const dataToSend = ref([])
 const invoice = ref({})
 const invoiceItems = ref([])
+const selectedValue = ref(0)
 const tableName = ref('invoice_private_tarification')
-
 const toastr = useToastr()
+
 const isLoanding = ref(false)
 const isDataLoanding = ref(false)
 const isNetWorkError = ref(false)
+const isLoadInvoice=ref(false)
+const isLoadTarif=ref(false)
 
 const amount = ref(0)
 const show = async () => {
+    isLoadInvoice.value=true
     await getItemInvoice()
     $('#showInvoiceModal').modal('show');
 }
-
 //Get list of categories
 const getCategories = async () => {
-
     isNetWorkError.value = false
-    try {
-        const response = await CategoryApi.getData('category-tarification');
+    const response= await getData('category-tarification')
+    if (response.error){
+        isNetWorkError.value=false;
+        toastr.error(response.error,'ERROR')
+    }else{
         listCategories.value = response.data.data;
-        isDataLoanding.value = false
-    } catch (error) {
-
-        if (error.code) {
-            isNetWorkError.value = true
-            errorResp.value = error.message
-        }
-        isDataLoanding.value = false
+        isNetWorkError.value=false;
     }
 }
 //Save items invoice
 const addItemsToInvoice = async () => {
     isLoanding.value = true
-    try {
-        for (let index = 0; index < itemsTarif.value.length; index++) {
-            const element = itemsTarif.value[index];
-            dataToSend.value.push({
-                invoice_private_id: Number(idInvoice.value),
-                tarification_id: element
-            })
-        }
-        console.log(dataToSend.value)
-        const response = await InvoiceApi.sendByParams(`create-items-invoice-private/${route.params.id}?table=${tableName.value}`, dataToSend.value);
-        toastr.success(response.data.message, 'Validation');
-        isLoanding.value = false
-        dataToSend.value = []
-    } catch (error) {
-        //toastr.error(response.data.message, 'Error');
-        console.log(error)
-        isLoanding.value = false
+    console.log(itemsTarif.value);
+    for (let index = 0; index < itemsTarif.value.length; index++) {
+        const element = itemsTarif.value[index];
+        dataToSend.value.push({
+            invoice_private_id: Number(route.params.id),
+            tarification_id: element
+        })
     }
-
+    const response= await postDataParams(`create-items-invoice-private/${route.params.id}?table=${tableName.value}`, dataToSend.value)
+    if (response.error){
+        isLoanding.value=false;
+        toastr.error(response.error,'ERROR')
+    }else {
+        isLoanding.value=false;
+        toastr.success(response.data.message)
+    }
 }
 //Current categories
 const getCurrentCategory = async () => {
-    try {
-        const response = await CategoryApi.getFirstData('first-category-rarif');
+    isNetWorkError.value = false
+    const response= await getData('first-category-tarif')
+    if (response.error){
+        isNetWorkError.value=false;
+        toastr.error(response.error,'ERROR')
+    }else{
         selectedValue.value = response.data.category.id;
-    } catch (error) {
-
-        if (error.code) {
-            isNetWorkError.value = true
-            errorResp.value = error.message
-        }
-
+        isNetWorkError.value=false;
     }
 }
 //Select categori en change tab index 
@@ -173,47 +170,52 @@ const getSelectedIndex = async (index) => {
 }
 //Get tarifs by category index
 const getTarifs = async () => {
-    isNetWorkError.value = false;
-    try {
-        const response = await TarifApi.getData('/tarification?category_id=' + selectedIndex.value);
+    isNetWorkError.value = false
+    isLoadTarif.value=true
+    const response= await getData(`/tarification?category_id=${selectedIndex.value}`)
+    if (response.error){
+        isNetWorkError.value=false;
+        toastr.error(response.error,'ERROR')
+        isLoadTarif.value=false
+    }else{
         listTarifs.value = response.data.data;
-        
-    } catch (error) {
-        if (error.code) {
-            isNetWorkError.value = true
-            errorResp.value = error.message
-        }
+        isNetWorkError.value=false;
+        isLoadTarif.value=false
     }
 }
 //get Invoice par id route params 
-const getInvoice = async () => {
+const getInvoice = async (id) => {
+    isNetWorkError.value = false
     isDataLoanding.value = true;
-    isNetWorkError.value = false;
-    try {
-        const response = await TarifApi.getData(`/invoice-private/${idInvoice.value}`);
-        invoice.value = response.data.data;
+    const response= await getData(`/invoice-private/${id}`)
+    if (response.error){
+        isNetWorkError.value=false;
         isDataLoanding.value = false
-    } catch (error) {
+        toastr.error(response.error,'ERROR')
+    }else{
+        invoice.value = response.data.data;
+        isNetWorkError.value=false;
         isDataLoanding.value = false
     }
 }
 //Get item invoice
 const getItemInvoice = async () => {
-    try {
-        const response = await TarifApi.getData(`/items-invoices-private/${idInvoice.value}?currency=CDF`);
+    const response= await getData(`/items-invoices-private/${route.params.id}?currency=CDF`)
+    if (response.error){
+        toastr.error(response.error,'ERROR')
+        isLoadInvoice.value = false
+    }else{
         invoiceItems.value = response.data.items_invoice.data;
         amount.value = response.data.items_invoice.total_invoice
-        console.log(response.data)
-    } catch (error) {
-
+        consultation.value.amount=response.data.items_invoice.consultation.amount
+        consultation.value.name=response.data.items_invoice.consultation.name
+        isLoadInvoice.value = false
     }
 }
 onMounted(async () => {
     getCurrentCategory()
     getCategories();
     getTarifs()
-    idInvoice.value = route.params.id;
-    getInvoice()
-    getItemInvoice();
+    getInvoice(route.params.id)
 })
 </script>

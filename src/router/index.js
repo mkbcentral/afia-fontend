@@ -261,7 +261,7 @@ const router = createRouter({
     {
       path: '/finance/invoice/private',
       name: 'finance.invoice.private',
-      component: () => import('../views/invoices/privates/InvoicePruvateView.vue'),
+      component: () => import('../views/invoices/privates/InvoicePrivateView.vue'),
       meta: {
         requireAuth: true
       }

@@ -8,11 +8,11 @@ import RateApi from '../../../services/Admin/AdminApi.js'
 import NetworkError from '../../../components/errors/Network.vue';
 import Swal from 'sweetalert2'
 import ItemListRateWidget from './widgets/ItemListRateWidget.vue';
-import FormModal from '../../../components/from/modals/FormModal.vue';
-import FormGroup from '../../../components/from/FormGroup.vue';
-import FormLabel from '../../../components/from/FormLabel.vue';
-import ButtonLoanding from '../../../components/from/ButtonLoanding.vue';
-import ButtonIcon from '../../../components/from/ButtonIcon.vue';
+import FormModal from '../../../components/form/modals/FormModal.vue';
+import FormGroup from '../../../components/form/FormGroup.vue';
+import FormLabel from '../../../components/form/FormLabel.vue';
+import ButtonLoanding from '../../../components/form/ButtonLoanding.vue';
+import ButtonIcon from '../../../components/form/ButtonIcon.vue';
 import InvalidFeedback from '../../../components/errors/InvalidFeedback.vue';
 
 const listRates = ref([])

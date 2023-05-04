@@ -17,7 +17,7 @@
         </li>
       </ul>
       <li class="nav-item pl-4 d-none d-sm-inline-block">
-        <CurrentRateView/>
+      
       </li>
       <ul class="navbar-nav ml-auto">
        

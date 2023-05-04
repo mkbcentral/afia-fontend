@@ -9,6 +9,7 @@ import ConsultationApi from '../../../../services/Admin/AdminApi.js'
 import ApiPatient from '../../../../services/Patients/PatientApi.js'
 import { useToastr } from '../../../../../src/widgets/toastr.js'
 import { useRouter, useRoute } from 'vue-router'
+import { postData,updateData } from '../../../../stores/data/apiRequest';
 
 const router = useRouter()
 const route = useRoute()
@@ -41,59 +42,33 @@ const schema = yup.object({
 
 const create = async (values, actions) => {
     isLoanding.value = true;
-    try {
-        const response = await ApiPatient.createPatient(values, '/patient-private')
-        if (response.data.success) {
-            isLoanding.value = false;
-            toastr.success(response.data.message, 'Validation');
-            router.push('/reception/patient-private')
-        } else {
-            if (response.data.errors) {
-                errorResp.value = response.data.errors
-            } else {
-                errorResp.value = response.data.message
-            }
-            isLoanding.value = false
-            toastr.error(errorResp.value, 'Validation')
-        }
-    } catch (error) {
-        if (error.response.status == 422) {
-            isLoanding.value = false;
-            actions.setErrors(error.response.data.errors)
-        } else {
-            isLoanding.value = false
-            toastr.error(error.message, 'Validation')
-        }
+    const response= await postData(`patient-private`,values)
+    if (response.error){
+        toastr.error(response.error,'ERROR')
+        actions.setErrors(response.errors)
+        isLoanding.value = false
+    }else{
+        router.push('/reception/patient-private')
+        toastr.success(response.data.message,'INFO')
+        console.log(response.data)
+        isLoanding.value = false
     }
+    
 }
 
 const update = async (values, actions) => {
     isLoanding.value = true;
-    console.log(values)
-    try {
-        const response = await ApiPatient.updatePatient(route.params.id, values, '/patient-private/')
-        if (response.data.success) {
-            isLoanding.value = false;
-            toastr.info(response.data.message, 'Validation');
-            router.push('/reception/patient-private')
-        } else {
-            if (response.data.errors) {
-                errorResp.value = response.data.errors
-            } else {
-                errorResp.value = response.data.message
-            }
-            isLoanding.value = false
-            toastr.error(errorResp.value, 'Error')
-        }
-    } catch (error) {
-        if (error.response.status == 422) {
-            isLoanding.value = false;
-            actions.setErrors(error.response.data.errors)
-        } else {
-            isLoanding.value = false
-            toastr.error(error.message, 'Validation')
-        }
-    }
+    const response= await updateData(`patient-private/`,route.params.id,values)
+    if (response.error){
+        toastr.error(response.error,'ERROR')
+        actions.setErrors(response.errors)
+        isLoanding.value = false
+    }else{
+        router.push('/reception/patient-private')
+        toastr.success(response.data.message,'INFO')
+        console.log(response.data)
+        isLoanding.value = false
+    }  
 }
 
 const handlerSubmit = (values, actions) => {
@@ -156,13 +131,8 @@ onMounted(async () => {
         isEditing.value = true
         getPaptient()
     }
-
     await getCommunes()
     await getConsultations()
-    flatpickr(".flatpickr", {
-        enableTime: false,
-        dateFormat: "d/m/Y"
-    })
 })
 
 </script>
